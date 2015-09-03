@@ -1,4 +1,3 @@
-
 package com.elle.elle_gui.presentation;
 
 import com.elle.elle_gui.database.DBConnection;
@@ -9,6 +8,7 @@ import com.elle.elle_gui.logic.EditableTableModel;
 import com.elle.elle_gui.logic.ITableConstants;
 import com.elle.elle_gui.logic.TableFilter;
 import com.elle.elle_gui.logic.Validator;
+import com.mysql.fabric.xmlrpc.base.Data;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
@@ -27,10 +27,12 @@ import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.text.DateFormat;
+import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Vector;
 import javax.swing.JFrame;
@@ -45,52 +47,52 @@ import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.JTableHeader;
+import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 import javax.swing.text.AbstractDocument;
 
 /**
  * ELLE_GUI_Frame
+ *
  * @author Carlos Igreja
  * @since 8-14-2015
  * @version ELLE_GUI-0.6.9
  */
 public class ELLE_GUI_Frame extends JFrame implements ITableConstants {
-    
+
     // Edit the version and date it was created for new archives and jars
-    private final String CREATION_DATE = "2015-08-14";  
-    private final String VERSION = "0.6.9a";   
-    
+    private final String CREATION_DATE = "2015-08-14";
+    private final String VERSION = "0.6.9a";
+
     // attributes
-    private Map<String,Tab> tabs; // stores individual tab objects 
+    private Map<String, Tab> tabs; // stores individual tab objects 
     private static Statement statement;
     private String database;
     private String selectedTab;
-    
+
     // components
     private static ELLE_GUI_Frame instance;
     private LogWindow logWindow;
     private LoginWindow loginWindow;
-    
+
     // tables
     private JTable positions;
     private JTable trades;
     private JTable allocations;   // not implemented yet
-    
+
     // button colors
     private Color colorBtnDefault;
     private Color colorBtnSelected;
-    
 
     /**
-     * ELLE_GUI_Frame
-     * Creates the ELLE_GUI_Frame 
-     * which is the main window of the application
+     * ELLE_GUI_Frame Creates the ELLE_GUI_Frame which is the main window of the
+     * application
      */
     public ELLE_GUI_Frame() {
         initComponents();
         setDefaultCloseOperation(this.EXIT_ON_CLOSE);
         setTitle("Elle GUI");
-        
+
         // the statement is used for sql statements with the database connection
         // the statement is created in LoginWindow and passed to ELLE_GUI.
         statement = DBConnection.getStatement();
@@ -98,35 +100,35 @@ public class ELLE_GUI_Frame extends JFrame implements ITableConstants {
         instance = this;                         // this is used to call this instance of ELLE_GUI 
         colorBtnDefault = btnPositions.getBackground();
         colorBtnSelected = Color.RED;
-        
+
         // initialize tabs
         tabs = new HashMap();
-        
+
         // create tabName objects -> this has to be before initcomponents();
         tabs.put(POSITIONS_TABLE_NAME, new Tab());
         tabs.put(TRADES_TABLE_NAME, new Tab());
 //        tabs.put(ALLOCATIONS_TABLE_NAME, new Tab());
-        
+
         // initialize tables
         positions = new JTable();
         trades = new JTable();
         //allocations = new JTable();
-        
+
         // set table names 
         tabs.get(POSITIONS_TABLE_NAME).setTableName(POSITIONS_TABLE_NAME);
         tabs.get(TRADES_TABLE_NAME).setTableName(TRADES_TABLE_NAME);
 //        tabs.get(ALLOCATIONS_TABLE_NAME).setTableName(ALLOCATIONS_TABLE_NAME);
-        
+
         // set names to tables (this was in tabbedPanelChanged method)
         positions.setName(POSITIONS_TABLE_NAME);
         trades.setName(TRADES_TABLE_NAME);
         //allocations.setName(ALLOCATIONS_TABLE_NAME);
-        
+
         // set tables to tabName objects
         tabs.get(POSITIONS_TABLE_NAME).setTable(positions);
         tabs.get(TRADES_TABLE_NAME).setTable(trades);
         //tabs.get(ALLOCATIONS_TABLE_NAME).setTable(allocations);
-        
+
         // set array variable of stored column names of the tables
         // this is just to store and use the information
         // to actually change the table names it should be done
@@ -134,21 +136,20 @@ public class ELLE_GUI_Frame extends JFrame implements ITableConstants {
         tabs.get(POSITIONS_TABLE_NAME).setTableColNames(positions);
         tabs.get(TRADES_TABLE_NAME).setTableColNames(trades);
         //tabs.get(ALLOCATIONS_TABLE_NAME).setTableColNames(allocations);
-        
+
         // set column width percents to tables of the tabName objects
         tabs.get(POSITIONS_TABLE_NAME).setColWidthPercent(COL_WIDTH_PER_POSITIONS);
         tabs.get(TRADES_TABLE_NAME).setColWidthPercent(COL_WIDTH_PER_TRADES);
 //        tabs.get(ALLOCATIONS_TABLE_NAME).setColWidthPercent(COL_WIDTH_PER_ALLOCATIONS);
-        
+
         // this sets the KeyboardFocusManger
         //setKeyboardFocusManager();
-        
         // add filters for each table
         // must be before setting ColumnPopupMenu because this is its parameter
         tabs.get(POSITIONS_TABLE_NAME).setFilter(new TableFilter(positions));
         tabs.get(TRADES_TABLE_NAME).setFilter(new TableFilter(trades));
         //tabs.get(ALLOCATIONS_TABLE_NAME).setFilter(new TableFilter(allocations));
-        
+
         // initialize columnPopupMenu 
         // - must be before setTerminalFunctions is called
         // - because the mouslistener is added to the table header
@@ -158,19 +159,19 @@ public class ELLE_GUI_Frame extends JFrame implements ITableConstants {
                 .setColumnPopupMenu(new ColumnPopupMenu(tabs.get(TRADES_TABLE_NAME).getFilter()));
 //        tabs.get(ALLOCATIONS_TABLE_NAME)
 //                .setColumnPopupMenu(new ColumnPopupMenu(tabs.get(ALLOCATIONS_TABLE_NAME).getFilter()));
-        
-        // load data from database to tables
+
+        // load data 
         loadTables(tabs);
-            
+
         // set initial record counts of now full tables
         // this should only need to be called once at start up of Analyster.
         // total counts are removed or added in the Tab class
         initTotalRowCounts(tabs);
-        
+
         // hide sql panel by default
         panelSQL.setVisible(false);
         this.setSize(this.getWidth(), 493);
-        
+
         // add positions table to the panel (initial start up)
         setSelectedTab(POSITIONS_TABLE_NAME);
         JScrollPane scroll = new JScrollPane(positions);
@@ -180,11 +181,11 @@ public class ELLE_GUI_Frame extends JFrame implements ITableConstants {
         Tab tab = tabs.get(POSITIONS_TABLE_NAME);
         String recordsText = tab.getRecordsLabel();
         labelRecords.setText(recordsText);
-        
+
         // start table with positions button selected
         btnPositions.setBackground(colorBtnSelected);
         btnPositions.requestFocus();
-        
+
     }
 
     /**
@@ -698,7 +699,7 @@ public class ELLE_GUI_Frame extends JFrame implements ITableConstants {
         Tab tab = tabs.get(TRADES_TABLE_NAME);
         String recordsText = tab.getRecordsLabel();
         labelRecords.setText(recordsText);
-        
+
         // update button colors
         btnTrades.setBackground(colorBtnSelected);
         btnPositions.setBackground(colorBtnDefault);
@@ -755,7 +756,7 @@ public class ELLE_GUI_Frame extends JFrame implements ITableConstants {
         Tab tab = tabs.get(ALLOCATIONS_TABLE_NAME);
         String recordsText = tab.getRecordsLabel();
         labelRecords.setText(recordsText);
-        
+
     }//GEN-LAST:event_btnAllocationsActionPerformed
 
     private void menuItemPositionsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuItemPositionsActionPerformed
@@ -785,7 +786,7 @@ public class ELLE_GUI_Frame extends JFrame implements ITableConstants {
     private void btnSymbolActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSymbolActionPerformed
 
         applySymbolSearchFilter();
-        
+
     }//GEN-LAST:event_btnSymbolActionPerformed
 
     private void btnDateRangeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDateRangeActionPerformed
@@ -796,7 +797,7 @@ public class ELLE_GUI_Frame extends JFrame implements ITableConstants {
     /**
      * applyDateRangeFilter
      */
-    private void applyDateRangeFilter(){
+    private void applyDateRangeFilter() {
         String startDate = textFieldStartDate.getText();
         String endDate = textFieldEndDate.getText();
         String errorMsg = "Not a valid ";
@@ -804,12 +805,12 @@ public class ELLE_GUI_Frame extends JFrame implements ITableConstants {
         Component component = this;
         Date startDateRange = null;
         Date endDateRange = null;
-        
-        if(Validator.isValidDate(startDate)){
-            if(Validator.isValidDate(endDate)){
+
+        if (Validator.isValidDate(startDate)) {
+            if (Validator.isValidDate(endDate)) {
                 // parse the dates
                 SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
-                try{
+                try {
                     startDateRange = simpleDateFormat.parse(startDate);
                     endDateRange = simpleDateFormat.parse(endDate);
                     // execute filter
@@ -826,24 +827,21 @@ public class ELLE_GUI_Frame extends JFrame implements ITableConstants {
                     // update records label
                     String recordsLabelStr = tab.getRecordsLabel();
                     labelRecords.setText(recordsLabelStr);
-                }
-                catch(ParseException e){
+                } catch (ParseException e) {
                     e.printStackTrace();
                 }
-            }
-            else{
+            } else {
                 isError = true;
                 errorMsg += "end date range";
                 component = textFieldEndDate;
             }
-        }
-        else{
+        } else {
             isError = true;
             errorMsg += "start date range";
             component = textFieldStartDate;
         }
-        
-        if(isError){
+
+        if (isError) {
             errorMsg += "\nDate format not correct: YYYY-MM-DD";
             JOptionPane.showMessageDialog(component, errorMsg);
             checkBoxDateRange.setSelected(false);
@@ -852,22 +850,22 @@ public class ELLE_GUI_Frame extends JFrame implements ITableConstants {
     private void btnEnterSQLActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEnterSQLActionPerformed
 
         int commandStart = textAreaSQL.getText().lastIndexOf(">>") + 2;
-        String command = textAreaSQL.getText().substring(commandStart);  
-        if (command.toLowerCase().contains("select")){
-            
+        String command = textAreaSQL.getText().substring(commandStart);
+        if (command.toLowerCase().contains("select")) {
+
             // display on current showingtable
             String tabName = getSelectedTabName();
             Tab tab = tabs.get(tabName);
             JTable table = tab.getTable();
-            
+
             loadTable(command, table);
         } else {
             try {
-                    statement.executeUpdate(command);
+                statement.executeUpdate(command);
             } catch (SQLException e) {
-                    JOptionPane.showMessageDialog(null, e.getMessage());
+                JOptionPane.showMessageDialog(null, e.getMessage());
             } catch (Exception e) {
-                    JOptionPane.showMessageDialog(null, e.getMessage());
+                JOptionPane.showMessageDialog(null, e.getMessage());
             }
         }
     }//GEN-LAST:event_btnEnterSQLActionPerformed
@@ -887,10 +885,9 @@ public class ELLE_GUI_Frame extends JFrame implements ITableConstants {
 
     private void checkBoxDateRangeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_checkBoxDateRangeActionPerformed
 
-        if(checkBoxDateRange.isSelected()){
+        if (checkBoxDateRange.isSelected()) {
             applyDateRangeFilter();
-        }
-        else{
+        } else {
             String tabName = getSelectedTabName();
             Tab tab = tabs.get(tabName);
             TableFilter filter = tab.getFilter();
@@ -901,17 +898,16 @@ public class ELLE_GUI_Frame extends JFrame implements ITableConstants {
             String recordsLabelStr = tab.getRecordsLabel();
             labelRecords.setText(recordsLabelStr);
             // apply checkbox selection
-            boolean isFiltering =filter.isDateRangeFiltering();
+            boolean isFiltering = filter.isDateRangeFiltering();
             checkBoxDateRange.setSelected(isFiltering);
         }
     }//GEN-LAST:event_checkBoxDateRangeActionPerformed
 
     private void checkBoxSymbolActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_checkBoxSymbolActionPerformed
 
-        if(checkBoxSymbol.isSelected()){
+        if (checkBoxSymbol.isSelected()) {
             applySymbolSearchFilter();
-        }
-        else{
+        } else {
             String tabName = getSelectedTabName();
             Tab tab = tabs.get(tabName);
             TableFilter filter = tab.getFilter();
@@ -937,14 +933,14 @@ public class ELLE_GUI_Frame extends JFrame implements ITableConstants {
         filter.clearAllFilters();
         filter.applyFilter();
         filter.applyColorHeaders();
-        
+
         // apply checkbox selection
-        boolean isFiltering =filter.isDateRangeFiltering();
+        boolean isFiltering = filter.isDateRangeFiltering();
         checkBoxDateRange.setSelected(isFiltering);
 
         // set label record information
         String recordsLabel = tab.getRecordsLabel();
-        labelRecords.setText(recordsLabel); 
+        labelRecords.setText(recordsLabel);
     }//GEN-LAST:event_btnClearAllFiltersActionPerformed
 
     private void menuItemShowMatchesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuItemShowMatchesActionPerformed
@@ -960,7 +956,7 @@ public class ELLE_GUI_Frame extends JFrame implements ITableConstants {
     }//GEN-LAST:event_menuItemTL8949ActionPerformed
 
     private void btnPositionsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnPositionsActionPerformed
-        
+
         // add positions table to the panel 
         setSelectedTab(POSITIONS_TABLE_NAME);
         JScrollPane scroll = new JScrollPane(positions);
@@ -970,7 +966,7 @@ public class ELLE_GUI_Frame extends JFrame implements ITableConstants {
         Tab tab = tabs.get(POSITIONS_TABLE_NAME);
         String recordsText = tab.getRecordsLabel();
         labelRecords.setText(recordsText);
-        
+
         // update button colors
         btnPositions.setBackground(colorBtnSelected);
         btnTrades.setBackground(colorBtnDefault);
@@ -978,31 +974,30 @@ public class ELLE_GUI_Frame extends JFrame implements ITableConstants {
 
     private void menuItemCheckBoxSQLActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuItemCheckBoxSQLActionPerformed
         /**
-         * ************* Strange behavior *************************
-         * The jPanelSQL.getHeight() is the height before 
-         * the jCheckBoxMenuItemViewSQLActionPerformed method was called.
-         * 
-         * The jPanelSQL.setVisible() does not change the size 
-         * of the sql panel after it is executed.
-         * 
-         * The jPanel size will only change after 
-         * the jCheckBoxMenuItemViewSQLActionPerformed is finished.
-         * 
-         * That is why the the actual integer is used rather than  getHeight().
-         * 
-         * Example:
-         * jPanelSQL.setVisible(true);
-         * jPanelSQL.getHeight(); // this returns 0
+         * ************* Strange behavior ************************* The
+         * jPanelSQL.getHeight() is the height before the
+         * jCheckBoxMenuItemViewSQLActionPerformed method was called.
+         *
+         * The jPanelSQL.setVisible() does not change the size of the sql panel
+         * after it is executed.
+         *
+         * The jPanel size will only change after the
+         * jCheckBoxMenuItemViewSQLActionPerformed is finished.
+         *
+         * That is why the the actual integer is used rather than getHeight().
+         *
+         * Example: jPanelSQL.setVisible(true); jPanelSQL.getHeight(); // this
+         * returns 0
          */
-        
-        if(menuItemCheckBoxSQL.isSelected()){
-            
+
+        if (menuItemCheckBoxSQL.isSelected()) {
+
             // show sql panel
             panelSQL.setVisible(true);
-            this.setSize(this.getWidth(), 493 + 128); 
-            
-        }else{
-            
+            this.setSize(this.getWidth(), 493 + 128);
+
+        } else {
+
             // hide sql panel
             panelSQL.setVisible(false);
             this.setSize(this.getWidth(), 493);
@@ -1010,45 +1005,44 @@ public class ELLE_GUI_Frame extends JFrame implements ITableConstants {
     }//GEN-LAST:event_menuItemCheckBoxSQLActionPerformed
 
     private void menuItemCheckBoxLogActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuItemCheckBoxLogActionPerformed
-        if(menuItemCheckBoxLog.isSelected()){
-            
+        if (menuItemCheckBoxLog.isSelected()) {
+
             logWindow.setLocationRelativeTo(this);
             logWindow.setVisible(true); // show log window
-            
+
             // remove check if window is closed from the window
             logWindow.addWindowListener(new WindowAdapter() {
-                    @Override
-                    public void windowClosing(WindowEvent e){
-                        menuItemCheckBoxLog.setSelected(false);
-                    }
-                });
-        }else{
+                @Override
+                public void windowClosing(WindowEvent e) {
+                    menuItemCheckBoxLog.setSelected(false);
+                }
+            });
+        } else {
             // hide log window
             logWindow.setVisible(false);
         }
     }//GEN-LAST:event_menuItemCheckBoxLogActionPerformed
 
-    
     /**
-     * initTotalRowCounts
-  called once to initialize the total rowIndex counts of each tabs table
+     * initTotalRowCounts called once to initialize the total rowIndex counts of
+     * each tabs table
+     *
      * @param tabs
-     * @return 
+     * @return
      */
-    public Map<String,Tab> initTotalRowCounts(Map<String,Tab> tabs) {
-        
+    public Map<String, Tab> initTotalRowCounts(Map<String, Tab> tabs) {
+
         int totalRecords;
- 
+
         boolean isFirstTabRecordLabelSet = false;
-        
-        for (Map.Entry<String, Tab> entry : tabs.entrySet())
-        {
+
+        for (Map.Entry<String, Tab> entry : tabs.entrySet()) {
             Tab tab = tabs.get(entry.getKey());
             JTable table = tab.getTable();
             totalRecords = table.getRowCount();
             tab.setTotalRecords(totalRecords);
-            
-            if(isFirstTabRecordLabelSet == false){
+
+            if (isFirstTabRecordLabelSet == false) {
                 String recordsLabel = tab.getRecordsLabel();
                 labelRecords.setText(recordsLabel);
                 isFirstTabRecordLabelSet = true; // now its set
@@ -1057,44 +1051,205 @@ public class ELLE_GUI_Frame extends JFrame implements ITableConstants {
 
         return tabs;
     }
-    
-    
+
     /**
-     * loadTables
-     * This method takes a tabs Map and loads all the tabs/tables
+     * loadTables This method takes a tabs Map and loads all the tabs/tables
+     *
      * @param tabs
-     * @return 
+     * @return
      */
-    public Map<String,Tab> loadTables(Map<String,Tab> tabs) {
-        
-        for (Map.Entry<String, Tab> entry : tabs.entrySet())
-        {
+    public Map<String, Tab> loadTables(Map<String, Tab> tabs) {
+
+        for (Map.Entry<String, Tab> entry : tabs.entrySet()) {
             Tab tab = tabs.get(entry.getKey());
             JTable table = tab.getTable();
             loadTable(table);
             setTableListeners(table);
         }
-        
+
         return tabs;
     }
-    
+
     /**
-    * loadTable
-    * This method takes a table and loads it
-    * Does not need to pass the table back since it is passed by reference
-    * However, it can make the code clearer and it's good practice to return
-    * @param table 
-    */
+     * loadTable This method takes a table and loads it Does not need to pass
+     * the table back since it is passed by reference However, it can make the
+     * code clearer and it's good practice to return
+     *
+     * @param table
+     */
     public JTable loadTable(JTable table) {
-        
+
         String sql = "SELECT * FROM " + table.getName() + " ORDER BY symbol ASC";
+
         loadTable(sql, table);
-        
+
+        formatTable(table);  // set cells' alignment and format
+
         return table;
     }
-    
-    public JTable loadTable(String sql, JTable table) {
+
+    private void formatTable(JTable table) {
+
+        tableHeaderRenderer(table); // Make table headers align CENTER
+
+        tableCellAlignment(table);   // Make table cells align CENTER
+
+        tableCellDecimalFormat(table); // Make table cells have four decimals
         
+        tableTimeCellFormat(table); // Make the table cells which shows time have
+        
+                                    // "yyyy-mm-dd hh:mm:ss" format
+        
+        //rename selected columns
+        
+        for (int i = 0; i<table.getColumnCount(); i++){
+            if(table.getColumnName(i).equalsIgnoreCase("wash")){
+                table.getTableHeader().getColumnModel().getColumn(i).setHeaderValue("W");
+            }
+        }
+
+    }
+
+    private void tableHeaderRenderer(JTable table) {
+
+        JTableHeader header = table.getTableHeader();
+        header.setDefaultRenderer(new HeaderRenderer(table));
+
+    }
+
+    private void tableCellDecimalFormat(JTable table) {
+        for (int i = 0; i < table.getColumnCount(); i++) {
+
+            TableColumn tableColumnI = table.getColumnModel().getColumn(i);
+
+            if (table.getColumnName(i).toLowerCase().equals("price")
+                    || table.getColumnName(i).toLowerCase().equals("adj_price")) {
+
+                tableColumnI.setCellRenderer(new DecimalFormatRenderer());
+
+            }
+        }
+    }
+
+    private void tableCellAlignment(JTable table) {
+
+        for (int i = 0; i < table.getColumnCount(); i++) {
+
+            TableColumn tableColumnI = table.getColumnModel().getColumn(i);
+
+            DefaultTableCellRenderer renderer = new DefaultTableCellRenderer();
+
+            if (table.getColumnName(i).toLowerCase().equals("price")
+                    || table.getColumnName(i).toLowerCase().equals("adj_price")
+                    || table.getColumnName(i).toLowerCase().equals("q")
+                    || table.getColumnName(i).toLowerCase().equals("basis")
+                    || table.getColumnName(i).toLowerCase().equals("strike")
+                    || table.getColumnName(i).toLowerCase().equals("qori")
+                    || table.getColumnName(i).toLowerCase().equals("adj_basis")
+                    || table.getColumnName(i).toLowerCase().equals("totalq")
+                    || table.getColumnName(i).toLowerCase().equals("realized_pl")) {
+
+                renderer.setHorizontalAlignment(SwingConstants.RIGHT);
+
+            } else {
+
+                renderer.setHorizontalAlignment(SwingConstants.CENTER);
+
+            }
+
+            tableColumnI.setCellRenderer(renderer);
+
+        }
+    }
+
+    private void tableTimeCellFormat(JTable table) {
+        for (int i = 0; i < table.getColumnCount(); i++) {
+            
+            TableColumn tableColumnI = table.getColumnModel().getColumn(i);
+            
+            if (table.getColumnName(i).toLowerCase().contains("time")) {
+                
+                tableColumnI.setCellRenderer(new DataRenderer());
+            }
+        }
+    }
+    
+    private static class DataRenderer extends DefaultTableCellRenderer {
+        
+        private SimpleDateFormat dateFormatNewValue = 
+                new SimpleDateFormat("yyyy-mm-dd hh:mm:ss");
+        private String valueToString;
+        
+        public DataRenderer() {
+            super();
+            setHorizontalAlignment(JLabel.CENTER);
+        }
+        
+        @Override
+        public Component getTableCellRendererComponent(
+                JTable table, Object value, boolean isSelected,
+                boolean hasFocus, int row, int col) {
+            
+            if(value !=null){
+                valueToString = dateFormatNewValue.format(value);
+                value = valueToString;
+            }
+            
+            return super.getTableCellRendererComponent(table,
+                    value, isSelected, hasFocus, row, col);
+            
+        }
+        
+    }
+
+    private static class HeaderRenderer implements TableCellRenderer {
+
+        DefaultTableCellRenderer renderer;
+
+        public HeaderRenderer(JTable table) {
+            renderer = (DefaultTableCellRenderer) table.getTableHeader().getDefaultRenderer();
+            renderer.setHorizontalAlignment(JLabel.CENTER);
+        }
+
+        @Override
+        public Component getTableCellRendererComponent(
+                JTable table, Object value, boolean isSelected,
+                boolean hasFocus, int row, int col) {
+            return renderer.getTableCellRendererComponent(
+                    table, value, isSelected, hasFocus, row, col);
+        }
+
+    }
+
+    private static class DecimalFormatRenderer extends DefaultTableCellRenderer {
+
+        private static final DecimalFormat formatter = new DecimalFormat("#.0000");
+
+        public DecimalFormatRenderer() {
+            super();
+            setHorizontalAlignment(JLabel.RIGHT);
+        }
+
+        @Override
+        public Component getTableCellRendererComponent(
+                JTable table, Object value, boolean isSelected,
+                boolean hasFocus, int row, int col) {
+
+            Double doubleValue = 0.0;
+
+            if (value != null) {
+                doubleValue = Double.parseDouble(value.toString());
+                value = formatter.format((Number) doubleValue);
+            }
+
+            return super.getTableCellRendererComponent(table,
+                    value, isSelected, hasFocus, row, col);
+        }
+          
+    }
+
+    public JTable loadTable(String sql, JTable table) {
+
         Vector data = new Vector();
         Vector columnNames = new Vector();
         int columns;
@@ -1126,96 +1281,98 @@ public class ELLE_GUI_Frame extends JFrame implements ITableConstants {
             System.out.println("SQL Error:");
             ex.printStackTrace();
         }
-        
+
         EditableTableModel model = new EditableTableModel(data, columnNames);
 
         // this has to be set here or else I get errors
         // I tried passing the model to the filter and setting it there
         // but it caused errors
         table.setModel(model);
-        
+
         // check that the filter items are initialized
         String tabName = table.getName();
         Tab tab = tabs.get(tabName);
-        
+
         // apply filter
         TableFilter filter = tab.getFilter();
-        if(filter.getFilterItems() == null){
+        if (filter.getFilterItems() == null) {
             filter.initFilterItems();
         }
         filter.applyFilter();
         filter.applyColorHeaders();
-        
+
         // load all checkbox items for the checkbox column pop up filter
         ColumnPopupMenu columnPopupMenu = tab.getColumnPopupMenu();
         columnPopupMenu.loadAllCheckBoxItems();
-        
+
         // set column format
         float[] colWidthPercent = tab.getColWidthPercent();
         setColumnFormat(colWidthPercent, table);
-        
+
         // set the listeners for the table
         setTableListeners(table);
-        
+
         System.out.println("Table loaded succesfully");
-        
+
         return table;
     }
-    
+
     /**
-     * setTableListeners
-     * This adds mouselisteners and keylisteners to tables.
-     * @param table 
+     * setTableListeners This adds mouselisteners and keylisteners to tables.
+     *
+     * @param table
      */
-    public void setTableListeners(final JTable table) { 
-        
+    public void setTableListeners(final JTable table) {
+
         // this adds a mouselistener to the table header
         JTableHeader header = table.getTableHeader();
         if (header != null) {
             header.addMouseListener(new MouseAdapter() {
                 @Override
                 public void mouseClicked(MouseEvent e) {
-                    
+
                     if (e.getClickCount() == 2) {
                         clearFilterDoubleClick(e, table);
-                    } 
+                    }
                 }
-                
+
                 /**
                  * Popup menus are triggered differently on different platforms
-                 * Therefore, isPopupTrigger should be checked in both 
-                 * mousePressed and mouseReleased events for proper 
+                 * Therefore, isPopupTrigger should be checked in both
+                 * mousePressed and mouseReleased events for proper
                  * cross-platform functionality.
-                 * @param e 
+                 *
+                 * @param e
                  */
                 @Override
                 public void mousePressed(MouseEvent e) {
                     if (e.isPopupTrigger()) {
                         // this calls the column popup menu
-                        tabs.get(table.getName()) 
+                        tabs.get(table.getName())
                                 .getColumnPopupMenu().showPopupMenu(e);
                     }
                 }
+
                 @Override
                 public void mouseReleased(MouseEvent e) {
                     if (e.isPopupTrigger()) {
                         // this calls the column popup menu
-                        tabs.get(table.getName()) 
+                        tabs.get(table.getName())
                                 .getColumnPopupMenu().showPopupMenu(e);
                     }
                 }
             });
         }
-        
+
         // add mouselistener to the table
         table.addMouseListener(
                 new MouseAdapter() {
                     @Override
                     public void mouseClicked(MouseEvent e) {
-                        
+
                         // if left mouse clicks
-                        if(SwingUtilities.isLeftMouseButton(e)){
-                            if (e.getClickCount() == 2 ) {
+                        if (SwingUtilities.isLeftMouseButton(e)) {
+                            if (e.getClickCount() == 2) {
                                 filterByDoubleClick(table);
                             } else if (e.getClickCount() == 1) {
 //                                if (jLabelEdit.getText().equals("ON ")) {
@@ -1223,29 +1380,27 @@ public class ELLE_GUI_Frame extends JFrame implements ITableConstants {
 //                                }
                             }
                         } // end if left mouse clicks
-                        
                         // if right mouse clicks
-                        else if(SwingUtilities.isRightMouseButton(e)){
-                            if (e.getClickCount() == 2 ) {
-                                
+                        else if (SwingUtilities.isRightMouseButton(e)) {
+                            if (e.getClickCount() == 2) {
+
                                 // make table editable
                                 //makeTableEditable(true);
-                                
                                 // get selected cell
                                 int columnIndex = table.columnAtPoint(e.getPoint()); // this returns the column index
                                 int rowIndex = table.rowAtPoint(e.getPoint()); // this returns the rowIndex index
                                 if (rowIndex != -1 && columnIndex != -1) {
-                                    
+
                                     // make it the active editing cell
                                     table.changeSelection(rowIndex, columnIndex, false, false);
-                                    
+
                                     selectAllText(e);
 
                                 } // end not null condition
-                                
+
                             } // end if 2 clicks 
                         } // end if right mouse clicks
-                        
+
                     }// end mouseClicked
 
                     private void selectAllText(MouseEvent e) {// Select all text inside jTextField
@@ -1266,7 +1421,7 @@ public class ELLE_GUI_Frame extends JFrame implements ITableConstants {
                     }
                 }
         );
-        
+
         // add table model listener
         table.getModel().addTableModelListener(new TableModelListener() {  // add table model listener every time the table model reloaded
             @Override
@@ -1297,44 +1452,44 @@ public class ELLE_GUI_Frame extends JFrame implements ITableConstants {
 //                }
             }
         });
-        
+
         // add keyListener to the table
         table.addKeyListener(new KeyAdapter() {
             @Override
             public void keyReleased(KeyEvent ke) {
                 if (ke.getKeyCode() == KeyEvent.VK_F2) {
-                    
+
                     // I believe this is meant to toggle edit mode
                     // so I passed the conditional
                     //makeTableEditable(jLabelEdit.getText().equals("ON ")?false:true);
-                } 
+                }
             }
         });
     }
-    
+
     /**
-     * setTableListeners
-     * This method overloads the seTerminalFunctions 
-     * to take tabs instead of a single table
+     * setTableListeners This method overloads the seTerminalFunctions to take
+     * tabs instead of a single table
+     *
      * @param tabs
-     * @return 
+     * @return
      */
-    public Map<String,Tab> setTableListeners(Map<String,Tab> tabs) {
-        
-        for (Map.Entry<String, Tab> entry : tabs.entrySet())
-        {
+    public Map<String, Tab> setTableListeners(Map<String, Tab> tabs) {
+
+        for (Map.Entry<String, Tab> entry : tabs.entrySet()) {
             setTableListeners(tabs.get(entry.getKey()).getTable());
         }
         return tabs;
     }
-    
+
     /**
-     * filterByDoubleClick
-     * this selects the item double clicked on to be filtered
-     * @param table 
+     * filterByDoubleClick this selects the item double clicked on to be
+     * filtered
+     *
+     * @param table
      */
     public void filterByDoubleClick(JTable table) {
-        
+
         int columnIndex = table.getSelectedColumn(); // this returns the column index
         int rowIndex = table.getSelectedRow(); // this returns the rowIndex index
         if (rowIndex != -1) {
@@ -1346,11 +1501,11 @@ public class ELLE_GUI_Frame extends JFrame implements ITableConstants {
             filter.addFilterItem(columnIndex, selectedField);
             filter.applyFilter();
             String recordsLabel = tab.getRecordsLabel();
-            labelRecords.setText(recordsLabel); 
-            
+            labelRecords.setText(recordsLabel);
+
             // apply checkbox selection
             int dateColIndex = filter.getDateColumnIndex();
-            if(columnIndex == dateColIndex){
+            if (columnIndex == dateColIndex) {
                 // this is no longer using a date range filter if applicable
                 checkBoxDateRange.setSelected(false);
             }
@@ -1358,65 +1513,62 @@ public class ELLE_GUI_Frame extends JFrame implements ITableConstants {
     }
 
     /**
-     * clearFilterDoubleClick
-     * This clears the filters for that column by double clicking on that 
-     * column header.
+     * clearFilterDoubleClick This clears the filters for that column by double
+     * clicking on that column header.
      */
     private void clearFilterDoubleClick(MouseEvent e, JTable table) {
-        
+
         int columnIndex = table.getColumnModel().getColumnIndexAtX(e.getX());
         //String tabName = getSelectedTabName();
         String tabName = getSelectedTabName(); //testing
         Tab tab = tabs.get(tabName);
         TableFilter filter = tab.getFilter();
-        
+
         // clear column filter
         int symbolColumnIndex = filter.getSymbolColumnIndex();
-        if(columnIndex == symbolColumnIndex){
+        if (columnIndex == symbolColumnIndex) {
             int underlyingColumnIndex = filter.getUnderlyingColumnIndex();
             filter.clearColFilter(underlyingColumnIndex);
             filter.removeColorHeader(symbolColumnIndex);
             checkBoxSymbol.setSelected(false);
-        }
-        else{
+        } else {
             filter.clearColFilter(columnIndex);
         }
         filter.applyFilter();
-        
+
         // update records label
         String recordsLabel = tab.getRecordsLabel();
-        labelRecords.setText(recordsLabel);  
+        labelRecords.setText(recordsLabel);
     }
-    
+
     /**
-     * setColumnFormat
-     * sets column format for each table
+     * setColumnFormat sets column format for each table
+     *
      * @param width
-     * @param table 
+     * @param table
      */
     public void setColumnFormat(float[] colWidths, JTable table) {
 
         // this is needed for the horizontal scrollbar to appear
         table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
-        
-        for(int index = 0; index < table.getColumnCount(); index++){
-            int colWidth = (int)colWidths[index];
+
+        for (int index = 0; index < table.getColumnCount(); index++) {
+            int colWidth = (int) colWidths[index];
             TableColumn column = table.getColumnModel().getColumn(index);
             column.setPreferredWidth(colWidth);
             column.setMinWidth(colWidth);
         }
     }
-    
+
     /**
-     * applySymbolSearchFilter
-     * apply symbol search filter.
+     * applySymbolSearchFilter apply symbol search filter.
      */
     private void applySymbolSearchFilter() {
-        
+
         // get selected tab
         String tabName = getSelectedTabName();
         Tab tab = tabs.get(tabName);
- 
+
         // apply filter for the symbol
         String filterItem = textFieldSymbol.getText();
         TableFilter filter = tab.getFilter();
@@ -1426,18 +1578,19 @@ public class ELLE_GUI_Frame extends JFrame implements ITableConstants {
         filter.applyFilter();
         int colIndexSymbol = filter.getSymbolColumnIndex();  // symbol column index
         filter.addColorHeader(colIndexSymbol);
-        
+
         checkBoxSymbol.setSelected(true);
-        
+
         // update records label
         String recordsLabel = tab.getRecordsLabel();
-        labelRecords.setText(recordsLabel);  
+        labelRecords.setText(recordsLabel);
     }
-    
-    /**************************************************************************
+
+    /**
+     * ************************************************************************
      ******************* SETTERS AND GETTERS **********************************
-     **************************************************************************/
-    
+     * ************************************************************************
+     */
     public Map<String, Tab> getTabs() {
         return tabs;
     }
@@ -1501,8 +1654,6 @@ public class ELLE_GUI_Frame extends JFrame implements ITableConstants {
     public void setSelectedTab(String selectedTab) {
         this.selectedTab = selectedTab;
     }
-    
-    
 
     @SuppressWarnings("unused")
     // Variables declaration - do not modify//GEN-BEGIN:variables

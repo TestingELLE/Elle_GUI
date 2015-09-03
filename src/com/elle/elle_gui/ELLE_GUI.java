@@ -54,7 +54,7 @@ public class ELLE_GUI {
                 loginWindow.setVisible(true);
                 
                 // debugging
-                loginWindow.dispose();
+                //loginWindow.dispose();
             }
         });
     }

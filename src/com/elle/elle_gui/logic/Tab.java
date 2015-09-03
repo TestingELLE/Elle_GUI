@@ -145,6 +145,11 @@ public class Tab implements ITableConstants{
         this.tableColNames = tableColNames;
     }
     
+    public void setTableParticularColName(int col, String str){
+        System.out.println(tableColNames.length);
+        tableColNames[col]= str;
+    }
+    
     public void setTableColNames(JTable table) {
         tableColNames = new String[table.getColumnCount()];
         for (int i = 0; i < table.getColumnCount(); i++) 
@@ -204,7 +209,7 @@ public class Tab implements ITableConstants{
     public void subtractFromTotalRowCount(int amountOfRecordsDeleted) {
         totalRecords = totalRecords - amountOfRecordsDeleted;
     }
-    
+       
     /**
      * This method subtracts an amount from the totalRecords value
      * This is used when records are deleted to update the totalRecords value
@@ -263,5 +268,5 @@ public class Tab implements ITableConstants{
 
         return output;
     }
-    
+
 }// end Tab
