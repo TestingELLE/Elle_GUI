@@ -12,6 +12,7 @@ import com.mysql.fabric.xmlrpc.base.Data;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics2D;
@@ -174,7 +175,11 @@ public class ELLE_GUI_Frame extends JFrame implements ITableConstants {
 
         // add positions table to the panel (initial start up)
         setSelectedTab(POSITIONS_TABLE_NAME);
-        JScrollPane scroll = new JScrollPane(positions);
+        JScrollPane scroll = new JScrollPane();
+        scroll.setViewportView(positions);
+        scroll.setPreferredSize(new Dimension(924, 900));
+        positions.setPreferredSize(new Dimension(2000, 2000));
+        
         panelShowTables.removeAll();
         panelShowTables.setLayout(new BorderLayout());
         panelShowTables.add(scroll, BorderLayout.CENTER);
@@ -693,6 +698,10 @@ public class ELLE_GUI_Frame extends JFrame implements ITableConstants {
         // add Trades table to the panel 
         setSelectedTab(TRADES_TABLE_NAME);
         JScrollPane scroll = new JScrollPane(trades);
+        scroll.setViewportView(positions);
+        scroll.setPreferredSize(new Dimension(924, 900));
+        positions.setPreferredSize(new Dimension(2000, 2000));
+        
         panelShowTables.removeAll();
         panelShowTables.setLayout(new BorderLayout());
         panelShowTables.add(scroll, BorderLayout.CENTER);
@@ -750,6 +759,9 @@ public class ELLE_GUI_Frame extends JFrame implements ITableConstants {
         // add allocations table to the panel 
         setSelectedTab(ALLOCATIONS_TABLE_NAME);
         JScrollPane scroll = new JScrollPane(allocations);
+        scroll.setViewportView(positions);
+        scroll.setPreferredSize(new Dimension(924, 900));
+        positions.setPreferredSize(new Dimension(2000, 2000));
         panelShowTables.removeAll();
         panelShowTables.setLayout(new BorderLayout());
         panelShowTables.add(scroll, BorderLayout.CENTER);
@@ -959,7 +971,13 @@ public class ELLE_GUI_Frame extends JFrame implements ITableConstants {
 
         // add positions table to the panel 
         setSelectedTab(POSITIONS_TABLE_NAME);
+        
         JScrollPane scroll = new JScrollPane(positions);
+        
+        scroll.setViewportView(positions);
+        scroll.setPreferredSize(new Dimension(924, 900));
+        positions.setPreferredSize(new Dimension(2000, 2000));
+        
         panelShowTables.removeAll();
         panelShowTables.setLayout(new BorderLayout());
         panelShowTables.add(scroll, BorderLayout.CENTER);
