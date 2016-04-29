@@ -44,6 +44,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Vector;
 import javax.swing.BorderFactory;
@@ -63,6 +64,7 @@ import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.JTableHeader;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
+import javax.swing.table.TableModel;
 import javax.swing.text.AbstractDocument;
 
 /**
@@ -1330,42 +1332,33 @@ public class ELLE_GUI_Frame extends JFrame implements ITableConstants {
         
         AccountTable selectedTab = getSelectedTab();
         JTable selectedTable = selectedTab.getTable();
-        
+        TableModel model = selectedTable.getModel();
+
         if (userSelection == JFileChooser.APPROVE_OPTION) {
-            String csvData = "" + "\n\n";
-
-            for (int i = 0; i < selectedTable.getModel().getRowCount(); i++) {
-                for (int x = 0; x < selectedTable.getModel().getColumnCount(); x++) {
-                    int col = selectedTable.convertColumnIndexToView(x);
-                    String curVal = (String) selectedTable.getModel().getValueAt(i, col);
-                    System.out.println(curVal);
-                    
-                    if (curVal == null) {
-                        curVal = "";
-                    }
-
-                    csvData = csvData + removeAnyCommas(curVal) + ",";
-                    boolean isDefault = true;
-
-                    if (isDefault) {
-                        if (x == selectedTable.getModel().getColumnCount() - 3) {
-                            csvData = csvData + "\n";
-                            continue;
-                        }
-                    } else if (x == selectedTable.getModel().getColumnCount() - 1) {
-                        csvData = csvData + "\n";
-                    }
-                }
-            }
-
             try {
                 FileWriter writer = new FileWriter(fileChooser.getSelectedFile() + ".csv");
-                writer.write(csvData);
-                writer.flush();
-                writer.close();
 
-                writer = null;
-                csvData = null;
+                for (int i = 0; i < model.getColumnCount(); i++) {
+                    if (model.getColumnName(i) == null) {
+                        writer.write("" + ",");
+                    } else {
+                        writer.write(model.getColumnName(i) + ",");
+                    }
+                }
+                
+                writer.write("\n");
+                
+                for (int i = 0; i < model.getRowCount(); i++) {
+                    for (int j = 0; j < model.getColumnCount(); j++) {
+                        if (model.getValueAt(i, j) == null) {
+                            writer.write("" + ",");
+                        } else {
+                            writer.write(model.getValueAt(i, j).toString() + ",");
+                        }
+                    }
+                    writer.write("\n");
+                }
+                writer.close();
             } catch (IOException ioe) {
                 JOptionPane.showMessageDialog(selectedTable, "Error Writing File.\nFile may be in use by another application."
                         + "\nCheck and try re-exporting", "Export Error", JOptionPane.ERROR_MESSAGE);
@@ -2104,6 +2097,15 @@ public class ELLE_GUI_Frame extends JFrame implements ITableConstants {
         }
         
         String tablename = sql.substring(14);
+        /*
+        Object[][] objectdata = new Object[data.size()][0];
+        for (int i = 0; i < objectdata.length; i++) {
+            objectdata[i] = ((Vector) data.get(i)).toArray();
+        }
+        
+        String[] stringcolumnNames = (String[]) columnNames.toArray(new String[columnNames.size()]);
+        
+        */
         read_csv readcsvfiles = new read_csv(data, columnNames);
         readcsvfiles.setTitle(tablename);
         readcsvfiles.setVisible(true);
