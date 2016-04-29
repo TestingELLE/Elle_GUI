@@ -28,36 +28,30 @@ public class read_csv extends javax.swing.JFrame {
 
     read_csv(Object[][] data, String[] columnNames) {
         DefaultTableModel model = new DefaultTableModel(data, columnNames);
-        JTable table = new JTable( model )
-        {
+        JTable table = new JTable(model);
 
-            @Override
-            public Class getColumnClass(int column)
-            {
-                return getValueAt(0, column).getClass();
-            }
-        };
         table.setPreferredScrollableViewportSize(table.getPreferredSize());
 
-        JScrollPane scrollPane = new JScrollPane( table );
-        getContentPane().add( scrollPane );
-        
+        JScrollPane scrollPane = new JScrollPane(table);
+        getContentPane().add(scrollPane);
+
         table.setFillsViewportHeight(true);
         pack();
     }
-    
-        read_csv(Vector data, Vector columnNames) {
+
+    read_csv(Vector data, Vector columnNames) {
         DefaultTableModel model = new DefaultTableModel(data, columnNames);
-        JTable table = new JTable( model );
+        JTable table = new JTable(model);
 
         table.setPreferredScrollableViewportSize(table.getPreferredSize());
 
-        JScrollPane scrollPane = new JScrollPane( table );
-        getContentPane().add( scrollPane );
-        
+        JScrollPane scrollPane = new JScrollPane(table);
+        getContentPane().add(scrollPane);
+
         table.setFillsViewportHeight(true);
         pack();
     }
+
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -89,5 +83,4 @@ public class read_csv extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     // End of variables declaration//GEN-END:variables
-
 }
