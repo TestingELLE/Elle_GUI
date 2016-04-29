@@ -5,6 +5,7 @@
  */
 package com.elle.elle_gui.presentation;
 
+import java.awt.Component;
 import java.util.Arrays;
 import java.util.Vector;
 import javax.swing.JScrollPane;
@@ -30,6 +31,7 @@ public class read_csv extends javax.swing.JFrame {
         JTable table = new JTable( model )
         {
 
+            @Override
             public Class getColumnClass(int column)
             {
                 return getValueAt(0, column).getClass();
@@ -44,16 +46,10 @@ public class read_csv extends javax.swing.JFrame {
         pack();
     }
     
-    read_csv(Vector data, Vector columnNames) {
+        read_csv(Vector data, Vector columnNames) {
         DefaultTableModel model = new DefaultTableModel(data, columnNames);
-        JTable table = new JTable( model )
-        {
+        JTable table = new JTable( model );
 
-            public Class getColumnClass(int column)
-            {
-                return getValueAt(0, column).getClass();
-            }
-        };
         table.setPreferredScrollableViewportSize(table.getPreferredSize());
 
         JScrollPane scrollPane = new JScrollPane( table );
@@ -62,7 +58,6 @@ public class read_csv extends javax.swing.JFrame {
         table.setFillsViewportHeight(true);
         pack();
     }
-    
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
