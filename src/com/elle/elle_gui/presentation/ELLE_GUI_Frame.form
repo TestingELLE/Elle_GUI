@@ -48,7 +48,7 @@
             </Menu>
             <MenuItem class="javax.swing.JMenuItem" name="menuItemRead">
               <Properties>
-                <Property name="text" type="java.lang.String" value="Read from Text File"/>
+                <Property name="text" type="java.lang.String" value="Read from CSV File"/>
               </Properties>
               <Events>
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="menuItemReadActionPerformed"/>
@@ -79,7 +79,7 @@
             </Menu>
             <MenuItem class="javax.swing.JMenuItem" name="menuItemSave">
               <Properties>
-                <Property name="text" type="java.lang.String" value="Save File"/>
+                <Property name="text" type="java.lang.String" value="Save Tab to CSV"/>
               </Properties>
               <Events>
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="menuItemSaveActionPerformed"/>

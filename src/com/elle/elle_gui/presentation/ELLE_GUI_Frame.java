@@ -753,7 +753,7 @@ public class ELLE_GUI_Frame extends JFrame implements ITableConstants {
 
         menuFile.add(menuConnections);
 
-        menuItemRead.setText("Read from Text File");
+        menuItemRead.setText("Read from CSV File");
         menuItemRead.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 menuItemReadActionPerformed(evt);
@@ -781,7 +781,7 @@ public class ELLE_GUI_Frame extends JFrame implements ITableConstants {
 
         menuFile.add(menuPrint);
 
-        menuItemSave.setText("Save File");
+        menuItemSave.setText("Save Tab to CSV");
         menuItemSave.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 menuItemSaveActionPerformed(evt);
