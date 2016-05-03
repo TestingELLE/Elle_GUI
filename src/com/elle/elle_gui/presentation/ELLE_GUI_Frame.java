@@ -12,6 +12,7 @@ import com.elle.elle_gui.logic.LoggingAspect;
 import com.elle.elle_gui.logic.PrintWindow;
 import com.elle.elle_gui.logic.TableFilter;
 import com.elle.elle_gui.logic.Validator;
+import com.elle.elle_gui.database.SQL_Commands;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
@@ -28,6 +29,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -38,9 +40,11 @@ import java.sql.Statement;
 import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Vector;
 import javax.swing.BorderFactory;
@@ -60,6 +64,7 @@ import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.JTableHeader;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
+import javax.swing.table.TableModel;
 import javax.swing.text.AbstractDocument;
 
 /**
@@ -303,6 +308,7 @@ public class ELLE_GUI_Frame extends JFrame implements ITableConstants {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        filechooser = new javax.swing.JFileChooser();
         panelCTRLPanel = new javax.swing.JPanel();
         btnTrades = new javax.swing.JButton();
         btnAllocations = new javax.swing.JButton();
@@ -370,6 +376,10 @@ public class ELLE_GUI_Frame extends JFrame implements ITableConstants {
         menuItemLoadsTable = new javax.swing.JMenuItem();
         menuHelp = new javax.swing.JMenu();
         menuOther = new javax.swing.JMenu();
+        viewmatches = new javax.swing.JMenuItem();
+        viewnomatches = new javax.swing.JMenuItem();
+
+        filechooser.setDialogTitle("Open from files...");
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -395,8 +405,6 @@ public class ELLE_GUI_Frame extends JFrame implements ITableConstants {
 
         btnSymbol.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/elle/elle_gui/images/filter.png"))); // NOI18N
         btnSymbol.setText(" ");
-        btnSymbol.setBorder(BorderFactory.createEmptyBorder());
-        btnSymbol.setContentAreaFilled(false);
         btnSymbol.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         btnSymbol.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -406,8 +414,6 @@ public class ELLE_GUI_Frame extends JFrame implements ITableConstants {
 
         btnDateRange.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/elle/elle_gui/images/filter.png"))); // NOI18N
         btnDateRange.setText(" ");
-        btnDateRange.setBorder(BorderFactory.createEmptyBorder());
-        btnDateRange.setContentAreaFilled(false);
         btnDateRange.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         btnDateRange.setIconTextGap(0);
         btnDateRange.addActionListener(new java.awt.event.ActionListener() {
@@ -747,7 +753,7 @@ public class ELLE_GUI_Frame extends JFrame implements ITableConstants {
 
         menuFile.add(menuConnections);
 
-        menuItemRead.setText("Read from Text File");
+        menuItemRead.setText("Read from CSV File");
         menuItemRead.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 menuItemReadActionPerformed(evt);
@@ -775,7 +781,7 @@ public class ELLE_GUI_Frame extends JFrame implements ITableConstants {
 
         menuFile.add(menuPrint);
 
-        menuItemSave.setText("Save File");
+        menuItemSave.setText("Save Tab to CSV");
         menuItemSave.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 menuItemSaveActionPerformed(evt);
@@ -945,6 +951,23 @@ public class ELLE_GUI_Frame extends JFrame implements ITableConstants {
         menuBar.add(menuHelp);
 
         menuOther.setText("Other");
+
+        viewmatches.setText("View Matches");
+        viewmatches.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                viewmatchesActionPerformed(evt);
+            }
+        });
+        menuOther.add(viewmatches);
+
+        viewnomatches.setText("View noMatches");
+        viewnomatches.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                viewnomatchesActionPerformed(evt);
+            }
+        });
+        menuOther.add(viewnomatches);
+
         menuBar.add(menuOther);
 
         setJMenuBar(menuBar);
@@ -1044,55 +1067,70 @@ public class ELLE_GUI_Frame extends JFrame implements ITableConstants {
 
     private void menuItemReadActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuItemReadActionPerformed
 
-        Path path = Paths.get("./IB 9048 AS 2013-0606C.csv");
-        File file = path.toFile();
+        //Path path = Paths.get("./IB 9048 AS 2013-0606C.csv");
+        //File file = path.toFile();
+        int returnVal = filechooser.showOpenDialog(this);
+        if (returnVal == JFileChooser.APPROVE_OPTION) {
+            File file = filechooser.getSelectedFile();
+            String filename = filechooser.getSelectedFile().getName();
+            String extension = filename.substring(filename.lastIndexOf("."), filename.length());
 
-        String[] columnNames = new String[0];
-        Object[][] data = new Object[0][0];
+            if (!".csv".equals(extension)) {
+                JOptionPane.showMessageDialog(filechooser, "Invalid file type!!! Please choose a csv file!", "Error", JOptionPane.ERROR_MESSAGE);
+            } else {
 
-        String line = "";
-        String splitSign = ",";
-        int i = 0;
-        try {
-            //initialize the data array
-            BufferedReader br
-                    = new BufferedReader(
-                            new FileReader(file));
-            while (br.readLine() != null) {
-                i++;
-            }
-            br.close();
-            data = new Object[i - 1][];
+                String[] columnNames = new String[0];
+                Object[][] data = new Object[0][0];
 
-            i = 0;
-            br = new BufferedReader(new FileReader(file));
-            line = br.readLine();
-            columnNames = line.split(splitSign);
-            String[] rowNumber = {"#"};
-            System.arraycopy(rowNumber, 0, columnNames, 0, 1);
-            line = br.readLine();
-            while (line != null) {
-                data[i] = new Object[line.split(splitSign).length + 1];
-                data[i][0] = i + 1;
-                for (int j = 1; j < data[i].length; j++) {
-                    data[i][j] = line.split(splitSign)[j - 1];
+                String line = "";
+                String splitSign = ",";
+                int i = 0;
+                try {
+                    //initialize the data array
+                    BufferedReader br
+                            = new BufferedReader(
+                                    new FileReader(file));
+                    while (br.readLine() != null) {
+                        i++;
+                    }
+                    br.close();
+                    data = new Object[i - 1][];
+
+                    i = 0;
+                    br = new BufferedReader(new FileReader(file));
+                    line = br.readLine();
+                    columnNames = line.split(splitSign);
+                    String[] rowNumber = {"#"};
+                    System.arraycopy(rowNumber, 0, columnNames, 0, 1);
+                    line = br.readLine();
+                    while (line != null) {
+                        data[i] = new Object[line.split(splitSign).length + 1];
+                        data[i][0] = i + 1;
+                        for (int j = 1; j < data[i].length; j++) {
+                            data[i][j] = line.split(splitSign)[j - 1];
+                        }
+                        i++;
+                        line = br.readLine();
+                    }
+                } catch (FileNotFoundException ex) {
+                    LoggingAspect.afterThrown(ex);
+                } catch (IOException ex) {
+                    LoggingAspect.afterThrown(ex);
                 }
-                i++;
-                line = br.readLine();
+
+                // testing the file
+                //JTable table = new JTable(data, columnNames);
+                //JScrollPane scroll = new JScrollPane(table);
+                //panelAccounts.removeAll();
+                //panelAccounts.setLayout(new BorderLayout());
+                //panelAccounts.add(scroll, BorderLayout.CENTER);
+
+                read_csv readcsvfiles = new read_csv(data, columnNames);
+                readcsvfiles.setTitle(filename);
+                readcsvfiles.setVisible(true);
+                readcsvfiles.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
             }
-        } catch (FileNotFoundException ex) {
-            LoggingAspect.afterThrown(ex);
-        } catch (IOException ex) {
-            LoggingAspect.afterThrown(ex);
         }
-
-        // testing the file
-        JTable table = new JTable(data, columnNames);
-        JScrollPane scroll = new JScrollPane(table);
-        panelAccounts.removeAll();
-        panelAccounts.setLayout(new BorderLayout());
-        panelAccounts.add(scroll, BorderLayout.CENTER);
-
     }//GEN-LAST:event_menuItemReadActionPerformed
 
     private void menuItemPrintGUIActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuItemPrintGUIActionPerformed
@@ -1291,10 +1329,40 @@ public class ELLE_GUI_Frame extends JFrame implements ITableConstants {
         JFileChooser fileChooser = new JFileChooser();
         fileChooser.setDialogTitle("Save File As");
         int userSelection = fileChooser.showSaveDialog(this);
+        
+        AccountTable selectedTab = getSelectedTab();
+        JTable selectedTable = selectedTab.getTable();
+        TableModel model = selectedTable.getModel();
+
         if (userSelection == JFileChooser.APPROVE_OPTION) {
-            File fileToSave = fileChooser.getSelectedFile();
-            logWindow.addMessageWithDate("Save file as: "
-                    + fileToSave.getAbsolutePath() + "\n");
+            try {
+                FileWriter writer = new FileWriter(fileChooser.getSelectedFile() + ".csv");
+
+                for (int i = 0; i < model.getColumnCount(); i++) {
+                    if (model.getColumnName(i) == null) {
+                        writer.write("" + ",");
+                    } else {
+                        writer.write(model.getColumnName(i) + ",");
+                    }
+                }
+                
+                writer.write("\n");
+                
+                for (int i = 0; i < model.getRowCount(); i++) {
+                    for (int j = 0; j < model.getColumnCount(); j++) {
+                        if (model.getValueAt(i, j) == null) {
+                            writer.write("" + ",");
+                        } else {
+                            writer.write(model.getValueAt(i, j).toString() + ",");
+                        }
+                    }
+                    writer.write("\n");
+                }
+                writer.close();
+            } catch (IOException ioe) {
+                JOptionPane.showMessageDialog(selectedTable, "Error Writing File.\nFile may be in use by another application."
+                        + "\nCheck and try re-exporting", "Export Error", JOptionPane.ERROR_MESSAGE);
+            }
         }
     }//GEN-LAST:event_menuItemSaveActionPerformed
 
@@ -1594,6 +1662,14 @@ public class ELLE_GUI_Frame extends JFrame implements ITableConstants {
             sqlOutputWindow.setVisible(true);
         }
     }//GEN-LAST:event_btnShowTablesActionPerformed
+
+    private void viewmatchesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_viewmatchesActionPerformed
+        loadtablematchesornomatches("select * from matches");
+    }//GEN-LAST:event_viewmatchesActionPerformed
+
+    private void viewnomatchesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_viewnomatchesActionPerformed
+        loadtablematchesornomatches("select * from noMatches");
+    }//GEN-LAST:event_viewnomatchesActionPerformed
 
     /**
      * initTotalRowCounts called once to initialize the total rowIndex counts of
@@ -1982,6 +2058,110 @@ public class ELLE_GUI_Frame extends JFrame implements ITableConstants {
 
         System.out.println("Table loaded succesfully");
         return tableView;
+    }
+
+    private void loadtablematchesornomatches(String sql) {
+        Vector data = new Vector();
+        Vector columnNames = new Vector();
+        Vector columnClass = new Vector();
+        int columns;
+
+        ResultSet rs = null;
+        ResultSetMetaData metaData = null;
+        try {
+            rs = statement.executeQuery(sql);
+            metaData = rs.getMetaData();
+        } catch (Exception ex) {
+            System.out.println("error");
+            LoggingAspect.afterThrown(ex);
+            //return table;
+        }
+        try {
+            columns = metaData.getColumnCount();
+            for (int i = 1; i <= columns; i++) {
+                columnClass.addElement(metaData.getColumnClassName(i));
+                columnNames.addElement(metaData.getColumnName(i));
+//                System.out.println(metaData.getColumnName(i) + " original: " + metaData.getColumnClassName(i));
+            }
+            while (rs.next()) {
+                Vector row = new Vector(columns);
+                for (int i = 1; i <= columns; i++) {
+                    row.addElement(rs.getObject(i));
+                }
+                data.addElement(row);
+            }
+            rs.close();
+
+        } catch (SQLException ex) {
+            LoggingAspect.afterThrown(ex);
+        }
+        
+        String tablename = sql.substring(14);
+        /*
+        Object[][] objectdata = new Object[data.size()][0];
+        for (int i = 0; i < objectdata.length; i++) {
+            objectdata[i] = ((Vector) data.get(i)).toArray();
+        }
+        
+        String[] stringcolumnNames = (String[]) columnNames.toArray(new String[columnNames.size()]);
+        
+        */
+        read_csv readcsvfiles = new read_csv(data, columnNames);
+        readcsvfiles.setTitle(tablename);
+        readcsvfiles.setVisible(true);
+        readcsvfiles.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+                
+        
+        // this has to be set here or else I get errors
+        // I tried passing the model to the filter and setting it there
+        // but it caused errors
+        //table.setModel(model);
+        
+        /*
+        for (int i = 0; i < table.getColumnCount(); i++) {
+//            System.out.println(table.getColumnName(i) + "class name: " + table.getColumnClass(i));
+        }
+
+        // check that the filter items are initialized
+        TableFilter filter = tab.getFilter();
+        if (filter.getFilterItems() == null) {
+            filter.initFilterItems();
+        }
+        // apply filter
+        filter.applyFilter();
+        filter.applyColorHeaders();
+
+        // load all checkbox items for the checkbox column pop up filter
+        ColumnPopupMenu columnPopupMenu = tab.getColumnPopupMenu();
+        columnPopupMenu.loadAllCheckBoxItems();
+
+        // set column format
+        Map<String, Integer> colWidthPercent = tab.getColWidthPercent();
+
+//        if (colWidthPercent.length != table.getColumnCount()) {
+//            colWidthPercent = new float[table.getColumnCount()];
+//            Arrays.fill(colWidthPercent, 80);
+//        }
+        setColumnFormat(colWidthPercent, table);
+
+        // set the listeners for the table
+
+        System.out.println("Table loaded succesfully");*/
+
+    }
+
+    private String removeAnyCommas(String src) {
+        if(src == null) {
+            return "";
+        }
+        
+        for(int i = 0; i < src.length(); i++) {
+            if(src.charAt(i) == ',') {
+                src = src.substring(0,i) + src.substring(i+1, src.length());
+            }
+        }
+        
+        return src;    
     }
 
     /**
@@ -2584,6 +2764,7 @@ public class ELLE_GUI_Frame extends JFrame implements ITableConstants {
     private javax.swing.JButton btnTrades;
     private javax.swing.JCheckBox checkBoxDateRange;
     private javax.swing.JCheckBox checkBoxSymbol;
+    private javax.swing.JFileChooser filechooser;
     private javax.swing.JMenuItem jMenuItem1;
     private javax.swing.JLabel labelHyphen;
     private javax.swing.JLabel labelRecords;
@@ -2639,6 +2820,8 @@ public class ELLE_GUI_Frame extends JFrame implements ITableConstants {
     private javax.swing.JTextField textFieldEndDate;
     private javax.swing.JTextField textFieldStartDate;
     private javax.swing.JTextField textFieldSymbol;
+    private javax.swing.JMenuItem viewmatches;
+    private javax.swing.JMenuItem viewnomatches;
     // End of variables declaration//GEN-END:variables
 
 }

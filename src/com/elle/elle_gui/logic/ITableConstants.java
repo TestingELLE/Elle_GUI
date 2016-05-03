@@ -29,7 +29,7 @@ public interface ITableConstants {
 
     // table names
     public static final String POSITIONS_TABLE_NAME = "positions";
-    public static final String TRADES_TABLE_NAME = "tradesALL";
+    public static final String TRADES_TABLE_NAME = "trades";
     public static final String TRADES_TABLE_VIEW_NAME = "Trades_DefaultView";
     public static final String ALLOCATIONS_TABLE_NAME = "allocations";
 
