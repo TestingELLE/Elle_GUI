@@ -130,7 +130,6 @@ public class LogWindow extends JFrame{
 
         this.pack();
         this.setVisible(false);    
-        Authorization.authorize(this);
     }
     
     /**
