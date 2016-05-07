@@ -12,7 +12,6 @@ import com.elle.elle_gui.logic.LoggingAspect;
 import com.elle.elle_gui.logic.PrintWindow;
 import com.elle.elle_gui.logic.TableFilter;
 import com.elle.elle_gui.logic.Validator;
-import com.elle.elle_gui.database.SQL_Commands;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
@@ -31,8 +30,6 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
@@ -40,14 +37,10 @@ import java.sql.Statement;
 import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Vector;
-import javax.swing.BorderFactory;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -1990,6 +1983,14 @@ public class ELLE_GUI_Frame extends JFrame implements ITableConstants {
         }
     }
 
+    /**
+     * loads and sets table model (does not load data from database)
+     * @param table
+     * @param tableName
+     * @param accountName
+     * @param tabs
+     * @return 
+     */
     private JTable loadViewTable(JTable table, String tableName, String accountName, Map<String, Map<String, AccountTable>> tabs) {
         System.out.println("1: " + accountName);
         Map<String, AccountTable> tables = tabs.get(accountName);
