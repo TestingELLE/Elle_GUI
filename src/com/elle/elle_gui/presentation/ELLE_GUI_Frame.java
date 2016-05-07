@@ -1840,10 +1840,6 @@ public class ELLE_GUI_Frame extends JFrame implements ITableConstants {
         return table;
     }
 
-    private void loadViewTable(JTable table, String tableName, String accountName) {
-
-    }
-
     /**
      * formatTable This formats the table
      *
