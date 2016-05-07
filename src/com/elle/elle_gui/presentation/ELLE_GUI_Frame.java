@@ -1986,7 +1986,7 @@ public class ELLE_GUI_Frame extends JFrame implements ITableConstants {
     /**
      * loads and sets table model (does not load data from database)
      * @param table
-     * @param tableName
+     * @param tableName not used
      * @param accountName
      * @param tabs
      * @return 
