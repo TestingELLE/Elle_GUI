@@ -3,7 +3,7 @@ package com.elle.elle_gui.dao;
 
 import com.elle.elle_gui.database.DBConnection;
 import com.elle.elle_gui.database.SQL_Commands;
-import com.elle.elle_gui.dbtables.BackupDBTableRecord;
+import com.elle.elle_gui.entities.BackupDBTableRecord;
 import com.elle.elle_gui.logic.LoggingAspect;
 import java.awt.Component;
 import java.sql.Connection;

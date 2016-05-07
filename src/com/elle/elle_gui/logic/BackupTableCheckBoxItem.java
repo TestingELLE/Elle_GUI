@@ -1,6 +1,6 @@
 package com.elle.elle_gui.logic;
 
-import com.elle.elle_gui.dbtables.BackupDBTableRecord;
+import com.elle.elle_gui.entities.BackupDBTableRecord;
 
 import javax.swing.*;
 
