@@ -35,6 +35,7 @@ public class Trade {
     private String multi;
     private String underlying;
     private String expiry;
+    private String strike;
     private String oType;
     private String lNotes;
     private String stategy;
@@ -263,6 +264,14 @@ public class Trade {
         this.expiry = expiry;
     }
 
+    public String getStrike() {
+        return strike;
+    }
+
+    public void setStrike(String strike) {
+        this.strike = strike;
+    }
+    
     public String getoType() {
         return oType;
     }
