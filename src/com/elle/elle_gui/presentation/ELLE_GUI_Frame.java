@@ -69,6 +69,9 @@ import javax.swing.text.AbstractDocument;
  */
 public class ELLE_GUI_Frame extends JFrame implements ITableConstants {
 
+    public static String creationDate;  // set automatically from manifest
+    public static String version;       // set automatically from manifest
+    
     // attributes
     private Map<String, Map<String, AccountTable>> tabs; // stores individual tab objects 
     private static Statement statement;
@@ -1980,7 +1983,7 @@ public class ELLE_GUI_Frame extends JFrame implements ITableConstants {
     }
 
     /**
-     * loads and sets table model (does not load data from database)
+     * loads and sets table model for the trades default view
      * @param table
      * @param tableName not used
      * @param accountName
@@ -2701,14 +2704,6 @@ public class ELLE_GUI_Frame extends JFrame implements ITableConstants {
 
     public void setLoginWindow(LoginWindow loginWindow) {
         this.loginWindow = loginWindow;
-    }
-
-    public String getCREATION_DATE() {
-        return CREATION_DATE;
-    }
-
-    public String getVERSION() {
-        return VERSION;
     }
 
     public static ELLE_GUI_Frame getInstance() {

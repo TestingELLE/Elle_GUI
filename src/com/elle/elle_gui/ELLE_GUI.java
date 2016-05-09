@@ -1,9 +1,15 @@
-
 package com.elle.elle_gui;
 
+import static com.elle.elle_gui.presentation.ELLE_GUI_Frame.creationDate;
+import static com.elle.elle_gui.presentation.ELLE_GUI_Frame.version;
 import com.elle.elle_gui.presentation.ELLE_GUI_Frame;
 import com.elle.elle_gui.presentation.LoginWindow;
 import java.awt.Dimension;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.jar.Attributes;
+import java.util.jar.Manifest;
+import javax.swing.JOptionPane;
 import javax.swing.UIManager;
 
 /**
@@ -47,6 +53,20 @@ public class ELLE_GUI {
         //</editor-fold>
         UIManager.getLookAndFeelDefaults().put("ScrollBar.minimumThumbSize", new Dimension(30, 30));
 
+        // get the creation date and version from the manifest
+        Manifest mf = new Manifest();
+        Attributes atts;
+        String s = "MANIFEST.MF";
+        InputStream inputStream = ELLE_GUI.class.getResourceAsStream(s);
+        try {
+            mf.read(inputStream);
+            atts = mf.getMainAttributes();
+            creationDate = atts.getValue("creation-date");
+            version = atts.getValue("version");
+        } catch (IOException ex) {
+            JOptionPane.showMessageDialog(null, "Error: " + ex.getMessage());
+        }
+        
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(() -> {
             LoginWindow loginWindow = new LoginWindow();
