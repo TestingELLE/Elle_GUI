@@ -47,6 +47,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Vector;
+import javafx.scene.control.Tab;
 import javax.swing.BorderFactory;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
@@ -343,26 +344,24 @@ public class ELLE_GUI_Frame extends JFrame implements ITableConstants {
         tableCombined = new javax.swing.JTable();
         menuBar = new javax.swing.JMenuBar();
         menuFile = new javax.swing.JMenu();
-        menuConnections = new javax.swing.JMenu();
-        menuItemAWS = new javax.swing.JMenuItem();
-        menuItemPupone = new javax.swing.JMenuItem();
-        menuItemLocal = new javax.swing.JMenuItem();
         menuItemRead = new javax.swing.JMenuItem();
         menuPrint = new javax.swing.JMenu();
         menuItemPrintGUI = new javax.swing.JMenuItem();
         menuItemPrintDisplayWindow = new javax.swing.JMenuItem();
         menuItemSave = new javax.swing.JMenuItem();
+        menuItemLogOut = new javax.swing.JMenuItem();
         menuEdit = new javax.swing.JMenu();
         menuItemConnection = new javax.swing.JMenuItem();
         jMenuItem1 = new javax.swing.JMenuItem();
+        menuConnections = new javax.swing.JMenu();
+        menuItemAWS = new javax.swing.JMenuItem();
+        menuItemPupone = new javax.swing.JMenuItem();
+        menuItemLocal = new javax.swing.JMenuItem();
         menuFind = new javax.swing.JMenu();
         menuReports = new javax.swing.JMenu();
         menuTools = new javax.swing.JMenu();
-        menuItemReconcile = new javax.swing.JMenuItem();
-        menuItemShowMatches = new javax.swing.JMenuItem();
-        menuItemIB8949 = new javax.swing.JMenuItem();
-        menuItemTL8949 = new javax.swing.JMenuItem();
         menuItemBackup = new javax.swing.JMenuItem();
+        menuItemReloadTabData = new javax.swing.JMenuItem();
         menuLoad = new javax.swing.JMenu();
         menuItemLoadFile = new javax.swing.JMenuItem();
         menuView = new javax.swing.JMenu();
@@ -374,10 +373,14 @@ public class ELLE_GUI_Frame extends JFrame implements ITableConstants {
         menuItemIB = new javax.swing.JMenuItem();
         menuItemTL = new javax.swing.JMenuItem();
         menuItemLoadsTable = new javax.swing.JMenuItem();
-        menuHelp = new javax.swing.JMenu();
-        menuOther = new javax.swing.JMenu();
         viewmatches = new javax.swing.JMenuItem();
         viewnomatches = new javax.swing.JMenuItem();
+        menuHelp = new javax.swing.JMenu();
+        menuOther = new javax.swing.JMenu();
+        menuItemShowMatches = new javax.swing.JMenuItem();
+        menuItemIB8949 = new javax.swing.JMenuItem();
+        menuItemReconcile = new javax.swing.JMenuItem();
+        menuItemTL8949 = new javax.swing.JMenuItem();
 
         filechooser.setDialogTitle("Open from files...");
 
@@ -724,35 +727,6 @@ public class ELLE_GUI_Frame extends JFrame implements ITableConstants {
 
         menuFile.setText("File");
 
-        menuConnections.setText("Select Connections");
-
-        menuItemAWS.setText("AWS");
-        menuItemAWS.setEnabled(false);
-        menuItemAWS.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                menuItemAWSActionPerformed(evt);
-            }
-        });
-        menuConnections.add(menuItemAWS);
-
-        menuItemPupone.setText("Pupone");
-        menuItemPupone.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                menuItemPuponeActionPerformed(evt);
-            }
-        });
-        menuConnections.add(menuItemPupone);
-
-        menuItemLocal.setText("Local");
-        menuItemLocal.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                menuItemLocalActionPerformed(evt);
-            }
-        });
-        menuConnections.add(menuItemLocal);
-
-        menuFile.add(menuConnections);
-
         menuItemRead.setText("Read from CSV File");
         menuItemRead.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -789,6 +763,14 @@ public class ELLE_GUI_Frame extends JFrame implements ITableConstants {
         });
         menuFile.add(menuItemSave);
 
+        menuItemLogOut.setText("Log out");
+        menuItemLogOut.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                menuItemLogOutActionPerformed(evt);
+            }
+        });
+        menuFile.add(menuItemLogOut);
+
         menuBar.add(menuFile);
 
         menuEdit.setText("Edit");
@@ -810,6 +792,35 @@ public class ELLE_GUI_Frame extends JFrame implements ITableConstants {
         });
         menuEdit.add(jMenuItem1);
 
+        menuConnections.setText("Select Connections");
+
+        menuItemAWS.setText("AWS");
+        menuItemAWS.setEnabled(false);
+        menuItemAWS.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                menuItemAWSActionPerformed(evt);
+            }
+        });
+        menuConnections.add(menuItemAWS);
+
+        menuItemPupone.setText("Pupone");
+        menuItemPupone.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                menuItemPuponeActionPerformed(evt);
+            }
+        });
+        menuConnections.add(menuItemPupone);
+
+        menuItemLocal.setText("Local");
+        menuItemLocal.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                menuItemLocalActionPerformed(evt);
+            }
+        });
+        menuConnections.add(menuItemLocal);
+
+        menuEdit.add(menuConnections);
+
         menuBar.add(menuEdit);
 
         menuFind.setText("Find");
@@ -820,38 +831,6 @@ public class ELLE_GUI_Frame extends JFrame implements ITableConstants {
 
         menuTools.setText("Tools");
 
-        menuItemReconcile.setText("Reconcile 8949s");
-        menuItemReconcile.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                menuItemReconcileActionPerformed(evt);
-            }
-        });
-        menuTools.add(menuItemReconcile);
-
-        menuItemShowMatches.setText("Show Matches");
-        menuItemShowMatches.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                menuItemShowMatchesActionPerformed(evt);
-            }
-        });
-        menuTools.add(menuItemShowMatches);
-
-        menuItemIB8949.setText("IB 8949");
-        menuItemIB8949.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                menuItemIB8949ActionPerformed(evt);
-            }
-        });
-        menuTools.add(menuItemIB8949);
-
-        menuItemTL8949.setText("TL 8949");
-        menuItemTL8949.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                menuItemTL8949ActionPerformed(evt);
-            }
-        });
-        menuTools.add(menuItemTL8949);
-
         menuItemBackup.setText("Backup Tables");
         menuItemBackup.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -859,6 +838,14 @@ public class ELLE_GUI_Frame extends JFrame implements ITableConstants {
             }
         });
         menuTools.add(menuItemBackup);
+
+        menuItemReloadTabData.setText("Reload Tab Data");
+        menuItemReloadTabData.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                menuItemReloadTabDataActionPerformed(evt);
+            }
+        });
+        menuTools.add(menuItemReloadTabData);
 
         menuBar.add(menuTools);
 
@@ -945,20 +932,13 @@ public class ELLE_GUI_Frame extends JFrame implements ITableConstants {
         });
         menuView.add(menuItemLoadsTable);
 
-        menuBar.add(menuView);
-
-        menuHelp.setText("Help");
-        menuBar.add(menuHelp);
-
-        menuOther.setText("Other");
-
         viewmatches.setText("View Matches");
         viewmatches.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 viewmatchesActionPerformed(evt);
             }
         });
-        menuOther.add(viewmatches);
+        menuView.add(viewmatches);
 
         viewnomatches.setText("View noMatches");
         viewnomatches.addActionListener(new java.awt.event.ActionListener() {
@@ -966,7 +946,46 @@ public class ELLE_GUI_Frame extends JFrame implements ITableConstants {
                 viewnomatchesActionPerformed(evt);
             }
         });
-        menuOther.add(viewnomatches);
+        menuView.add(viewnomatches);
+
+        menuBar.add(menuView);
+
+        menuHelp.setText("Help");
+        menuBar.add(menuHelp);
+
+        menuOther.setText("Other");
+
+        menuItemShowMatches.setText("Show Matches");
+        menuItemShowMatches.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                menuItemShowMatchesActionPerformed(evt);
+            }
+        });
+        menuOther.add(menuItemShowMatches);
+
+        menuItemIB8949.setText("IB 8949");
+        menuItemIB8949.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                menuItemIB8949ActionPerformed(evt);
+            }
+        });
+        menuOther.add(menuItemIB8949);
+
+        menuItemReconcile.setText("Reconcile 8949s");
+        menuItemReconcile.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                menuItemReconcileActionPerformed(evt);
+            }
+        });
+        menuOther.add(menuItemReconcile);
+
+        menuItemTL8949.setText("TL 8949");
+        menuItemTL8949.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                menuItemTL8949ActionPerformed(evt);
+            }
+        });
+        menuOther.add(menuItemTL8949);
 
         menuBar.add(menuOther);
 
@@ -1671,6 +1690,50 @@ public class ELLE_GUI_Frame extends JFrame implements ITableConstants {
         loadtablematchesornomatches("select * from noMatches");
     }//GEN-LAST:event_viewnomatchesActionPerformed
 
+    private void menuItemReloadTabDataActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuItemReloadTabDataActionPerformed
+       reloadDataAction();
+    }//GEN-LAST:event_menuItemReloadTabDataActionPerformed
+
+    private void menuItemLogOutActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuItemLogOutActionPerformed
+              Object[] options = {"Reconnect", "Log Out"};  // the titles of buttons
+
+        int n = JOptionPane.showOptionDialog(this, "Would you like to reconnect?", "Log off",
+                JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE,
+                null, //do not use a custom Icon
+                options, //the titles of buttons
+                options[0]); //default button title
+
+        switch (n) {
+            case 0: {               // Reconnect
+
+                // create a new Login Window
+                loginWindow = new LoginWindow();
+                loginWindow.setLocationRelativeTo(this);
+                loginWindow.setVisible(true);
+
+                // dispose of this Object and return resources
+                this.dispose();
+
+                break;
+            }
+            case 1:
+                System.exit(0); // Quit
+        }
+    }//GEN-LAST:event_menuItemLogOutActionPerformed
+
+    
+    private void reloadDataAction() {
+       
+
+        
+        
+        // reload modified table data into dropdown list
+        loadTables(tabs);
+
+        
+        
+
+    }
     /**
      * initTotalRowCounts called once to initialize the total rowIndex counts of
      * each tabs table
@@ -2785,12 +2848,14 @@ public class ELLE_GUI_Frame extends JFrame implements ITableConstants {
     private javax.swing.JMenuItem menuItemLoadFile;
     private javax.swing.JMenuItem menuItemLoadsTable;
     private javax.swing.JMenuItem menuItemLocal;
+    private javax.swing.JMenuItem menuItemLogOut;
     private javax.swing.JMenuItem menuItemPositions;
     private javax.swing.JMenuItem menuItemPrintDisplayWindow;
     private javax.swing.JMenuItem menuItemPrintGUI;
     private javax.swing.JMenuItem menuItemPupone;
     private javax.swing.JMenuItem menuItemRead;
     private javax.swing.JMenuItem menuItemReconcile;
+    private javax.swing.JMenuItem menuItemReloadTabData;
     private javax.swing.JMenuItem menuItemSave;
     private javax.swing.JMenuItem menuItemShowMatches;
     private javax.swing.JMenuItem menuItemTL;
