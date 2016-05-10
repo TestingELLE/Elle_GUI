@@ -1723,9 +1723,15 @@ public class ELLE_GUI_Frame extends JFrame implements ITableConstants {
 
     
     private void reloadDataAction() {
-       
-
-        
+//        AccountTable selectedTab = getSelectedTab();
+//       
+//       JTable table = selectedTab.getTable();
+//     
+//       
+//         DefaultTableCellRenderer renderer;
+//
+//            renderer = (DefaultTableCellRenderer) table.getTableHeader().getDefaultRenderer();
+     
         
         // reload modified table data into dropdown list
         loadTables(tabs);
@@ -2271,10 +2277,11 @@ public class ELLE_GUI_Frame extends JFrame implements ITableConstants {
         DefaultTableCellRenderer renderer;
 
         public HeaderRenderer(JTable table) {
+            if(table.getTableHeader().getDefaultRenderer() instanceof DefaultTableCellRenderer){
             renderer = (DefaultTableCellRenderer) table.getTableHeader().getDefaultRenderer();
             renderer.setHorizontalAlignment(JLabel.CENTER);
         }
-
+        }
         @Override
         public Component getTableCellRendererComponent(
                 JTable table, Object value, boolean isSelected,
