@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- You can set the version of ELLE_GUI here and then build the new jar.-->
 <project name="ELLE_GUI" default="dist" basedir=".">
-    <description>Builds, tests, and runs the project ELLE_GUI</description>
+    <description>Builds, tests, and runs the project ELLE_GUI.</description>
     
     <!-- this is netbeans generated code -->
     <import file="nbproject/build-impl.xml"/>
@@ -23,19 +23,18 @@
  
     <!-- This creates the jar that we want with the included dependencies -->
     <!-- There should be no need to edit this code -->
-    <!-- other than adding or removing dependancies-->
-    <!-- Dependancies are kept in the lib folder in ELLE_GUI-->
+    <!-- other than adding or removing dependancies -->
+    <!-- Dependancies are kept in the lib folder in ELLE_GUI -->
     <!-- The new jar will be in the target folder in ELLE_GUI --> 
     <target name="-post-jar"> 
       <delete dir="target"/>
       <jar jarfile="target/${jarname}.jar">
         <zipfileset src="${dist.jar}" excludes="META-INF/*" />
         <zipgroupfileset dir="lib" excludes="META-INF/*" />
-        <manifest>		
-            <attribute name="Main-Class" value="com.elle.elle_gui.ELLE_GUI"/>		
+        <manifest>
+            <attribute name="Main-Class" value="com.elle.elle_gui.ELLE_GUI"/>
         </manifest>
       </jar>
       <delete dir="dist"/>
     </target> 
 </project>
-

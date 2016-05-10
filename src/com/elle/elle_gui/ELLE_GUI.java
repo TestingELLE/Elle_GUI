@@ -2,14 +2,12 @@ package com.elle.elle_gui;
 
 import static com.elle.elle_gui.presentation.ELLE_GUI_Frame.creationDate;
 import static com.elle.elle_gui.presentation.ELLE_GUI_Frame.version;
-import com.elle.elle_gui.presentation.ELLE_GUI_Frame;
 import com.elle.elle_gui.presentation.LoginWindow;
 import java.awt.Dimension;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.jar.Attributes;
 import java.util.jar.Manifest;
-import javax.swing.JOptionPane;
 import javax.swing.UIManager;
 
 /**
@@ -23,10 +21,6 @@ public class ELLE_GUI {
      */
     public static void main(String args[]) {
         /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-         */
         try {
             for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
                 if ("Nimbus".equals(info.getName())) {
@@ -52,9 +46,9 @@ public class ELLE_GUI {
             creationDate = atts.getValue("creation-date");
             version = atts.getValue("version");
         } catch (IOException ex) {
-            JOptionPane.showMessageDialog(null, "Error: " + ex.getMessage());
         }
         
+        // login window
         LoginWindow loginWindow = new LoginWindow();
         loginWindow.setLocationRelativeTo(null);
         loginWindow.setVisible(true);
