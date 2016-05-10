@@ -28,7 +28,7 @@
     <!-- The new jar will be in the target folder in ELLE_GUI --> 
     <target name="-post-jar"> 
       <delete dir="target"/>
-      <jar jarfile="target/${version}.jar">
+      <jar jarfile="target/${jarname}.jar">
         <zipfileset src="${dist.jar}" excludes="META-INF/*" />
         <zipfileset src="lib/mysql-connector-java-5.1.30-bin.jar" excludes="META-INF/*" />
         <zipfileset src="lib/swingx-all-1.6.4.jar" excludes="META-INF/*" />
