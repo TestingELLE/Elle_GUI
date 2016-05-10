@@ -21,7 +21,7 @@ BEGIN
     select positionsTable.*,@rownum2 := @rownum2 + 1 AS rank from positions positionsTable
     right join 
     tradesRecord_temporary tradesALLTable
-    on positionsTable.pos_id=1 and positionsTable.ksflag='bk';
+    on positionsTable.pos_id=1 and positionsTable.ksflag='0';
     
     #update the positions table value using the trades result by rank_id
     set SQL_SAFE_UPDATES=0;

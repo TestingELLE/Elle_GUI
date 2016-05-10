@@ -1,18 +1,25 @@
-CREATE PROCEDURE `aggregateTrades`(IN MYTABLE varchar(50))
+CREATE  PROCEDURE `aggregateTrades`(IN MYTABLE varchar(50))
 BEGIN
-	
-	set SQL_SAFE_UPDATES=0;
+    
+    set SQL_SAFE_UPDATES=0;
     
     set @`timeStamp`=Now();
     
     insert into `timeStamps` values(@`timeStamp`,'aggregateTrades');
+    
+    drop temporary table if exists orderedtable;
+    SET @cmd1 = CONCAT('create temporary table if not exists orderedtable
+    select * from ',MYTABLE,' order by id DESC');
+    PREPARE STMT1 FROM @cmd1;
+    EXECUTE STMT1;
+    DEALLOCATE PREPARE STMT1;   
     
     drop temporary table if exists aggregatedCalculation_temporary;
     SET @cmd1 = CONCAT('create temporary table if not exists aggregatedCalculation_temporary
     select l2.id as grp,sum(l2.Q) as sumOfQ,sum(l2.basis) as sumOfBasis,
     avg(l2.multi) as avgOfMulti, -sum(l2.proceeds)/sum(l2.Q)/avg(l2.multi) as price,sum(l2.comm) as sumOfComm,
     sum(l2.proceeds) as sumOfProceeds
-    from ',MYTABLE,' l2
+    from orderedtable l2
     where OC = "O" and !field(ksflag,"ks","bk","tot")
     and 
     exists(select "X" from ',MYTABLE,' group_team
@@ -60,6 +67,16 @@ BEGIN
     EXECUTE STMT4;
     DEALLOCATE PREPARE STMT4;
     
-	
+    
+    SET @cmd5 = CONCAT(  'Insert into aggregatedTrades
+    select * from ',MYTABLE,' where ksflag="bk" or ksflag="tot";');
+    PREPARE STMT5 FROM @cmd5;
+    EXECUTE STMT5;
+    DEALLOCATE PREPARE STMT5;
+    
+    SET @cmd6 = CONCAT(  'delete from ',MYTABLE,' where ksflag = "bk";');
+    PREPARE STMT6 FROM @cmd6;
+    EXECUTE STMT6;
+    DEALLOCATE PREPARE STMT6;
     
 END

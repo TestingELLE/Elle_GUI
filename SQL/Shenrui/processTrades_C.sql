@@ -6,12 +6,18 @@ BEGIN
     
     set @`timeStamp`=Now();
     
+    
+    
     drop temporary table if exists position_temp;
 	create temporary table position_temp
     SELECT s1.*
 	FROM positions s1
 	LEFT JOIN positions s2 ON s1.pos_id = s2.pos_id AND s1.line < s2.line
 	WHERE s2.symbol IS NULL;
+    
+    delete from position_temp 
+    where pos_id in (select pos_id from aggregatePositions)
+    and ksflag='0';
     
     
 	#Get the record with OC='C' in trades table
