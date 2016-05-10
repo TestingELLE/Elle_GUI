@@ -51,7 +51,6 @@ public class ELLE_GUI {
             atts = mf.getMainAttributes();
             creationDate = atts.getValue("creation-date");
             version = atts.getValue("version");
-            JOptionPane.showMessageDialog(null, "All good = ");
         } catch (IOException ex) {
             JOptionPane.showMessageDialog(null, "Error: " + ex.getMessage());
         }
