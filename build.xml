@@ -31,6 +31,9 @@
       <jar jarfile="target/${jarname}.jar">
         <zipfileset src="${dist.jar}" excludes="META-INF/*" />
         <zipgroupfileset dir="lib" excludes="META-INF/*" />
+        <manifest>		
+            <attribute name="Main-Class" value="com.elle.elle_gui.ELLE_GUI"/>		
+        </manifest>
       </jar>
       <delete dir="dist"/>
     </target> 

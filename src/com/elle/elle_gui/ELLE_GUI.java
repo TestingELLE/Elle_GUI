@@ -35,22 +35,10 @@ public class ELLE_GUI {
                 }
             }
         } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(ELLE_GUI_Frame.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(ELLE_GUI_Frame.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(ELLE_GUI_Frame.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(ELLE_GUI_Frame.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
         UIManager.getLookAndFeelDefaults().put("ScrollBar.minimumThumbSize", new Dimension(30, 30));
 
         // get the creation date and version from the manifest
@@ -63,15 +51,13 @@ public class ELLE_GUI {
             atts = mf.getMainAttributes();
             creationDate = atts.getValue("creation-date");
             version = atts.getValue("version");
+            JOptionPane.showMessageDialog(null, "All good = ");
         } catch (IOException ex) {
             JOptionPane.showMessageDialog(null, "Error: " + ex.getMessage());
         }
         
-        /* Create and display the form */
-        java.awt.EventQueue.invokeLater(() -> {
-            LoginWindow loginWindow = new LoginWindow();
-            loginWindow.setLocationRelativeTo(null);
-            loginWindow.setVisible(true);
-        });
+        LoginWindow loginWindow = new LoginWindow();
+        loginWindow.setLocationRelativeTo(null);
+        loginWindow.setVisible(true);
     }
 }
