@@ -1,5 +1,5 @@
 
-package com.elle.elle_gui.dbtables;
+package com.elle.elle_gui.entities;
 
 /**
  * BackupDBTableRecord

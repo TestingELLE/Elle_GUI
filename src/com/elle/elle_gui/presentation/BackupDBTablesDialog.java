@@ -1,7 +1,7 @@
 package com.elle.elle_gui.presentation;
 
 import com.elle.elle_gui.dao.BackupDBTableDAO;
-import com.elle.elle_gui.dbtables.BackupDBTableRecord;
+import com.elle.elle_gui.entities.BackupDBTableRecord;
 import com.elle.elle_gui.logic.BackupTableCheckBoxItem;
 import com.elle.elle_gui.logic.CheckBoxList;
 import com.elle.elle_gui.logic.LoggingAspect;

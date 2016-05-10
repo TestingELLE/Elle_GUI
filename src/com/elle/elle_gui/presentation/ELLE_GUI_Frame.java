@@ -12,7 +12,6 @@ import com.elle.elle_gui.logic.LoggingAspect;
 import com.elle.elle_gui.logic.PrintWindow;
 import com.elle.elle_gui.logic.TableFilter;
 import com.elle.elle_gui.logic.Validator;
-import com.elle.elle_gui.database.SQL_Commands;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
@@ -31,8 +30,6 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
@@ -40,15 +37,10 @@ import java.sql.Statement;
 import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Vector;
-import javafx.scene.control.Tab;
-import javax.swing.BorderFactory;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -77,6 +69,9 @@ import javax.swing.text.AbstractDocument;
  */
 public class ELLE_GUI_Frame extends JFrame implements ITableConstants {
 
+    public static String creationDate;  // set automatically from manifest
+    public static String version;       // set automatically from manifest
+    
     // attributes
     private Map<String, Map<String, AccountTable>> tabs; // stores individual tab objects 
     private static Statement statement;
@@ -1916,10 +1911,6 @@ public class ELLE_GUI_Frame extends JFrame implements ITableConstants {
         return table;
     }
 
-    private void loadViewTable(JTable table, String tableName, String accountName) {
-
-    }
-
     /**
      * formatTable This formats the table
      *
@@ -2059,6 +2050,14 @@ public class ELLE_GUI_Frame extends JFrame implements ITableConstants {
         }
     }
 
+    /**
+     * loads and sets table model for the trades default view
+     * @param table
+     * @param tableName not used
+     * @param accountName
+     * @param tabs
+     * @return 
+     */
     private JTable loadViewTable(JTable table, String tableName, String accountName, Map<String, Map<String, AccountTable>> tabs) {
         System.out.println("1: " + accountName);
         Map<String, AccountTable> tables = tabs.get(accountName);
@@ -2774,14 +2773,6 @@ public class ELLE_GUI_Frame extends JFrame implements ITableConstants {
 
     public void setLoginWindow(LoginWindow loginWindow) {
         this.loginWindow = loginWindow;
-    }
-
-    public String getCREATION_DATE() {
-        return CREATION_DATE;
-    }
-
-    public String getVERSION() {
-        return VERSION;
     }
 
     public static ELLE_GUI_Frame getInstance() {

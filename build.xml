@@ -6,8 +6,20 @@
     <!-- this is netbeans generated code -->
     <import file="nbproject/build-impl.xml"/>
     
-    <!-- set the version of ELLE_GUI here -->
-    <property name="version" value="ELLE_GUI-1.0.3"/>
+    <!-- set the date and version of here -->
+    <property name="creation-date" value="2016-05-10"/>
+    <property name="version" value="1.0.4"/>
+    
+    <!-- this is the jar name when it is created -->
+    <property name="jarname" value="ELLE_GUI-${version}"/>
+    
+    <!-- this creates a manifest to get the date and version of the jar -->
+    <target name="-post-init">
+        <manifest file="src/com/elle/elle_gui/MANIFEST.MF">
+            <attribute name="creation-date" value="${creation-date}" />
+            <attribute name="version" value="${version}" />
+        </manifest>
+    </target>
     
     <!-- This creates the jar that we want with the included dependancies -->
     <!-- There should be no need to edit this code -->
@@ -16,7 +28,7 @@
     <!-- The new jar will be in the target folder in ELLE_GUI --> 
     <target name="-post-jar"> 
       <delete dir="target"/>
-      <jar jarfile="target/${version}.jar">
+      <jar jarfile="target/${jarname}.jar">
         <zipfileset src="${dist.jar}" excludes="META-INF/*" />
         <zipfileset src="lib/mysql-connector-java-5.1.30-bin.jar" excludes="META-INF/*" />
         <zipfileset src="lib/swingx-all-1.6.4.jar" excludes="META-INF/*" />
