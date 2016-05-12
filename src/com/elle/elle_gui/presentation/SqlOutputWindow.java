@@ -1,11 +1,13 @@
 package com.elle.elle_gui.presentation;
 
+
 import com.elle.elle_gui.dao.SqlOutputWindowDAO;
 import java.awt.Component;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
+
 
 /**
  * SqlOutputWindow
