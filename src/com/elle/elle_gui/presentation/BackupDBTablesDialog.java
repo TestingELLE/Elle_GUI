@@ -12,7 +12,6 @@ import java.awt.Frame;
 import java.awt.ScrollPane;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.Calendar;
 import javax.swing.JCheckBox;
@@ -39,11 +38,11 @@ public class BackupDBTablesDialog extends javax.swing.JPanel {
     /**
      * Creates new form BackupDBTablesWindow
      */
-    public BackupDBTablesDialog(Connection connection, Component parent) {
+    public BackupDBTablesDialog(Component parent) {
         initComponents();
 
         this.parentComponent = parent;
-        this.dao = new BackupDBTableDAO(connection, parent);
+        this.dao = new BackupDBTableDAO(parent);
 
         setCheckBoxListListener();
 
