@@ -1,7 +1,13 @@
 package com.elle.elle_gui.presentation;
 
 import com.elle.elle_gui.admissions.Authorization;
+import com.elle.elle_gui.dao.AllocationDAO;
+import com.elle.elle_gui.dao.PositionDAO;
+import com.elle.elle_gui.dao.TradeDAO;
 import com.elle.elle_gui.database.DBConnection;
+import com.elle.elle_gui.entities.Allocation;
+import com.elle.elle_gui.entities.Position;
+import com.elle.elle_gui.entities.Trade;
 import com.elle.elle_gui.logic.ATrade;
 import com.elle.elle_gui.logic.ColumnPopupMenu;
 import com.elle.elle_gui.logic.AccountTable;
@@ -37,9 +43,11 @@ import java.sql.Statement;
 import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 import java.util.Vector;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
@@ -54,6 +62,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.table.DefaultTableModel;
 import javax.swing.table.JTableHeader;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
@@ -73,7 +82,7 @@ public class ELLE_GUI_Frame extends JFrame implements ITableConstants {
     public static String version;       // set automatically from manifest
     
     // attributes
-    private Map<String, Map<String, AccountTable>> tabs; // stores individual tab objects 
+    private Map<String, Map<String, AccountTable>> tabs; // stores individual accountTable objects 
     private static Statement statement;
     private String database;
 
@@ -88,6 +97,11 @@ public class ELLE_GUI_Frame extends JFrame implements ITableConstants {
     // button colors
     private Color colorBtnDefault;
     private Color colorBtnSelected;
+    
+    // DAO
+    private AllocationDAO allocationDAO;
+    private PositionDAO positionDAO;
+    private TradeDAO tradeDAO;
 
     /**
      * ELLE_GUI_Frame Creates the ELLE_GUI_Frame which is the main window of the
@@ -105,6 +119,11 @@ public class ELLE_GUI_Frame extends JFrame implements ITableConstants {
         instance = this;                         // this is used to call this instance of ELLE_GUI 
         colorBtnDefault = btnPositions.getBackground();
         colorBtnSelected = Color.RED;
+        
+        // init DAO
+        allocationDAO = new AllocationDAO();
+        positionDAO = new PositionDAO();
+        tradeDAO = new TradeDAO();
 
         // initialize tabs
         tabs = new HashMap();
@@ -115,39 +134,30 @@ public class ELLE_GUI_Frame extends JFrame implements ITableConstants {
         // create hashmap for IB9048 tables
         Map<String, AccountTable> tabIB9048 = new HashMap();
         tabIB9048.put(POSITIONS_TABLE_NAME, new AccountTable());
-        tabIB9048.put(TRADES_TABLE_VIEW_NAME, new AccountTable());
         tabIB9048.put(ALLOCATIONS_TABLE_NAME, new AccountTable());
         tabIB9048.put(TRADES_TABLE_NAME, new AccountTable());
         // initialize tables for IB9048 -Postions table
         tabIB9048.get(POSITIONS_TABLE_NAME).setTable(new JTable());
         tabIB9048.get(POSITIONS_TABLE_NAME).setTableName(POSITIONS_TABLE_NAME);
-
-        tabIB9048.get(POSITIONS_TABLE_NAME).setColWidthPercent(COL_WIDTH_PER_POSITIONS);
+        tabIB9048.get(POSITIONS_TABLE_NAME).setColWidthPercentDefaultView(COL_WIDTH_PER_POSITIONS_DEFAULT_VIEW);
+        tabIB9048.get(POSITIONS_TABLE_NAME).setColWidthPercentAllFields(COL_WIDTH_PER_POSITIONS_ALL_FIELDS);
         tabIB9048.get(POSITIONS_TABLE_NAME).setFilter(new TableFilter(tabIB9048.get(POSITIONS_TABLE_NAME).getTable()));
-        tabIB9048.get(POSITIONS_TABLE_NAME)
-                .setColumnPopupMenu(new ColumnPopupMenu(tabIB9048.get(POSITIONS_TABLE_NAME).getFilter()));
-        // initialize tables for IB9048 -TradesView table
-        tabIB9048.get(TRADES_TABLE_VIEW_NAME).setTable(new JTable());
-        tabIB9048.get(TRADES_TABLE_VIEW_NAME).setTableName(TRADES_TABLE_VIEW_NAME);
-        tabIB9048.get(TRADES_TABLE_VIEW_NAME).setColWidthPercent(COL_WIDTH_PER_TRADES_VIEW);
-        tabIB9048.get(TRADES_TABLE_VIEW_NAME).setFilter(new TableFilter(tabIB9048.get(TRADES_TABLE_VIEW_NAME).getTable()));
-        tabIB9048.get(TRADES_TABLE_VIEW_NAME)
-                .setColumnPopupMenu(new ColumnPopupMenu(tabIB9048.get(TRADES_TABLE_VIEW_NAME).getFilter()));
+        tabIB9048.get(POSITIONS_TABLE_NAME).setColumnPopupMenu(new ColumnPopupMenu(tabIB9048.get(POSITIONS_TABLE_NAME).getFilter()));
         // initialize tables for IB9048 -Trades table
         tabIB9048.get(TRADES_TABLE_NAME).setTable(new JTable());
         tabIB9048.get(TRADES_TABLE_NAME).setTableName(TRADES_TABLE_NAME);
-        tabIB9048.get(TRADES_TABLE_NAME).setColWidthPercent(COL_WIDTH_PER_TRADES);
+        tabIB9048.get(TRADES_TABLE_NAME).setColWidthPercentDefaultView(COL_WIDTH_PER_TRADES_DEFAULT_VIEW);
+        tabIB9048.get(TRADES_TABLE_NAME).setColWidthPercentAllFields(COL_WIDTH_PER_TRADES_ALL_FIELDS);
         tabIB9048.get(TRADES_TABLE_NAME).setFilter(new TableFilter(tabIB9048.get(TRADES_TABLE_NAME).getTable()));
-        tabIB9048.get(TRADES_TABLE_NAME)
-                .setColumnPopupMenu(new ColumnPopupMenu(tabIB9048.get(TRADES_TABLE_NAME).getFilter()));
+        tabIB9048.get(TRADES_TABLE_NAME).setColumnPopupMenu(new ColumnPopupMenu(tabIB9048.get(TRADES_TABLE_NAME).getFilter()));
         // initialize tables for IB9048 -Allocations table
         tabIB9048.get(ALLOCATIONS_TABLE_NAME).setTable(new JTable());
         tabIB9048.get(ALLOCATIONS_TABLE_NAME).setTableName(ALLOCATIONS_TABLE_NAME);
-        tabIB9048.get(ALLOCATIONS_TABLE_NAME).setColWidthPercent(COL_WIDTH_PER_ALLOCATIONS);
+        tabIB9048.get(ALLOCATIONS_TABLE_NAME).setColWidthPercentDefaultView(COL_WIDTH_PER_ALLOCATIONS_DEFAULT_VIEW);
+        tabIB9048.get(ALLOCATIONS_TABLE_NAME).setColWidthPercentAllFields(COL_WIDTH_PER_ALLOCATIONS_ALL_FIELDS);
         tabIB9048.get(ALLOCATIONS_TABLE_NAME).setFilter(new TableFilter(tabIB9048.get(ALLOCATIONS_TABLE_NAME).getTable()));
-        tabIB9048.get(ALLOCATIONS_TABLE_NAME)
-                .setColumnPopupMenu(new ColumnPopupMenu(tabIB9048.get(ALLOCATIONS_TABLE_NAME).getFilter()));
-        // add tables to the IB9048 account tab
+        tabIB9048.get(ALLOCATIONS_TABLE_NAME).setColumnPopupMenu(new ColumnPopupMenu(tabIB9048.get(ALLOCATIONS_TABLE_NAME).getFilter()));
+        // add tables to the IB9048 account accountTable
         tabs.put(IB9048_ACCOUNT_NAME, tabIB9048);
 
         /**
@@ -156,40 +166,30 @@ public class ELLE_GUI_Frame extends JFrame implements ITableConstants {
         // create hashmap for TOS3622 tables
         Map<String, AccountTable> tabTOS3622 = new HashMap();
         tabTOS3622.put(POSITIONS_TABLE_NAME, new AccountTable());
-        tabTOS3622.put(TRADES_TABLE_VIEW_NAME, new AccountTable());
         tabTOS3622.put(ALLOCATIONS_TABLE_NAME, new AccountTable());
         tabTOS3622.put(TRADES_TABLE_NAME, new AccountTable());
-
         // initialize tables for TOS3622 -Postions table
         tabTOS3622.get(POSITIONS_TABLE_NAME).setTable(new JTable());
         tabTOS3622.get(POSITIONS_TABLE_NAME).setTableName(POSITIONS_TABLE_NAME);
-        tabTOS3622.get(POSITIONS_TABLE_NAME).setColWidthPercent(COL_WIDTH_PER_POSITIONS);
+        tabTOS3622.get(POSITIONS_TABLE_NAME).setColWidthPercentDefaultView(COL_WIDTH_PER_POSITIONS_DEFAULT_VIEW);
+        tabTOS3622.get(POSITIONS_TABLE_NAME).setColWidthPercentAllFields(COL_WIDTH_PER_POSITIONS_ALL_FIELDS);
         tabTOS3622.get(POSITIONS_TABLE_NAME).setFilter(new TableFilter(tabTOS3622.get(POSITIONS_TABLE_NAME).getTable()));
-        tabTOS3622.get(POSITIONS_TABLE_NAME)
-                .setColumnPopupMenu(new ColumnPopupMenu(tabTOS3622.get(POSITIONS_TABLE_NAME).getFilter()));
-        // initialize tables for TOS3622 -TradesView table
-        tabTOS3622.get(TRADES_TABLE_VIEW_NAME).setTable(new JTable());
-        tabTOS3622.get(TRADES_TABLE_VIEW_NAME).setTableName(TRADES_TABLE_VIEW_NAME);
-        tabTOS3622.get(TRADES_TABLE_VIEW_NAME).setColWidthPercent(COL_WIDTH_PER_TRADES_VIEW);
-        tabTOS3622.get(TRADES_TABLE_VIEW_NAME).setFilter(new TableFilter(tabTOS3622.get(TRADES_TABLE_VIEW_NAME).getTable()));
-        tabTOS3622.get(TRADES_TABLE_VIEW_NAME)
-                .setColumnPopupMenu(new ColumnPopupMenu(tabTOS3622.get(TRADES_TABLE_VIEW_NAME).getFilter()));
-
+        tabTOS3622.get(POSITIONS_TABLE_NAME).setColumnPopupMenu(new ColumnPopupMenu(tabTOS3622.get(POSITIONS_TABLE_NAME).getFilter()));
         // initialize tables for TOS3622 -Trades table
         tabTOS3622.get(TRADES_TABLE_NAME).setTable(new JTable());
         tabTOS3622.get(TRADES_TABLE_NAME).setTableName(TRADES_TABLE_NAME);
-        tabTOS3622.get(TRADES_TABLE_NAME).setColWidthPercent(COL_WIDTH_PER_TRADES);
+        tabTOS3622.get(TRADES_TABLE_NAME).setColWidthPercentDefaultView(COL_WIDTH_PER_TRADES_DEFAULT_VIEW);
+        tabTOS3622.get(TRADES_TABLE_NAME).setColWidthPercentAllFields(COL_WIDTH_PER_TRADES_ALL_FIELDS);
         tabTOS3622.get(TRADES_TABLE_NAME).setFilter(new TableFilter(tabTOS3622.get(TRADES_TABLE_NAME).getTable()));
-        tabTOS3622.get(TRADES_TABLE_NAME)
-                .setColumnPopupMenu(new ColumnPopupMenu(tabTOS3622.get(TRADES_TABLE_NAME).getFilter()));
+        tabTOS3622.get(TRADES_TABLE_NAME).setColumnPopupMenu(new ColumnPopupMenu(tabTOS3622.get(TRADES_TABLE_NAME).getFilter()));
         // initialize tables for TOS3622 -Allocations table
         tabTOS3622.get(ALLOCATIONS_TABLE_NAME).setTable(new JTable());
         tabTOS3622.get(ALLOCATIONS_TABLE_NAME).setTableName(ALLOCATIONS_TABLE_NAME);
-        tabTOS3622.get(ALLOCATIONS_TABLE_NAME).setColWidthPercent(COL_WIDTH_PER_ALLOCATIONS);
+        tabTOS3622.get(ALLOCATIONS_TABLE_NAME).setColWidthPercentDefaultView(COL_WIDTH_PER_ALLOCATIONS_DEFAULT_VIEW);
+        tabTOS3622.get(ALLOCATIONS_TABLE_NAME).setColWidthPercentAllFields(COL_WIDTH_PER_ALLOCATIONS_ALL_FIELDS);
         tabTOS3622.get(ALLOCATIONS_TABLE_NAME).setFilter(new TableFilter(tabTOS3622.get(ALLOCATIONS_TABLE_NAME).getTable()));
-        tabTOS3622.get(ALLOCATIONS_TABLE_NAME)
-                .setColumnPopupMenu(new ColumnPopupMenu(tabTOS3622.get(ALLOCATIONS_TABLE_NAME).getFilter()));
-        // add tables to the TOS3622 account tab
+        tabTOS3622.get(ALLOCATIONS_TABLE_NAME).setColumnPopupMenu(new ColumnPopupMenu(tabTOS3622.get(ALLOCATIONS_TABLE_NAME).getFilter()));
+        // add tables to the TOS3622 account accountTable
         tabs.put(TOS3622_ACCOUNT_NAME, tabTOS3622);
 
         /**
@@ -198,39 +198,30 @@ public class ELLE_GUI_Frame extends JFrame implements ITableConstants {
         // create hashmap for Combined tables
         Map<String, AccountTable> tabCombined = new HashMap();
         tabCombined.put(POSITIONS_TABLE_NAME, new AccountTable());
-        tabCombined.put(TRADES_TABLE_VIEW_NAME, new AccountTable());
         tabCombined.put(ALLOCATIONS_TABLE_NAME, new AccountTable());
         tabCombined.put(TRADES_TABLE_NAME, new AccountTable());
-
         // initialize tables for Combined -Postions table
         tabCombined.get(POSITIONS_TABLE_NAME).setTable(new JTable());
         tabCombined.get(POSITIONS_TABLE_NAME).setTableName(POSITIONS_TABLE_NAME);
-        tabCombined.get(POSITIONS_TABLE_NAME).setColWidthPercent(COL_WIDTH_PER_POSITIONS);
+        tabCombined.get(POSITIONS_TABLE_NAME).setColWidthPercentDefaultView(COL_WIDTH_PER_POSITIONS_DEFAULT_VIEW);
+        tabCombined.get(POSITIONS_TABLE_NAME).setColWidthPercentAllFields(COL_WIDTH_PER_POSITIONS_ALL_FIELDS);
         tabCombined.get(POSITIONS_TABLE_NAME).setFilter(new TableFilter(tabCombined.get(POSITIONS_TABLE_NAME).getTable()));
-        tabCombined.get(POSITIONS_TABLE_NAME)
-                .setColumnPopupMenu(new ColumnPopupMenu(tabCombined.get(POSITIONS_TABLE_NAME).getFilter()));
-        // initialize tables for Combined -TradesView table
-        tabCombined.get(TRADES_TABLE_VIEW_NAME).setTable(new JTable());
-        tabCombined.get(TRADES_TABLE_VIEW_NAME).setTableName(TRADES_TABLE_VIEW_NAME);
-        tabCombined.get(TRADES_TABLE_VIEW_NAME).setColWidthPercent(COL_WIDTH_PER_TRADES_VIEW);
-        tabCombined.get(TRADES_TABLE_VIEW_NAME).setFilter(new TableFilter(tabCombined.get(TRADES_TABLE_VIEW_NAME).getTable()));
-        tabCombined.get(TRADES_TABLE_VIEW_NAME)
-                .setColumnPopupMenu(new ColumnPopupMenu(tabCombined.get(TRADES_TABLE_VIEW_NAME).getFilter()));
+        tabCombined.get(POSITIONS_TABLE_NAME).setColumnPopupMenu(new ColumnPopupMenu(tabCombined.get(POSITIONS_TABLE_NAME).getFilter()));
         // initialize tables for Combined -Trades table
         tabCombined.get(TRADES_TABLE_NAME).setTable(new JTable());
         tabCombined.get(TRADES_TABLE_NAME).setTableName(TRADES_TABLE_NAME);
-        tabCombined.get(TRADES_TABLE_NAME).setColWidthPercent(COL_WIDTH_PER_TRADES);
+        tabCombined.get(TRADES_TABLE_NAME).setColWidthPercentDefaultView(COL_WIDTH_PER_TRADES_DEFAULT_VIEW);
+        tabCombined.get(TRADES_TABLE_NAME).setColWidthPercentAllFields(COL_WIDTH_PER_TRADES_ALL_FIELDS);
         tabCombined.get(TRADES_TABLE_NAME).setFilter(new TableFilter(tabCombined.get(TRADES_TABLE_NAME).getTable()));
-        tabCombined.get(TRADES_TABLE_NAME)
-                .setColumnPopupMenu(new ColumnPopupMenu(tabCombined.get(TRADES_TABLE_NAME).getFilter()));
+        tabCombined.get(TRADES_TABLE_NAME).setColumnPopupMenu(new ColumnPopupMenu(tabCombined.get(TRADES_TABLE_NAME).getFilter()));
         // initialize tables for Combined -Allocations table
         tabCombined.get(ALLOCATIONS_TABLE_NAME).setTable(new JTable());
         tabCombined.get(ALLOCATIONS_TABLE_NAME).setTableName(ALLOCATIONS_TABLE_NAME);
-        tabCombined.get(ALLOCATIONS_TABLE_NAME).setColWidthPercent(COL_WIDTH_PER_ALLOCATIONS);
+        tabCombined.get(ALLOCATIONS_TABLE_NAME).setColWidthPercentDefaultView(COL_WIDTH_PER_ALLOCATIONS_DEFAULT_VIEW);
+        tabCombined.get(ALLOCATIONS_TABLE_NAME).setColWidthPercentAllFields(COL_WIDTH_PER_ALLOCATIONS_ALL_FIELDS);
         tabCombined.get(ALLOCATIONS_TABLE_NAME).setFilter(new TableFilter(tabCombined.get(ALLOCATIONS_TABLE_NAME).getTable()));
-        tabCombined.get(ALLOCATIONS_TABLE_NAME)
-                .setColumnPopupMenu(new ColumnPopupMenu(tabCombined.get(ALLOCATIONS_TABLE_NAME).getFilter()));
-        // add tables to the Combined account tab
+        tabCombined.get(ALLOCATIONS_TABLE_NAME).setColumnPopupMenu(new ColumnPopupMenu(tabCombined.get(ALLOCATIONS_TABLE_NAME).getFilter()));
+        // add tables to the Combined account accountTable
         tabs.put(COMBINED_ACCOUNT_NAME, tabCombined);
 
         // this sets the KeyboardFocusManger
@@ -243,24 +234,18 @@ public class ELLE_GUI_Frame extends JFrame implements ITableConstants {
         // this may not even be needed for this application
         tabs.get(IB9048_ACCOUNT_NAME).get(POSITIONS_TABLE_NAME).
                 setTableColNamesAndIDList(tabs.get(IB9048_ACCOUNT_NAME).get(POSITIONS_TABLE_NAME).getTable());
-        tabs.get(IB9048_ACCOUNT_NAME).get(TRADES_TABLE_VIEW_NAME).
-                setTableColNamesAndIDList(tabs.get(IB9048_ACCOUNT_NAME).get(TRADES_TABLE_VIEW_NAME).getTable());
         tabs.get(IB9048_ACCOUNT_NAME).get(ALLOCATIONS_TABLE_NAME).
                 setTableColNamesAndIDList(tabs.get(IB9048_ACCOUNT_NAME).get(ALLOCATIONS_TABLE_NAME).getTable());
         tabs.get(IB9048_ACCOUNT_NAME).get(TRADES_TABLE_NAME).
                 setTableColNamesAndIDList(tabs.get(IB9048_ACCOUNT_NAME).get(TRADES_TABLE_NAME).getTable());
         tabs.get(TOS3622_ACCOUNT_NAME).get(POSITIONS_TABLE_NAME).
                 setTableColNamesAndIDList(tabs.get(TOS3622_ACCOUNT_NAME).get(POSITIONS_TABLE_NAME).getTable());
-        tabs.get(TOS3622_ACCOUNT_NAME).get(TRADES_TABLE_VIEW_NAME).
-                setTableColNamesAndIDList(tabs.get(TOS3622_ACCOUNT_NAME).get(TRADES_TABLE_VIEW_NAME).getTable());
         tabs.get(TOS3622_ACCOUNT_NAME).get(ALLOCATIONS_TABLE_NAME).
                 setTableColNamesAndIDList(tabs.get(TOS3622_ACCOUNT_NAME).get(ALLOCATIONS_TABLE_NAME).getTable());
         tabs.get(TOS3622_ACCOUNT_NAME).get(TRADES_TABLE_NAME).
                 setTableColNamesAndIDList(tabs.get(TOS3622_ACCOUNT_NAME).get(TRADES_TABLE_NAME).getTable());
         tabs.get(COMBINED_ACCOUNT_NAME).get(POSITIONS_TABLE_NAME).
                 setTableColNamesAndIDList(tabs.get(COMBINED_ACCOUNT_NAME).get(POSITIONS_TABLE_NAME).getTable());
-        tabs.get(COMBINED_ACCOUNT_NAME).get(TRADES_TABLE_VIEW_NAME).
-                setTableColNamesAndIDList(tabs.get(COMBINED_ACCOUNT_NAME).get(TRADES_TABLE_VIEW_NAME).getTable());
         tabs.get(COMBINED_ACCOUNT_NAME).get(ALLOCATIONS_TABLE_NAME).
                 setTableColNamesAndIDList(tabs.get(COMBINED_ACCOUNT_NAME).get(ALLOCATIONS_TABLE_NAME).getTable());
         tabs.get(COMBINED_ACCOUNT_NAME).get(TRADES_TABLE_NAME).
@@ -1011,54 +996,38 @@ public class ELLE_GUI_Frame extends JFrame implements ITableConstants {
 
     private void btnTradesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnTradesActionPerformed
 
-        // local variables
-        String tabName = "";
+        String tabName = getSelectedTabName();
 
-        String AccountTableName = "";
-        for (Map.Entry<String, Map<String, AccountTable>> tabEntry : tabs.entrySet()) {
-            tabName = tabEntry.getKey();
-            if (!menuItemTrades.isSelected()
-                    || this.btnTableDisplayState.getText().toLowerCase().contains("view")) {
-                AccountTableName = TRADES_TABLE_VIEW_NAME;
-                tabs.get(tabName).get(TRADES_TABLE_VIEW_NAME).setTableSelected(true);
-                tabs.get(tabName).get(TRADES_TABLE_NAME).setTableSelected(false);
-            } else if (menuItemTrades.isSelected()
-                    || this.btnTableDisplayState.getText().toLowerCase().contains("all fields")) {
-                AccountTableName = TRADES_TABLE_NAME;
-                tabs.get(tabName).get(TRADES_TABLE_NAME).setTableSelected(true);
-                tabs.get(tabName).get(TRADES_TABLE_VIEW_NAME).setTableSelected(false);
-            }
+        // set the trades table as selected
+        tabs.get(tabName).get(POSITIONS_TABLE_NAME).setTableSelected(false);
+        tabs.get(tabName).get(ALLOCATIONS_TABLE_NAME).setTableSelected(false);
+        tabs.get(tabName).get(TRADES_TABLE_NAME).setTableSelected(true);
 
-            // set the trades table as selected
-            tabs.get(tabName).get(POSITIONS_TABLE_NAME).setTableSelected(false);
-            tabs.get(tabName).get(ALLOCATIONS_TABLE_NAME).setTableSelected(false);
-        }
-        tabName = getSelectedTabName();
-        AccountTable tab = tabs.get(tabName).get(AccountTableName);
-        JTable table = tab.getTable();
-        TableFilter filter = tab.getFilter();
+        AccountTable accountTable = tabs.get(tabName).get(TRADES_TABLE_NAME);
+        JTable table = accountTable.getTable();
+        TableFilter filter = accountTable.getFilter();
         JScrollPane scroll = new JScrollPane(table);
-        setScrollBarFormat(scroll, table);            // fix issue with scroll bar dissappearing
-
         // update button colors
-        btnTrades.setBackground(colorBtnSelected);
         btnPositions.setBackground(colorBtnDefault);
+        btnTrades.setBackground(colorBtnSelected);
         btnAllocations.setBackground(colorBtnDefault);
+        
+        // update view label
+        btnTableDisplayState.setText(accountTable.getView());
 
-        // change panel table to trades
+        // change panel table to positions
         JPanel panel = getSelectedTabPanel();
         panel.removeAll();
         panel.setLayout(new BorderLayout());
         panel.add(scroll, BorderLayout.CENTER);
 
-        // apply filter for the trades table
+        // apply filter for the positions table
         filter.applyFilter();
         filter.applyColorHeaders();
 
         // update records label
-        String recordsText = tab.getRecordsLabel();
+        String recordsText = accountTable.getRecordsLabel();
         labelRecords.setText(recordsText);
-
     }//GEN-LAST:event_btnTradesActionPerformed
 
     private void menuItemPuponeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuItemPuponeActionPerformed
@@ -1081,8 +1050,6 @@ public class ELLE_GUI_Frame extends JFrame implements ITableConstants {
 
     private void menuItemReadActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuItemReadActionPerformed
 
-        //Path path = Paths.get("./IB 9048 AS 2013-0606C.csv");
-        //File file = path.toFile();
         int returnVal = filechooser.showOpenDialog(this);
         if (returnVal == JFileChooser.APPROVE_OPTION) {
             File file = filechooser.getSelectedFile();
@@ -1132,13 +1099,6 @@ public class ELLE_GUI_Frame extends JFrame implements ITableConstants {
                     LoggingAspect.afterThrown(ex);
                 }
 
-                // testing the file
-                //JTable table = new JTable(data, columnNames);
-                //JScrollPane scroll = new JScrollPane(table);
-                //panelAccounts.removeAll();
-                //panelAccounts.setLayout(new BorderLayout());
-                //panelAccounts.add(scroll, BorderLayout.CENTER);
-
                 read_csv readcsvfiles = new read_csv(data, columnNames);
                 readcsvfiles.setTitle(filename);
                 readcsvfiles.setVisible(true);
@@ -1164,33 +1124,29 @@ public class ELLE_GUI_Frame extends JFrame implements ITableConstants {
     }//GEN-LAST:event_menuItemLoadFileActionPerformed
 
     private void btnAllocationsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAllocationsActionPerformed
-        // local variables
-        String tabName = "";
-        for (Map.Entry<String, Map<String, AccountTable>> tabEntry : tabs.entrySet()) {
-            tabName = tabEntry.getKey();
-//        setScrollBarFormat(scroll, table);            // fix issue with scroll bar dissappearing
 
-            // set the positions table as selected
-            tabs.get(tabName).get(POSITIONS_TABLE_NAME).setTableSelected(false);
-            tabs.get(tabName).get(TRADES_TABLE_VIEW_NAME).setTableSelected(false);
-            tabs.get(tabName).get(ALLOCATIONS_TABLE_NAME).setTableSelected(true);
-            tabs.get(tabName).get(TRADES_TABLE_NAME).setTableSelected(false);
-        }
-        tabName = getSelectedTabName();
+        String tabName = getSelectedTabName();
+        
+        // set the allocations table as selected
+        tabs.get(tabName).get(POSITIONS_TABLE_NAME).setTableSelected(false);
+        tabs.get(tabName).get(ALLOCATIONS_TABLE_NAME).setTableSelected(true);
+        tabs.get(tabName).get(TRADES_TABLE_NAME).setTableSelected(false);
+        
         AccountTable accountTable = tabs.get(tabName).get(ALLOCATIONS_TABLE_NAME);
         JTable table = accountTable.getTable();
         TableFilter filter = accountTable.getFilter();
         JScrollPane scroll = new JScrollPane(table);
-//        setScrollBarFormat(scroll, table);            // fix issue with scroll bar dissappearing
 
         // update button colors
         btnPositions.setBackground(colorBtnDefault);
         btnTrades.setBackground(colorBtnDefault);
         btnAllocations.setBackground(colorBtnSelected);
+        
+        // update view label
+        btnTableDisplayState.setText(accountTable.getView());
 
-        // set the positions table as selected
+        // set the allocations table as selected
         tabs.get(tabName).get(POSITIONS_TABLE_NAME).setTableSelected(false);
-        tabs.get(tabName).get(TRADES_TABLE_VIEW_NAME).setTableSelected(false);
         tabs.get(tabName).get(ALLOCATIONS_TABLE_NAME).setTableSelected(true);
         tabs.get(tabName).get(TRADES_TABLE_NAME).setTableSelected(false);
 
@@ -1207,17 +1163,6 @@ public class ELLE_GUI_Frame extends JFrame implements ITableConstants {
         // update records label
         String recordsText = accountTable.getRecordsLabel();
         labelRecords.setText(recordsText);
-        // this button is grayed out for now
-//        // add allocations table to the panel 
-//        setSelectedTab(ALLOCATIONS_TABLE_NAME);
-//        JScrollPane scroll = new JScrollPane(allocations);
-//        panelAccounts.removeAll();
-//        panelAccounts.setLayout(new BorderLayout());
-//        panelAccounts.add(scroll, BorderLayout.CENTER);
-//        Tab tab = tabs.get(ALLOCATIONS_TABLE_NAME);
-//        String recordsText = tab.getRecordsLabel();
-//        labelRecords.setText(recordsText);
-
     }//GEN-LAST:event_btnAllocationsActionPerformed
 
     private void menuItemPositionsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuItemPositionsActionPerformed
@@ -1451,19 +1396,13 @@ public class ELLE_GUI_Frame extends JFrame implements ITableConstants {
 
     private void btnPositionsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnPositionsActionPerformed
 
-        // local variables
-        String tabName = "";
-        for (Map.Entry<String, Map<String, AccountTable>> tabEntry : tabs.entrySet()) {
-            tabName = tabEntry.getKey();
-//        setScrollBarFormat(scroll, table);            // fix issue with scroll bar dissappearing
+        String tabName = getSelectedTabName();
 
-            // set the positions table as selected
-            tabs.get(tabName).get(POSITIONS_TABLE_NAME).setTableSelected(true);
-            tabs.get(tabName).get(TRADES_TABLE_VIEW_NAME).setTableSelected(false);
-            tabs.get(tabName).get(ALLOCATIONS_TABLE_NAME).setTableSelected(false);
-            tabs.get(tabName).get(TRADES_TABLE_NAME).setTableSelected(false);
-        }
-        tabName = getSelectedTabName();
+        // set the positions table as selected
+        tabs.get(tabName).get(POSITIONS_TABLE_NAME).setTableSelected(true);
+        tabs.get(tabName).get(ALLOCATIONS_TABLE_NAME).setTableSelected(false);
+        tabs.get(tabName).get(TRADES_TABLE_NAME).setTableSelected(false);
+
         AccountTable accountTable = tabs.get(tabName).get(POSITIONS_TABLE_NAME);
         JTable table = accountTable.getTable();
         TableFilter filter = accountTable.getFilter();
@@ -1472,6 +1411,9 @@ public class ELLE_GUI_Frame extends JFrame implements ITableConstants {
         btnPositions.setBackground(colorBtnSelected);
         btnTrades.setBackground(colorBtnDefault);
         btnAllocations.setBackground(colorBtnDefault);
+        
+        // update view label
+        btnTableDisplayState.setText(accountTable.getView());
 
         // change panel table to positions
         JPanel panel = getSelectedTabPanel();
@@ -1486,7 +1428,6 @@ public class ELLE_GUI_Frame extends JFrame implements ITableConstants {
         // update records label
         String recordsText = accountTable.getRecordsLabel();
         labelRecords.setText(recordsText);
-
     }//GEN-LAST:event_btnPositionsActionPerformed
 
     private void menuItemCheckBoxSQLActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuItemCheckBoxSQLActionPerformed
@@ -1543,56 +1484,55 @@ public class ELLE_GUI_Frame extends JFrame implements ITableConstants {
     private void tabbedPaneAccountsStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_tabbedPaneAccountsStateChanged
         // called by init components so just skip if tabs is null
         if (tabs != null) {
-            // get the account
-            String tabName = getSelectedTabName();        // tab/account name
 
-            // get the table name
-            String tableName = "";
+            String tabName = getSelectedTabName(); // account name
+            AccountTable accountTable = null;      // the account table
+            String tableName = "";                 // table name
+            
             if (tabs.get(tabName).get(POSITIONS_TABLE_NAME).isTableSelected()) {
                 tableName = POSITIONS_TABLE_NAME;
+                accountTable = tabs.get(tabName).get(tableName);
                 // update button colors
                 btnPositions.setBackground(colorBtnSelected);
                 btnTrades.setBackground(colorBtnDefault);
                 btnAllocations.setBackground(colorBtnDefault);
-            } else if (tabs.get(tabName).get(TRADES_TABLE_VIEW_NAME).isTableSelected()
-                    || tabs.get(tabName).get(TRADES_TABLE_NAME).isTableSelected()) {
-                if (!menuItemTrades.isSelected()) {
-                    tableName = TRADES_TABLE_VIEW_NAME;
-                } else {
-                    tableName = TRADES_TABLE_NAME;
-                }
+            } else if (tabs.get(tabName).get(TRADES_TABLE_NAME).isTableSelected()) {
+                tableName = TRADES_TABLE_NAME;
+                accountTable = tabs.get(tabName).get(tableName);
                 // update button colors
                 btnTrades.setBackground(colorBtnSelected);
                 btnPositions.setBackground(colorBtnDefault);
                 btnAllocations.setBackground(colorBtnDefault);
             } else if (tabs.get(tabName).get(ALLOCATIONS_TABLE_NAME).isTableSelected()) {
                 tableName = ALLOCATIONS_TABLE_NAME;
+                accountTable = tabs.get(tabName).get(tableName);
                 // update button colors
                 btnPositions.setBackground(colorBtnDefault);
                 btnTrades.setBackground(colorBtnDefault);
                 btnAllocations.setBackground(colorBtnSelected);
             }
+            
+            // set view label
+            btnTableDisplayState.setText(accountTable.getView());
+            
             // display correct table
-            displayTable(tabName, tableName);  // shows the correct table depending on tab and button selected}
+            displayTable(tabName, tableName);  // shows the correct table depending on accountTable and button selected}
         }
     }//GEN-LAST:event_tabbedPaneAccountsStateChanged
 
     private void menuItemTradesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuItemTradesActionPerformed
-        System.out.println("trade button selected: " + tabs.get(getSelectedTabName())
-                .get(TRADES_TABLE_VIEW_NAME).isTableSelected());
-        String tableName = "";
-        if (menuItemTrades.isSelected()) {
 
-            tableName = TRADES_TABLE_NAME;
+        String tableName = "";
+        tableName = TRADES_TABLE_NAME;
+        if (menuItemTrades.isSelected()) {
+            // TODO show columns
             btnTableDisplayState.setText("All Fields");
         } else {
-            tableName = TRADES_TABLE_VIEW_NAME;
+            // TODO hide columns
             btnTableDisplayState.setText("Default Views");
         }
-        if (tabs.get(getSelectedTabName()).get(TRADES_TABLE_VIEW_NAME).isTableSelected()
-                || tabs.get(getSelectedTabName()).get(TRADES_TABLE_NAME).isTableSelected()) {
-            String tabName = this.getSelectedTabName();
-
+        if (tabs.get(getSelectedTabName()).get(TRADES_TABLE_NAME).isTableSelected()) {
+            String tabName = getSelectedTabName();
             displayTable(tabName, tableName);
         }
     }//GEN-LAST:event_menuItemTradesActionPerformed
@@ -1606,44 +1546,38 @@ public class ELLE_GUI_Frame extends JFrame implements ITableConstants {
         viewATradeWindow.setVisible(true);
     }//GEN-LAST:event_menuItemAViewATradesActionPerformed
 
+    /**
+     * This method is invoked when the label is clicked for default views
+     * @param evt 
+     */
     private void btnTableDisplayStateMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnTableDisplayStateMouseClicked
-        System.out.println(tabs.get(getSelectedTabName()).get(TRADES_TABLE_VIEW_NAME).isTableSelected());
-        System.out.println(tabs.get(getSelectedTabName()).get(TRADES_TABLE_NAME).isTableSelected());
-        JLabel tradesTableViewState = (JLabel) evt.getComponent();
-        String tableName = "";
-        String preTableName = "";
-
+        
+        /**
+         * toggle design [all fields, default view]
+         */
+        JLabel viewLabel = (JLabel) evt.getComponent();
         String tabName = getSelectedTabName();
+        String tableName = getTableName(tabName);
+        AccountTable accountTable = tabs.get(tabName).get(tableName);
+        Map<String,Integer> colWidths;
 
-        if (tradesTableViewState.getText().toLowerCase().contains("view")) {
-            tableName = TRADES_TABLE_NAME;
-            preTableName = TRADES_TABLE_VIEW_NAME;
-            btnTableDisplayState.setText("All Fields");
-            menuItemTrades.setSelected(true);
-        } else if (tradesTableViewState.getText().toLowerCase().contains("all fields")) {
-            tableName = TRADES_TABLE_VIEW_NAME;
-            preTableName = TRADES_TABLE_NAME;
-            btnTableDisplayState.setText("Defaut Views");
+        if (viewLabel.getText().equals(VIEW_LABEL_TXT_ALL_FIELDS)) {
+            accountTable.setView(VIEW_LABEL_TXT_DEFAULT_VIEW);
+            accountTable.setAllFields(false);
+            colWidths = accountTable.getColWidthPercentDefaultView();
+            btnTableDisplayState.setText(accountTable.getView());
             menuItemTrades.setSelected(false);
         }
-        if (tabs.get(getSelectedTabName()).get(TRADES_TABLE_VIEW_NAME).isTableSelected()
-                || tabs.get(getSelectedTabName()).get(TRADES_TABLE_NAME).isTableSelected()) {
-
-//            TableFilter prefilter = tabs.get(tabName).get(preTableName).getFilter();
-//            TableFilter aftfilter = tabs.get(tabName).get(tableName).getFilter();
-//            for (int preTableCol : prefilter.getFilterItems().keySet()) {
-//                for (int aftTableCol =0; aftTableCol < tabs.get(tabName).
-//                        get(tableName).getTable().getColumnCount(); aftTableCol++) {
-//                    String name  = tabs.get(tabName).get(tableName).getTableColNames().elementAt(aftTableCol);
-//                    if (tabs.get(tabName).get(preTableName).getTableColNames()
-//                            .get(preTableCol).equalsIgnoreCase(name)) {
-//                        aftfilter.addFilterItems(aftTableCol, prefilter.getFilterItems().get(preTableCol));  
-//                    }
-//                }
-//            }
-            // display correct table
-            displayTable(tabName, tableName);  // shows the correct table depending on tab and button selected}
+        else{
+            accountTable.setView(VIEW_LABEL_TXT_ALL_FIELDS);
+            accountTable.setAllFields(true);
+            colWidths = accountTable.getColWidthPercentAllFields();
+            btnTableDisplayState.setText(accountTable.getView());
+            menuItemTrades.setSelected(true);
         }
+
+        setColumnFormat(colWidths, accountTable.getTable());
+        displayTable(tabName, tableName);
     }//GEN-LAST:event_btnTableDisplayStateMouseClicked
 
     private void menuItemBackupActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuItemBackupActionPerformed
@@ -1689,6 +1623,10 @@ public class ELLE_GUI_Frame extends JFrame implements ITableConstants {
        reloadDataAction();
     }//GEN-LAST:event_menuItemReloadTabDataActionPerformed
 
+    /**
+     * 
+     * @param evt 
+     */
     private void menuItemLogOutActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuItemLogOutActionPerformed
               Object[] options = {"Reconnect", "Log Out"};  // the titles of buttons
 
@@ -1716,19 +1654,14 @@ public class ELLE_GUI_Frame extends JFrame implements ITableConstants {
         }
     }//GEN-LAST:event_menuItemLogOutActionPerformed
 
-    
+    /**
+     * 
+     */
     private void reloadDataAction() {
-       
-
-        
-        
         // reload modified table data into dropdown list
         loadTables(tabs);
-
-        
-        
-
     }
+    
     /**
      * initTotalRowCounts called once to initialize the total rowIndex counts of
      * each tabs table
@@ -1776,7 +1709,6 @@ public class ELLE_GUI_Frame extends JFrame implements ITableConstants {
                 AccountTable tab = tables.get(tableName);
                 JTable table = tab.getTable();
                 System.out.println("2: " + tableName);
-//                System.out.println(tableName + " " + accountName); 
                 loadTable(table, tableName, accountName);
                 setTableListeners(tab);
                 // set initial total records
@@ -1797,114 +1729,286 @@ public class ELLE_GUI_Frame extends JFrame implements ITableConstants {
      */
     public JTable loadTable(JTable table, String tableName, String accountName) {
 
-        String sql;  // sql query
-
-        if (accountName == "Combined") {
-            sql = "SELECT * FROM " + tableName
-                    + " ORDER BY symbol ASC";
-        } else {
-            sql = "SELECT * FROM " + tableName
-                    + " WHERE Account = '" + accountName
-                    + "' ORDER BY symbol ASC";
+        // check what table it is
+        switch (tableName) {
+            case TRADES_TABLE_NAME:
+                loadTableTrades(table,accountName);
+                break;
+            case POSITIONS_TABLE_NAME:
+                loadTablePositions(table,accountName);
+                break;
+            case ALLOCATIONS_TABLE_NAME:
+                loadTableAllocations(table,accountName);
+                break;
+            default:
+                break;
         }
-        System.out.println(sql);
-        if (!tableName.equals(TRADES_TABLE_VIEW_NAME)) {
-            table = loadTable(sql, table, tableName, accountName);
-        }
-        if (tableName.equals(TRADES_TABLE_NAME)) {
-            loadViewTable(table, tableName, accountName, tabs);
-        }
-        // format the table
-        formatTable(table);
-
-        return table;
-    }
-
-    /**
-     * loadTable
-     *
-     * @param sql
-     * @param table
-     * @return
-     */
-    public JTable loadTable(String sql, JTable table, String tableName, String accountName) {
-
-        Vector data = new Vector();
-        Vector columnNames = new Vector();
-        Vector columnClass = new Vector();
-        int columns;
-
-        ResultSet rs = null;
-        ResultSetMetaData metaData = null;
-        try {
-            rs = statement.executeQuery(sql);
-            metaData = rs.getMetaData();
-        } catch (Exception ex) {
-            System.out.println("error");
-            LoggingAspect.afterThrown(ex);
-            return table;
-        }
-        try {
-            columns = metaData.getColumnCount();
-            for (int i = 1; i <= columns; i++) {
-                columnClass.addElement(metaData.getColumnClassName(i));
-                columnNames.addElement(metaData.getColumnName(i));
-//                System.out.println(metaData.getColumnName(i) + " original: " + metaData.getColumnClassName(i));
-            }
-            while (rs.next()) {
-                Vector row = new Vector(columns);
-                for (int i = 1; i <= columns; i++) {
-                    row.addElement(rs.getObject(i));
-                }
-                data.addElement(row);
-            }
-            rs.close();
-
-        } catch (SQLException ex) {
-            LoggingAspect.afterThrown(ex);
-        }
-
-        EditableTableModel model = new EditableTableModel(data, columnNames, columnClass);
-
-        // this has to be set here or else I get errors
-        // I tried passing the model to the filter and setting it there
-        // but it caused errors
-        table.setModel(model);
-        for (int i = 0; i < table.getColumnCount(); i++) {
-//            System.out.println(table.getColumnName(i) + "class name: " + table.getColumnClass(i));
-        }
-
+        
         // check that the filter items are initialized
-        AccountTable tab = tabs.get(accountName).get(tableName);
-        TableFilter filter = tab.getFilter();
+        AccountTable accountTable = tabs.get(accountName).get(tableName);
+        TableFilter filter = accountTable.getFilter();
         if (filter.getFilterItems() == null) {
             filter.initFilterItems();
         }
+
         // apply filter
         filter.applyFilter();
         filter.applyColorHeaders();
 
         // load all checkbox items for the checkbox column pop up filter
-        ColumnPopupMenu columnPopupMenu = tab.getColumnPopupMenu();
+        ColumnPopupMenu columnPopupMenu = accountTable.getColumnPopupMenu();
         columnPopupMenu.loadAllCheckBoxItems();
 
         // set column format
-        Map<String, Integer> colWidthPercent = tab.getColWidthPercent();
+        Map<String, Integer> colWidthPercent;
 
-//        if (colWidthPercent.length != table.getColumnCount()) {
-//            colWidthPercent = new float[table.getColumnCount()];
-//            Arrays.fill(colWidthPercent, 80);
-//        }
+        if(accountTable.isAllFields()){
+            colWidthPercent = accountTable.getColWidthPercentAllFields();
+        }
+        else{
+            colWidthPercent = accountTable.getColWidthPercentDefaultView();
+        }
         setColumnFormat(colWidthPercent, table);
 
         // set the listeners for the table
-        setTableListeners(tab);
+        setTableListeners(accountTable);
 
-        System.out.println("Table loaded succesfully");
+        // format the table
+        formatTable(table);
 
         return table;
     }
+    
+    private void loadTableTrades(JTable table,String accountName){
+        
+        // clear table model
+        DefaultTableModel model = (DefaultTableModel)table.getModel();
+        model.setRowCount(0);
+        model.setColumnCount(TRADES_COL_NAMES.length);
+        
+        // DAO
+        ArrayList<Trade> trades = tradeDAO.get(accountName);
+        if(!trades.isEmpty() && trades != null){
+            for(Trade trade: trades){
+                inserTableRow(table, trade);
+            }
+        }
 
+        // get the data from the table model	
+        Vector data = new Vector();
+        model = (DefaultTableModel)table.getModel();
+        data = model.getDataVector();
+        
+        // get the column names
+        Vector columnNames = new Vector();
+        for(String colName: TRADES_COL_NAMES){
+            columnNames.addElement(colName);
+        }
+
+        // get the column classes
+        Vector columnClasses = new Vector();
+        model.setColumnCount(columnNames.size());
+        for(int i = 0; i < model.getColumnCount();i++){
+            columnClasses.addElement(model.getColumnClass(i).toString());
+        }
+        
+        EditableTableModel etm = new EditableTableModel(data, columnNames, columnClasses);
+        table.setModel(etm);
+    }
+    
+    private void loadTablePositions(JTable table,String accountName){
+
+        // clear table model
+        DefaultTableModel model = (DefaultTableModel)table.getModel();
+        model.setRowCount(0);
+        model.setColumnCount(POSITIONS_COL_NAMES.length);
+        
+        // DAO
+        ArrayList<Position> positions = PositionDAO.get(accountName);
+        if(!positions.isEmpty() && positions != null){
+            for(Position position: positions){
+                inserTableRow(table, position);
+            }
+        }
+
+        // get the data from the table model	
+        Vector data = new Vector();
+        model = (DefaultTableModel)table.getModel();
+        data = model.getDataVector();
+        
+        // get the column names
+        Vector columnNames = new Vector();
+        for(String colName: POSITIONS_COL_NAMES){
+            columnNames.addElement(colName);
+        }
+
+        // get the column classes
+        Vector columnClasses = new Vector();
+        model.setColumnCount(columnNames.size());
+        for(int i = 0; i < model.getColumnCount();i++){
+            columnClasses.addElement(model.getColumnClass(i).toString());
+        }
+        
+        EditableTableModel etm = new EditableTableModel(data, columnNames, columnClasses);
+        table.setModel(etm);
+    }
+    
+    private void loadTableAllocations(JTable table,String accountName){
+
+        // clear table model
+        DefaultTableModel model = (DefaultTableModel)table.getModel();
+        model.setRowCount(0);
+        model.setColumnCount(ALLOCATIONS_COL_NAMES.length);
+        
+        // DAO
+        ArrayList<Allocation> allocations = AllocationDAO.get(accountName);
+        if(!allocations.isEmpty() && allocations != null){
+            for(Allocation allocation: allocations){
+                inserTableRow(table, allocation);
+            }
+        }
+
+        // get the data from the table model	
+        Vector data = new Vector();
+        model = (DefaultTableModel)table.getModel();
+        data = model.getDataVector();
+        
+        // get the column names
+        Vector columnNames = new Vector();
+        for(String colName: ALLOCATIONS_COL_NAMES){
+            columnNames.addElement(colName);
+        }
+
+        // get the column classes
+        Vector columnClasses = new Vector();
+        model.setColumnCount(columnNames.size());
+        for(int i = 0; i < model.getColumnCount();i++){
+            columnClasses.addElement(model.getColumnClass(i).toString());
+        }
+        
+        EditableTableModel etm = new EditableTableModel(data, columnNames, columnClasses);
+        table.setModel(etm);
+    }
+    
+    /**
+     * Inserts a new rowIndex in the table
+     * @param table
+     * @param trade 
+     */
+    public void inserTableRow(JTable table, Trade trade) {
+
+        Object[] rowData = new Object[39];
+        rowData[0] = trade.getId();
+        rowData[1] = trade.getTradeTime();
+        rowData[2] = trade.getOc();
+        rowData[3] = trade.getLs();
+        rowData[4] = trade.getSymbol();
+        rowData[5] = trade.getQ();
+        rowData[6] = trade.getPrice();
+        rowData[7] = trade.getComm();
+        rowData[8] = trade.getProceeds();
+        rowData[9] = trade.getBasis();
+        rowData[10] = trade.getPriceAdj();
+        rowData[11] = trade.getProcessed();
+        rowData[12] = trade.getLotTime();
+        rowData[13] = trade.getRealizedPl();
+        rowData[14] = trade.getCodes();
+        rowData[15] = trade.getKsflag();
+        rowData[16] = trade.getNotes();
+        rowData[17] = trade.getAccount();
+        rowData[18] = trade.getYr();
+        rowData[19] = trade.getFileCode();
+        rowData[20] = trade.getInputLine();
+        rowData[21] = trade.getLocked();
+        rowData[22] = trade.getMflag();
+        rowData[23] = trade.getSecType();
+        rowData[24] = trade.getMulti();
+        rowData[25] = trade.getUnderlying();
+        rowData[26] = trade.getExpiry();
+        rowData[27] = trade.getStrike();
+        rowData[28] = trade.getoType();
+        rowData[29] = trade.getlNotes();
+        rowData[30] = trade.getStategy();
+        rowData[31] = trade.getxChange();
+        rowData[32] = trade.getOrder();
+        rowData[33] = trade.getFill();
+        rowData[34] = trade.getTotalQ();
+        rowData[35] = trade.gettGrp();
+        rowData[36] = trade.getMatching();
+        rowData[37] = trade.getMethod();
+        rowData[38] = trade.getTimeStamp();
+        ((DefaultTableModel)table.getModel()).addRow(rowData);
+    }
+
+    /**
+     * Inserts a new rowIndex in the table
+     * @param table
+     * @param position 
+     */
+    public void inserTableRow(JTable table, Position position) {
+
+        Object[] rowData = new Object[32];
+        rowData[0] = position.getPosId();
+        rowData[1] = position.getSymbol();
+        rowData[2] = position.getLotTime();
+        rowData[3] = position.getQ();
+        rowData[4] = position.getLine();
+        rowData[5] = position.getOce();
+        rowData[6] = position.getOceTime();
+        rowData[7] = position.getLs();
+        rowData[8] = position.getQori();
+        rowData[9] = position.getPriceAdj();
+        rowData[10] = position.getBasisAdj();
+        rowData[11] = position.getPrice();
+        rowData[12] = position.getBasis();
+        rowData[13] = position.getHow();
+        rowData[14] = position.gettId();
+        rowData[15] = position.getWash();
+        rowData[16] = position.getKsflag();
+        rowData[17] = position.getCodes();
+        rowData[18] = position.getAccount();
+        rowData[19] = position.getYr();
+        rowData[20] = position.getlCodes();
+        rowData[21] = position.getSecType();
+        rowData[22] = position.getMulti();
+        rowData[23] = position.getUnderlying();
+        rowData[24] = position.getExpiry();
+        rowData[25] = position.getStrike();
+        rowData[26] = position.getoType();
+        rowData[27] = position.getNotes();
+        rowData[28] = position.getFileCode();
+        rowData[29] = position.getInputLine();
+        rowData[30] = position.getGrp();
+        rowData[31] = position.getTimeStamp();
+        ((DefaultTableModel)table.getModel()).addRow(rowData);
+    }
+    
+    /**
+     * Inserts a new rowIndex in the table
+     * @param table
+     * @param allocation 
+     */
+    public void inserTableRow(JTable table, Allocation allocation) {
+
+        Object[] rowData = new Object[15];
+        rowData[0] = allocation.getId();
+        rowData[1] = allocation.getSymbol();
+        rowData[2] = allocation.getTradeTime();
+        rowData[3] = allocation.getTradeQ();
+        rowData[4] = allocation.getTradePrice();
+        rowData[5] = allocation.getMethod();
+        rowData[6] = allocation.getMathQ();
+        rowData[7] = allocation.getMathProceeds();
+        rowData[8] = allocation.getLotTime();
+        rowData[9] = allocation.getLine();
+        rowData[10] = allocation.getPriceAdj();
+        rowData[11] = allocation.getMatchBasis();
+        rowData[12] = allocation.getRealizedPL();
+        rowData[13] = allocation.getTerm();
+        rowData[14] = allocation.getAccount();
+        ((DefaultTableModel)table.getModel()).addRow(rowData);
+    }
+    
     /**
      * formatTable This formats the table
      *
@@ -1928,7 +2032,6 @@ public class ELLE_GUI_Frame extends JFrame implements ITableConstants {
                 table.getTableHeader().getColumnModel().getColumn(i).setHeaderValue("W");
             }
         }
-
     }
 
     /**
@@ -1942,7 +2045,6 @@ public class ELLE_GUI_Frame extends JFrame implements ITableConstants {
 
         scroll.setViewportView(table);
         scroll.setPreferredSize(new Dimension(924, 900));
-        //table.setPreferredSize(new Dimension(2000, 2000));
     }
 
     /**
@@ -1952,11 +2054,9 @@ public class ELLE_GUI_Frame extends JFrame implements ITableConstants {
      * @param table
      */
     private void tableHeaderRenderer(JTable table) {
-
         JTableHeader header = table.getTableHeader();
         header.removeAll();
         header.setDefaultRenderer(new HeaderRenderer(table));
-
     }
 
     /**
@@ -1981,9 +2081,7 @@ public class ELLE_GUI_Frame extends JFrame implements ITableConstants {
             } else if (table.getColumnClass(i).getName().toLowerCase().contains("decimal")
                     || table.getColumnClass(i).getName().toLowerCase().contains("integer")) {
                 tableColumnI.setCellRenderer(new CommaFormatRenderer());
-//                System.out.println(i + " " + table.getColumnName(i));
             }
-//            System.out.println(i + " " + table.getColumnName(i) + ": " + table.getColumnClass(i));
         }
     }
 
@@ -2045,83 +2143,9 @@ public class ELLE_GUI_Frame extends JFrame implements ITableConstants {
     }
 
     /**
-     * loads and sets table model for the trades default view
-     * @param table
-     * @param tableName not used
-     * @param accountName
-     * @param tabs
-     * @return 
+     * 
+     * @param sql 
      */
-    private JTable loadViewTable(JTable table, String tableName, String accountName, Map<String, Map<String, AccountTable>> tabs) {
-        System.out.println("1: " + accountName);
-        Map<String, AccountTable> tables = tabs.get(accountName);
-        AccountTable tabView = tables.get(TRADES_TABLE_VIEW_NAME);
-        JTable tableView = tabView.getTable();
-
-        Vector<Vector> tableVerticalViewData = new Vector<Vector>();
-        Vector<String> columnName = new Vector<String>();
-        Vector<String> columnClass = new Vector<String>();
-
-        Map<String, Integer> tableViewColNames = tabView.getColWidthPercent();
-
-        try {
-            EditableTableModel tableModel = (EditableTableModel) table.getModel();
-
-            for (int modelCol = 0; modelCol < table.getColumnCount(); modelCol++) {
-                String tableColName = table.getColumnName(modelCol);
-                for (String name : tableViewColNames.keySet()) {
-                    if (tableColName.equalsIgnoreCase(name)) {
-//                        System.out.println(name);
-                        tableVerticalViewData.addElement(tableModel.getColumnAt(modelCol));
-                        columnName.addElement(tableModel.getColumnName(modelCol));
-                        columnClass.addElement(tableModel.getColumnClass(modelCol).toString());
-                    }
-                }
-            }
-        } catch (ClassCastException ex) {
-            System.out.println("error");
-            LoggingAspect.afterThrown(ex);
-            return tableView;
-        }
-
-        Vector<Vector> tableHorizontalViewData = new Vector<Vector>();
-        for (int rIndex = 0; rIndex < table.getRowCount(); rIndex++) {
-            Vector tableRowData = new Vector();
-            for (int cIndex = 0; cIndex < tableViewColNames.size(); cIndex++) {
-//                System.out.println(rIndex + " " + cIndex);
-                tableRowData.addElement(tableVerticalViewData.elementAt(cIndex).elementAt(rIndex));
-            }
-            tableHorizontalViewData.addElement(tableRowData);
-        }
-
-        EditableTableModel tableViewModel = new EditableTableModel(tableHorizontalViewData, columnName, columnClass);
-        tableView.setModel(tableViewModel);
-        // check that the filter items are initialized
-//        AccountTable tab = tabs.get(accountName).get(tableName);
-        TableFilter filter = tabView.getFilter();
-        if (filter.getFilterItems() == null) {
-            filter.initFilterItems();
-        }
-        // apply filter
-        filter.applyFilter();
-        filter.applyColorHeaders();
-
-        // load all checkbox items for the checkbox column pop up filter
-        ColumnPopupMenu columnPopupMenu = tabView.getColumnPopupMenu();
-        columnPopupMenu.loadAllCheckBoxItems();
-
-        // set column format
-        Map<String, Integer> colWidthPercent = tabView.getColWidthPercent();
-
-        setColumnFormat(colWidthPercent, tableView);
-
-        // set the listeners for the table
-        setTableListeners(tabView);
-
-        System.out.println("Table loaded succesfully");
-        return tableView;
-    }
-
     private void loadtablematchesornomatches(String sql) {
         Vector data = new Vector();
         Vector columnNames = new Vector();
@@ -2159,57 +2183,11 @@ public class ELLE_GUI_Frame extends JFrame implements ITableConstants {
         }
         
         String tablename = sql.substring(14);
-        /*
-        Object[][] objectdata = new Object[data.size()][0];
-        for (int i = 0; i < objectdata.length; i++) {
-            objectdata[i] = ((Vector) data.get(i)).toArray();
-        }
-        
-        String[] stringcolumnNames = (String[]) columnNames.toArray(new String[columnNames.size()]);
-        
-        */
+
         read_csv readcsvfiles = new read_csv(data, columnNames);
         readcsvfiles.setTitle(tablename);
         readcsvfiles.setVisible(true);
         readcsvfiles.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-                
-        
-        // this has to be set here or else I get errors
-        // I tried passing the model to the filter and setting it there
-        // but it caused errors
-        //table.setModel(model);
-        
-        /*
-        for (int i = 0; i < table.getColumnCount(); i++) {
-//            System.out.println(table.getColumnName(i) + "class name: " + table.getColumnClass(i));
-        }
-
-        // check that the filter items are initialized
-        TableFilter filter = tab.getFilter();
-        if (filter.getFilterItems() == null) {
-            filter.initFilterItems();
-        }
-        // apply filter
-        filter.applyFilter();
-        filter.applyColorHeaders();
-
-        // load all checkbox items for the checkbox column pop up filter
-        ColumnPopupMenu columnPopupMenu = tab.getColumnPopupMenu();
-        columnPopupMenu.loadAllCheckBoxItems();
-
-        // set column format
-        Map<String, Integer> colWidthPercent = tab.getColWidthPercent();
-
-//        if (colWidthPercent.length != table.getColumnCount()) {
-//            colWidthPercent = new float[table.getColumnCount()];
-//            Arrays.fill(colWidthPercent, 80);
-//        }
-        setColumnFormat(colWidthPercent, table);
-
-        // set the listeners for the table
-
-        System.out.println("Table loaded succesfully");*/
-
     }
 
     private String removeAnyCommas(String src) {
@@ -2227,16 +2205,31 @@ public class ELLE_GUI_Frame extends JFrame implements ITableConstants {
     }
 
     /**
-     * DataRenderer This is the data renderer
-     *
+     * returns the selected table name for the tab
+     * @param tabName name of the selected tab
+     * @return name of the selected table for the selected tab
+     */
+    private String getTableName(String tabName) {
+        if(tabs.get(tabName).get(TRADES_TABLE_NAME).isTableSelected()){
+            return TRADES_TABLE_NAME;
+        }
+        else if(tabs.get(tabName).get(POSITIONS_TABLE_NAME).isTableSelected()){
+            return POSITIONS_TABLE_NAME;
+        }
+        else if(tabs.get(tabName).get(ALLOCATIONS_TABLE_NAME).isTableSelected()){
+            return ALLOCATIONS_TABLE_NAME;
+        }
+        else{
+            return null;
+        }
+    }
+
+    /**
+     * DataRenderer 
+     * This removes the .0 at the end of the original value in the data object.
      * @author Xiaoqian Fu
      */
     private static class DataRenderer extends DefaultTableCellRenderer {
-
-//        private SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-mm-dd hh:mm:ss.s");
-        private SimpleDateFormat dateFormatNewValue
-                = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        private String valueToString;
 
         public DataRenderer() {
             super();
@@ -2248,16 +2241,18 @@ public class ELLE_GUI_Frame extends JFrame implements ITableConstants {
                 JTable table, Object value, boolean isSelected,
                 boolean hasFocus, int row, int col) {
 
-            if (value != null) {
-                valueToString = dateFormatNewValue.format(value);
-                value = valueToString;
+            // change value
+            if(value == null){
+                value = "";
+            }
+            else{
+                String s = value.toString();
+                value = s.replace(".0", "");
             }
 
             return super.getTableCellRendererComponent(table,
                     value, isSelected, hasFocus, row, col);
-
         }
-
     }
 
     /**
@@ -2440,7 +2435,7 @@ public class ELLE_GUI_Frame extends JFrame implements ITableConstants {
                                 filterByDoubleClick(table);
 //                                System.out.println(table.getName());
 //                                for (int i = 0; i < table.getModel().getRowCount(); i++) {
-//                                    System.out.println(tab.getIDList()[i] + " and " + table.getModel().getValueAt(i, 1));
+//                                    System.out.println(accountTable.getIDList()[i] + " and " + table.getModel().getValueAt(i, 1));
 //                                }
                             } else if (e.getClickCount() == 1) {
 //                                if (jLabelEdit.getText().equals("ON ")) {
@@ -2456,8 +2451,8 @@ public class ELLE_GUI_Frame extends JFrame implements ITableConstants {
                                 // make table editable
                                 //makeTableEditable(true);
                                 // get selected cell
-                                int columnIndex = table.columnAtPoint(e.getPoint()); // this returns the column index
-                                int rowIndex = table.rowAtPoint(e.getPoint()); // this returns the rowIndex index
+                                int columnIndex = table.columnAtPoint(e.getPoint()); // this returns the column i
+                                int rowIndex = table.rowAtPoint(e.getPoint()); // this returns the rowIndex i
                                 if (rowIndex != -1 && columnIndex != -1) {
 
                                     // make it the active editing cell
@@ -2495,30 +2490,7 @@ public class ELLE_GUI_Frame extends JFrame implements ITableConstants {
         table.getModel().addTableModelListener(new TableModelListener() {  // add table model listener every time the table model reloaded
             @Override
             public void tableChanged(TableModelEvent e) {
-                int row = e.getFirstRow();
-                int col = e.getColumn();
-//                String tab = getSelectedTabName();
-//                JTable table = tabs.get(tab).getTable();
-//                ModifiedTableData data = tabs.get(tab).getTableData();
-//                Object oldValue = data.getOldData()[row][col];
-//                Object newValue = table.getModel().getValueAt(row, col);
-//                
-//                // disable the upload changes button
-//                btnUploadChanges.setEnabled(false);
-//
-//                // check that data is different
-//                if(!newValue.equals(oldValue)){
-//
-//                    String tableName = table.getName();
-//                    String columnName = table.getColumnName(col);
-//                    int id = (Integer) table.getModel().getValueAt(row, 0);
-//                    data.getNewData().add(new ModifiedData(tableName, columnName, newValue, id));
-//
-//                    // color the cell
-//                    JTableCellRenderer cellRender = tabs.get(tab).getCellRenderer();
-//                    cellRender.getCells().get(col).add(row);
-//                    table.getColumnModel().getColumn(col).setCellRenderer(cellRender);
-//                }
+                //TODO
             }
         });
 
@@ -2559,8 +2531,8 @@ public class ELLE_GUI_Frame extends JFrame implements ITableConstants {
      */
     public void filterByDoubleClick(JTable table) {
 
-        int columnIndex = table.getSelectedColumn(); // this returns the column index
-        int rowIndex = table.getSelectedRow(); // this returns the rowIndex index
+        int columnIndex = table.getSelectedColumn(); // this returns the column i
+        int rowIndex = table.getSelectedRow(); // this returns the rowIndex i
         if (rowIndex != -1) {
             Object selectedField = table.getValueAt(rowIndex, columnIndex);
             //String tabName = getSelectedTabName();
@@ -2618,17 +2590,15 @@ public class ELLE_GUI_Frame extends JFrame implements ITableConstants {
 
         // this is needed for the horizontal scrollbar to appear
         table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
-        for (int index = 0; index < table.getColumnCount(); index++) {
+        int colWidth;
+        for (int i = 0; i < table.getColumnCount(); i++) {
 
-            TableColumn column = table.getColumnModel().getColumn(index);
-            String tableColName = table.getColumnName(index);
-            int colWidth = 80;
-            if (colWidths.get(tableColName) != null) {
-//                System.out.println(table.getName() + " " + tableColName);
-                colWidth = colWidths.get(tableColName);
-            }
-            column.setPreferredWidth(colWidth);
+            TableColumn column = table.getColumnModel().getColumn(i);
+            String tableColName = table.getColumnName(i);
+            colWidth = colWidths.get(tableColName);
             column.setMinWidth(colWidth);
+            column.setMaxWidth(colWidth);
+            column.setPreferredWidth(colWidth);
         }
     }
 
@@ -2637,17 +2607,17 @@ public class ELLE_GUI_Frame extends JFrame implements ITableConstants {
      */
     private void applySymbolSearchFilter() {
 
-        // get selected tab
+        // get selected accountTable
         AccountTable tab = getSelectedTab();
 
         // apply filter for the symbol
         String filterItem = textFieldSymbol.getText();
         TableFilter filter = tab.getFilter();
-        int colIndexUL = filter.getUnderlyingColumnIndex();   // underlying column index
+        int colIndexUL = filter.getUnderlyingColumnIndex();   // underlying column i
         filter.addFilterItem(colIndexUL, filterItem);
         filter.removeColorHeader(colIndexUL);
         filter.applyFilter();
-        int colIndexSymbol = filter.getSymbolColumnIndex();  // symbol column index
+        int colIndexSymbol = filter.getSymbolColumnIndex();  // symbol column i
         filter.addColorHeader(colIndexSymbol);
 
         checkBoxSymbol.setSelected(true);
@@ -2687,8 +2657,8 @@ public class ELLE_GUI_Frame extends JFrame implements ITableConstants {
     }
 
     /**
-     * displayTable Displays the correct table depending on the tab and button
-     * selected
+     * displayTable Displays the correct table depending on the accountTable and button
+ selected
      */
     public void displayTable(String tabName, String tableName) {
 
@@ -2700,7 +2670,7 @@ public class ELLE_GUI_Frame extends JFrame implements ITableConstants {
         setScrollBarFormat(scroll, table);            // fix issue with scroll bar dissappearing
 
         // change panel table
-        JPanel panel = getSelectedTabPanel();         // tab panel used to display the account table
+        JPanel panel = getSelectedTabPanel();         // accountTable panel used to display the account table
         panel.removeAll();
         panel.setLayout(new BorderLayout());
         panel.add(scroll, BorderLayout.CENTER);
@@ -2712,11 +2682,10 @@ public class ELLE_GUI_Frame extends JFrame implements ITableConstants {
         // update records label
         String recordsText = accountTable.getRecordsLabel();
         labelRecords.setText(recordsText);
-
     }
 
     /**
-     * getSelectedTab Returns the selected tab and table selected
+     * getSelectedTab Returns the selected accountTable and table selected
      *
      * @return
      */
@@ -2724,8 +2693,10 @@ public class ELLE_GUI_Frame extends JFrame implements ITableConstants {
         String tabName = getSelectedTabName();
         if (tabs.get(tabName).get(POSITIONS_TABLE_NAME).isTableSelected()) {
             return tabs.get(tabName).get(POSITIONS_TABLE_NAME);
-        } else if (tabs.get(tabName).get(TRADES_TABLE_VIEW_NAME).isTableSelected()) {
-            return tabs.get(tabName).get(TRADES_TABLE_VIEW_NAME);
+        } else if (tabs.get(tabName).get(TRADES_TABLE_NAME).isTableSelected()) {
+            return tabs.get(tabName).get(TRADES_TABLE_NAME);
+        } else if (tabs.get(tabName).get(ALLOCATIONS_TABLE_NAME).isTableSelected()) {
+            return tabs.get(tabName).get(ALLOCATIONS_TABLE_NAME);
         }
         // this should never be reached
         return new AccountTable();
@@ -2790,7 +2761,7 @@ public class ELLE_GUI_Frame extends JFrame implements ITableConstants {
 
     public JPanel getSelectedTabPanel() {
 
-        // not sure of the index of the table
+        // not sure of the i of the table
         //return (JTable)tabbedPaneAccounts.getComponentAt(0);
         // temporary test code
         String tabName = getSelectedTabName();

@@ -14,7 +14,7 @@ public class Allocation {
     private String tradeQ;
     private String tradePrice;
     private String method;
-    private String methodQ;
+    private String mathQ;
     private String mathProceeds;
     private String lotTime;
     private String line;
@@ -72,12 +72,12 @@ public class Allocation {
         this.method = method;
     }
 
-    public String getMethodQ() {
-        return methodQ;
+    public String getMathQ() {
+        return mathQ;
     }
 
-    public void setMethodQ(String methodQ) {
-        this.methodQ = methodQ;
+    public void setMathQ(String mathQ) {
+        this.mathQ = mathQ;
     }
 
     public String getMathProceeds() {
