@@ -1,6 +1,5 @@
 package com.elle.elle_gui.logic;
 
-import com.elle.elle_gui.presentation.ELLE_GUI_Frame;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Vector;
@@ -21,7 +20,8 @@ public class AccountTable implements ITableConstants {
     private String tableName;                    // name of the JTable
     private JTable table;                        // the JTable on the tab
     private TableFilter filter;                  // filter used for the table
-    private Map<String, Integer> colWidthPercent;             // column width for each column
+    private Map<String, Integer> colWidthPercentAllFields;             // column width for each column
+    private Map<String, Integer> colWidthPercentDefaultView;             // column width for each column
     private int totalRecords;                    // total records in table model
     private int recordsShown;                    // number of records shown on table
     private Vector<String> tableColNames;              // column header names
@@ -35,7 +35,9 @@ public class AccountTable implements ITableConstants {
     private boolean archiveRecordMenuItemEnabled;  // enables archive record menu item
     private boolean addRecordsBtnVisible;          // sets the add records button visible
     private boolean batchEditBtnVisible;           // sets the batch edit button visible
-    private boolean tableSelected;             // sets if this table is selected
+    private boolean tableSelected;                 // sets if this table is selected
+    private String view;                           // sets the view label text
+    private boolean allFields;                     // is all fields view showing
 
     /**
      * CONSTRUCTOR Tab This is used if no table is ready such as before
@@ -51,7 +53,10 @@ public class AccountTable implements ITableConstants {
         addRecordsBtnVisible = false;
         batchEditBtnVisible = false;
         tableSelected = false;
-        colWidthPercent = new HashMap<String, Integer>();
+        colWidthPercentAllFields = new HashMap<String, Integer>();
+        colWidthPercentDefaultView = new HashMap<String, Integer>();
+        view = VIEW_LABEL_TXT_DEFAULT_VIEW;
+        allFields = false;
     }
 
     /**
@@ -69,7 +74,10 @@ public class AccountTable implements ITableConstants {
         filter = new TableFilter(table);
         ColumnPopupMenu = new ColumnPopupMenu(filter);
         tableSelected = false;
-        colWidthPercent = new HashMap<String, Integer>();
+        colWidthPercentAllFields = new HashMap<String, Integer>();
+        colWidthPercentDefaultView = new HashMap<String, Integer>();
+        view = VIEW_LABEL_TXT_DEFAULT_VIEW;
+        allFields = false;
 
         // store the column names for the table
         for (int i = 0; i < table.getColumnCount(); i++) {
@@ -98,12 +106,12 @@ public class AccountTable implements ITableConstants {
         this.filter = filter;
     }
 
-    public Map<String, Integer> getColWidthPercent() {
-        return colWidthPercent;
+    public Map<String, Integer> getColWidthPercentAllFields() {
+        return colWidthPercentAllFields;
     }
 
-    public void setColWidthPercent(Map<String,Integer> colWidthPercent) {
-        this.colWidthPercent = colWidthPercent;
+    public void setColWidthPercentAllFields(Map<String,Integer> colWidthPercentAllFields) {
+        this.colWidthPercentAllFields = colWidthPercentAllFields;
     }
 
     public int getTotalRecords() {
@@ -245,6 +253,38 @@ public class AccountTable implements ITableConstants {
         totalRecords = totalRecords + amountOfRecordsAdded;
     }
 
+    public Object[] getIdList() {
+        return idList;
+    }
+
+    public void setIdList(Object[] idList) {
+        this.idList = idList;
+    }
+
+    public String getView() {
+        return view;
+    }
+
+    public void setView(String view) {
+        this.view = view;
+    }
+
+    public boolean isAllFields() {
+        return allFields;
+    }
+
+    public void setAllFields(boolean allFields) {
+        this.allFields = allFields;
+    }
+
+    public Map<String, Integer> getColWidthPercentDefaultView() {
+        return colWidthPercentDefaultView;
+    }
+
+    public void setColWidthPercentDefaultView(Map<String, Integer> colWidthPercentDefaultView) {
+        this.colWidthPercentDefaultView = colWidthPercentDefaultView;
+    }
+    
     /**
      * This method returns a string that displays the records.
      *
@@ -273,12 +313,6 @@ public class AccountTable implements ITableConstants {
                 output = "<html><pre>"
                         + "          Number of records shown: " + getRecordsShown()
                         + "<br/> Number of records in Allocations: " + getTotalRecords()
-                        + "</pre></html>";
-                break;
-            case TRADES_TABLE_VIEW_NAME:
-                output = "<html><pre>"
-                        + "     Number of records shown: " + getRecordsShown()
-                        + "<br/> Number of records in Trades: " + getTotalRecords()
                         + "</pre></html>";
                 break;
             default:

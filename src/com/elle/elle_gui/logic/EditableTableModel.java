@@ -95,7 +95,6 @@ public class EditableTableModel extends DefaultTableModel {
 
         int indexOfDotInClassName = columnClassName.indexOf(".", 5)+1;
         columnClassName = columnClassName.substring(indexOfDotInClassName).toLowerCase();
-//        System.out.println(col + " " + columnClassName);
         
         switch(columnClassName){
             case "string":
@@ -115,4 +114,13 @@ public class EditableTableModel extends DefaultTableModel {
 
     }
 
+    public Vector getColumnClass() {
+        return columnClass;
+    }
+
+    public void setColumnClass(Vector columnClass) {
+        this.columnClass = columnClass;
+    }
+
+    
 }
