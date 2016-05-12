@@ -47,7 +47,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 import java.util.Vector;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
@@ -348,8 +347,6 @@ public class ELLE_GUI_Frame extends JFrame implements ITableConstants {
         menuItemCheckBoxLog = new javax.swing.JCheckBoxMenuItem();
         menuItemCheckBoxSQL = new javax.swing.JCheckBoxMenuItem();
         menuItemAViewATrades = new javax.swing.JMenuItem();
-        menuItemTrades = new javax.swing.JCheckBoxMenuItem();
-        menuItemPositions = new javax.swing.JMenuItem();
         menuItemIB = new javax.swing.JMenuItem();
         menuItemTL = new javax.swing.JMenuItem();
         menuItemLoadsTable = new javax.swing.JMenuItem();
@@ -868,23 +865,6 @@ public class ELLE_GUI_Frame extends JFrame implements ITableConstants {
         });
         menuView.add(menuItemAViewATrades);
 
-        menuItemTrades.setText("Display Trades-All Fields");
-        menuItemTrades.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                menuItemTradesActionPerformed(evt);
-            }
-        });
-        menuView.add(menuItemTrades);
-
-        menuItemPositions.setText("Display Positions-All Fields");
-        menuItemPositions.setEnabled(false);
-        menuItemPositions.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                menuItemPositionsActionPerformed(evt);
-            }
-        });
-        menuView.add(menuItemPositions);
-
         menuItemIB.setText("Display IB_8949-All Fields");
         menuItemIB.setEnabled(false);
         menuItemIB.addActionListener(new java.awt.event.ActionListener() {
@@ -1164,10 +1144,6 @@ public class ELLE_GUI_Frame extends JFrame implements ITableConstants {
         String recordsText = accountTable.getRecordsLabel();
         labelRecords.setText(recordsText);
     }//GEN-LAST:event_btnAllocationsActionPerformed
-
-    private void menuItemPositionsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuItemPositionsActionPerformed
-
-    }//GEN-LAST:event_menuItemPositionsActionPerformed
 
     private void menuItemIBActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuItemIBActionPerformed
 
@@ -1520,23 +1496,6 @@ public class ELLE_GUI_Frame extends JFrame implements ITableConstants {
         }
     }//GEN-LAST:event_tabbedPaneAccountsStateChanged
 
-    private void menuItemTradesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuItemTradesActionPerformed
-
-        String tableName = "";
-        tableName = TRADES_TABLE_NAME;
-        if (menuItemTrades.isSelected()) {
-            // TODO show columns
-            btnTableDisplayState.setText("All Fields");
-        } else {
-            // TODO hide columns
-            btnTableDisplayState.setText("Default Views");
-        }
-        if (tabs.get(getSelectedTabName()).get(TRADES_TABLE_NAME).isTableSelected()) {
-            String tabName = getSelectedTabName();
-            displayTable(tabName, tableName);
-        }
-    }//GEN-LAST:event_menuItemTradesActionPerformed
-
     private void menuItemAViewATradesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuItemAViewATradesActionPerformed
         AccountTable selectedTab = getSelectedTab();
         JTable selectedTable = selectedTab.getTable();
@@ -1566,14 +1525,12 @@ public class ELLE_GUI_Frame extends JFrame implements ITableConstants {
             accountTable.setAllFields(false);
             colWidths = accountTable.getColWidthPercentDefaultView();
             btnTableDisplayState.setText(accountTable.getView());
-            menuItemTrades.setSelected(false);
         }
         else{
             accountTable.setView(VIEW_LABEL_TXT_ALL_FIELDS);
             accountTable.setAllFields(true);
             colWidths = accountTable.getColWidthPercentAllFields();
             btnTableDisplayState.setText(accountTable.getView());
-            menuItemTrades.setSelected(true);
         }
 
         setColumnFormat(colWidths, accountTable.getTable());
@@ -1584,7 +1541,7 @@ public class ELLE_GUI_Frame extends JFrame implements ITableConstants {
         // open new connection
         DBConnection.close(); // connection might be timed out on server
         if (DBConnection.open()) {  // open a new connection
-            BackupDBTablesDialog backupDBTables = new BackupDBTablesDialog(DBConnection.getConnection(), this);
+            BackupDBTablesDialog backupDBTables = new BackupDBTablesDialog(this);
         } else {
             JOptionPane.showMessageDialog(this, "Could not connect to Database");
         }
@@ -2812,7 +2769,6 @@ public class ELLE_GUI_Frame extends JFrame implements ITableConstants {
     private javax.swing.JMenuItem menuItemLoadsTable;
     private javax.swing.JMenuItem menuItemLocal;
     private javax.swing.JMenuItem menuItemLogOut;
-    private javax.swing.JMenuItem menuItemPositions;
     private javax.swing.JMenuItem menuItemPrintDisplayWindow;
     private javax.swing.JMenuItem menuItemPrintGUI;
     private javax.swing.JMenuItem menuItemPupone;
@@ -2823,7 +2779,6 @@ public class ELLE_GUI_Frame extends JFrame implements ITableConstants {
     private javax.swing.JMenuItem menuItemShowMatches;
     private javax.swing.JMenuItem menuItemTL;
     private javax.swing.JMenuItem menuItemTL8949;
-    private javax.swing.JCheckBoxMenuItem menuItemTrades;
     private javax.swing.JMenu menuLoad;
     private javax.swing.JMenu menuOther;
     private javax.swing.JMenu menuPrint;

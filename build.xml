@@ -6,9 +6,9 @@
     <!-- this is netbeans generated code -->
     <import file="nbproject/build-impl.xml"/>
     
-    <!-- set the date and version of here -->
+    <!-- set the date and version here -->
     <property name="creation-date" value="2016-05-12"/>
-    <property name="version" value="1.2.0"/>
+    <property name="version" value="1.2.1"/>
     
     <!-- this is the jar name when it is created -->
     <property name="jarname" value="ELLE_GUI-${version}"/>
@@ -21,10 +21,10 @@
         </manifest>
     </target>
     
-    <!-- This creates the jar that we want with the included dependancies -->
+    <!-- This creates the jar that we want with the included dependencies -->
     <!-- There should be no need to edit this code -->
-    <!-- other than adding or removing dependancies-->
-    <!-- Dependancies are kept in the lib folder in ELLE_GUI-->
+    <!-- other than adding or removing dependencies-->
+    <!-- Dependencies are kept in the lib folder in ELLE_GUI-->
     <!-- The new jar will be in the target folder in ELLE_GUI --> 
     <target name="-post-jar"> 
       <delete dir="target"/>
