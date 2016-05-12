@@ -9,11 +9,11 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 
 /**
- * PositionDAO1
+ * PositionDAO
  * @author Carlos Igreja
  * @since  May 7, 2016
  */
-public class PositionDAO1 {
+public class PositionDAO {
 
     // database table information
     public static final String DB_TABLE_NAME = "positions";

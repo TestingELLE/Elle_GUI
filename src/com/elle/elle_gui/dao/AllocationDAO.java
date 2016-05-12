@@ -9,11 +9,11 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 
 /**
- * AllocationDAO1
+ * AllocationDAO
  * @author Carlos Igreja
  * @since  May 7, 2016
  */
-public class AllocationDAO1 {
+public class AllocationDAO {
     
     // database table information
     public static final String DB_TABLE_NAME = "allocations";

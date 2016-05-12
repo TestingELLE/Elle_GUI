@@ -9,11 +9,11 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 
 /**
- * TradeDAO1
+ * TradeDAO
  * @author Carlos Igreja
  * @since  May 7, 2016
  */
-public class TradeDAO1 {
+public class TradeDAO {
 
     // database table information
     public static final String DB_TABLE_NAME = "trades";

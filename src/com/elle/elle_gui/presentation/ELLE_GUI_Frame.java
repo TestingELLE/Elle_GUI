@@ -1,9 +1,9 @@
 package com.elle.elle_gui.presentation;
 
 import com.elle.elle_gui.admissions.Authorization;
-import com.elle.elle_gui.dao.AllocationDAO1;
-import com.elle.elle_gui.dao.PositionDAO1;
-import com.elle.elle_gui.dao.TradeDAO1;
+import com.elle.elle_gui.dao.AllocationDAO;
+import com.elle.elle_gui.dao.PositionDAO;
+import com.elle.elle_gui.dao.TradeDAO;
 import com.elle.elle_gui.database.DBConnection;
 import com.elle.elle_gui.entities.Allocation;
 import com.elle.elle_gui.entities.Position;
@@ -99,9 +99,9 @@ public class ELLE_GUI_Frame extends JFrame implements ITableConstants {
     private Color colorBtnSelected;
     
     // DAO
-    private AllocationDAO1 allocationDAO;
-    private PositionDAO1 positionDAO;
-    private TradeDAO1 tradeDAO;
+    private AllocationDAO allocationDAO;
+    private PositionDAO positionDAO;
+    private TradeDAO tradeDAO;
 
     /**
      * ELLE_GUI_Frame Creates the ELLE_GUI_Frame which is the main window of the
@@ -121,9 +121,9 @@ public class ELLE_GUI_Frame extends JFrame implements ITableConstants {
         colorBtnSelected = Color.RED;
         
         // init DAO
-        allocationDAO = new AllocationDAO1();
-        positionDAO = new PositionDAO1();
-        tradeDAO = new TradeDAO1();
+        allocationDAO = new AllocationDAO();
+        positionDAO = new PositionDAO();
+        tradeDAO = new TradeDAO();
 
         // initialize tabs
         tabs = new HashMap();
@@ -1824,7 +1824,7 @@ public class ELLE_GUI_Frame extends JFrame implements ITableConstants {
         model.setColumnCount(POSITIONS_COL_NAMES.length);
         
         // DAO
-        ArrayList<Position> positions = PositionDAO1.get(accountName);
+        ArrayList<Position> positions = PositionDAO.get(accountName);
         if(!positions.isEmpty() && positions != null){
             for(Position position: positions){
                 inserTableRow(table, position);
@@ -1861,7 +1861,7 @@ public class ELLE_GUI_Frame extends JFrame implements ITableConstants {
         model.setColumnCount(ALLOCATIONS_COL_NAMES.length);
         
         // DAO
-        ArrayList<Allocation> allocations = AllocationDAO1.get(accountName);
+        ArrayList<Allocation> allocations = AllocationDAO.get(accountName);
         if(!allocations.isEmpty() && allocations != null){
             for(Allocation allocation: allocations){
                 inserTableRow(table, allocation);
