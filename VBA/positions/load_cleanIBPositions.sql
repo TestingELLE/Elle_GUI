@@ -2,12 +2,15 @@ USE pupone_EG;
 DROP TABLE IF EXISTS w_positions111231;
 CREATE TABLE w_positions111231 LIKE positions;
 SET @max = (SELECT COUNT(*) FROM w_positions111231);
+SET @max = - @max;
+SET sql_mode = 'NO_UNSIGNED_SUBTRACTION';
+
 
 ALTER TABLE w_positions111231 DROP PRIMARY KEY;
 ALTER TABLE w_positions111231 ADD PRIMARY KEY(inputLine);
 
 LOAD DATA LOCAL INFILE
-'/Users/weiren/Desktop/trades_table_clean/loading/wei_positions_loading/PositionsDL 111231 TEST-positions-60520S-4SQL.csv'
+'/Users/weiren/Desktop/trades_table_clean/loading/wei_positions_loading_finalversion/PositionsDL 111231 TEST-positions-60520S-4SQL.csv'
 INTO TABLE w_positions111231 
 FIELDS OPTIONALLY ENCLOSED BY '"' TERMINATED BY ','
 LINES TERMINATED BY '\r\n'
@@ -25,10 +28,10 @@ UPDATE w_positions111231 SET expiry = NULL WHERE expiry = '0000-00-00';
 
 UPDATE w_positions111231 SET inputLine = @max + inputLine;
 UPDATE w_positions111231 SET OCE_Time = lot_Time;
-UPDATE w_positions111231 SET pos_id = @max + inputLine;
+UPDATE w_positions111231 SET pos_id = @max - inputLine;
 
 ALTER TABLE w_positions111231 DROP PRIMARY KEY;
-ALTER TABLE w_positions111231 ADD PRIMARY KEY(inputLine, account);
+ALTER TABLE w_positions111231 ADD PRIMARY KEY(pos_id, line, ksflag, account, yr);
 
 
 
