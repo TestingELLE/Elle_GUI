@@ -105,7 +105,7 @@ BEGIN
 
     
 	#insert to matches table
-	insert into matches select t_id,t_symbol,t_Q,t_trade_Time,p_id,p_line,p_lot_time,t_proceeds,t_basis,t_realized_PL,p_symbol,p_Q,t_lot_Time,p_OCE,p_OCE_time,p_price_adj,p_basis_adj,p_price,p_basis,`timeStamp`,t_rank,p_yr,p_account from temp5;
+	insert into matches select t_id,t_symbol,t_Q,t_trade_Time,p_id,p_line,p_lot_time,t_proceeds,t_basis,t_realized_PL,NULL,NULL,p_symbol,p_Q,t_lot_Time,p_OCE,p_OCE_time,p_price_adj,p_basis_adj,p_price,p_basis,`timeStamp`,t_rank,p_yr,p_account from temp5;
 
    
     update trades, temp5
