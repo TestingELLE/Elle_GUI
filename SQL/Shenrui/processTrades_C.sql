@@ -1,4 +1,4 @@
-CREATE PROCEDURE `processTrades_C`()
+CREATE DEFINER=`pupone_Shenrui`@`%` PROCEDURE `processTrades_C`()
     SQL SECURITY INVOKER
 BEGIN
 
@@ -16,7 +16,7 @@ BEGIN
 	WHERE s2.symbol IS NULL;
     
     delete from position_temp 
-    where pos_id in (select pos_id from aggregatePositions)
+    where pos_id in (select pos_id from aggregatedPositions)
     and ksflag='0';
     
     
@@ -34,11 +34,11 @@ BEGIN
 	create temporary table temp4
 	select temp3.id as t_id, temp3.underlying as t_underlying, temp3.symbol as t_symbol, temp3.Q as t_Q, temp3.lot_Time as t_lot_Time,
 	temp3.trade_Time as t_trade_Time, temp3.basis as t_basis, temp3.realized_PL as t_realized_PL, 
-	temp3.proceeds as t_proceeds, temp3.price_adj as t_price_adj,
+	temp3.proceeds as t_proceeds, 
 	l1.symbol as p_symbol, l1.Q as p_Q,l1.lot_time as p_lot_Time,
 	l1.pos_id as p_id, l1.line as p_line,
 	l1.OCE as p_OCE, l1.OCE_time as p_OCE_time, l1.price_adj as p_price_adj, 
-	l1.basis_adj as p_basis_adj, l1.price as p_price, l1.basis as p_basis, l1.ksflag as p_ksflag
+	l1.basis_adj as p_basis_adj, l1.price as p_price, l1.basis as p_basis, l1.ksflag as p_ksflag,l1.yr as p_yr, l1.account as p_account
 	from temp3
 	left join position_temp l1
 	on temp3.symbol = l1.symbol and if(TIME (temp3.lot_time)='00:00:00',date (temp3.lot_Time) =date (l1.lot_Time),temp3.lot_Time=l1.lot_Time)
@@ -70,6 +70,9 @@ BEGIN
     on l1.t_symbol = l2.t_symbol
     where l1.t_trade_time<=l2.t_trade_time and !isnull(l1.p_Q);
 
+
+#################
+
     #get no match record
     drop temporary table if exists delete_list1;
 	create temporary table delete_list1
@@ -92,6 +95,7 @@ BEGIN
     where t_id in (select t_id from delete_list1);
     
  
+ 
     #order trades table by underlying, pos_id , trades_time
     set @rownum1=0;
     drop temporary table if exists temp5;
@@ -101,8 +105,9 @@ BEGIN
 
     
 	#insert to matches table
-	insert into matches select * from temp5;
-	
+	insert into matches select t_id,t_symbol,t_Q,t_trade_Time,p_id,p_line,p_lot_time,t_proceeds,t_basis,t_realized_PL,p_symbol,p_Q,t_lot_Time,p_OCE,p_OCE_time,p_price_adj,p_basis_adj,p_price,p_basis,`timeStamp`,t_rank,p_yr,p_account from temp5;
+
+   
     update trades, temp5
 	set trades.processed = 'Y',trades.`timeStamp`=@`timeStamp`
     where trades.id  = temp5.t_id;

@@ -1,4 +1,4 @@
-CREATE  PROCEDURE `aggregateTrades`(IN MYTABLE varchar(50))
+CREATE DEFINER=`pupone_Shenrui`@`%` PROCEDURE `aggregateTrades`(IN MYTABLE varchar(50))
 BEGIN
     
     set SQL_SAFE_UPDATES=0;

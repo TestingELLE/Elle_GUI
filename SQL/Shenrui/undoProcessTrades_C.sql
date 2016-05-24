@@ -1,4 +1,4 @@
-CREATE PROCEDURE `undoProcessTrades_C`(IN timeStampinput2 varchar(255))
+CREATE DEFINER=`pupone_Shenrui`@`%` PROCEDURE `undoProcessTrades_C`(IN timeStampinput2 varchar(255))
     SQL SECURITY INVOKER
 BEGIN
     set SQL_SAFE_UPDATES=0;

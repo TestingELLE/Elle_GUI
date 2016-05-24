@@ -1,10 +1,12 @@
-CREATE  PROCEDURE `match`(in id int,in posid int)
+CREATE DEFINER=`pupone_Shenrui`@`%` PROCEDURE `match`(in id int,in posid int)
 BEGIN
-	set @id= id;
+    set @id= id;
     set @posid=posid;
 		
 	set SQL_SAFE_UPDATES=0;
-        
+    if not exists (select "X" from trades ,positions where id =@id and pos_id = @posid and trades.symbol=positions.symbol) then
+    select 'no match';
+    else        
     drop temporary table if exists temp6;
 	create temporary table temp6
 	select * from positions
@@ -33,5 +35,5 @@ BEGIN
 		update trades
 		set trades.processed = 'Y' ,locked='Y'
 		where trades.id=@id;
-    
+    end if;
 END
