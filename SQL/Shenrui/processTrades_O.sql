@@ -1,4 +1,4 @@
-CREATE PROCEDURE `processTrades_O`(IN MYTABLE varchar(50))
+CREATE DEFINER=`pupone_Shenrui`@`%` PROCEDURE `processTrades_O`(IN MYTABLE varchar(50))
     SQL SECURITY INVOKER
 BEGIN
 	set @`timeStamp`=Now();
@@ -34,8 +34,8 @@ BEGIN
 	t1.OCE='O',
 	t1.OCE_Time=t2.trade_Time,
 	t1.LS=t2.LS,
-	t1.Qori=t2.Q,
-	t1.price_adj=t2.price,
+	#t1.Qori=t2.Q,
+	#t1.price_adj=t2.price,
 	t1.basis_adj=t2.proceeds,
 	t1.price=t2.price,
 	t1.basis=t2.proceeds,
@@ -45,7 +45,7 @@ BEGIN
 	t1.codes=t2.codes,
 	t1.account=t2.account,
 	t1.yr=t2.yr,
-	t1.L_codes=t2.codes,
+	#t1.L_codes=t2.codes,
 	t1.secType=t2.secType,
 	t1.multi=t2.multi,
 	t1.underlying=t2.underlying,

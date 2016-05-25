@@ -1,4 +1,4 @@
-CREATE PROCEDURE `undoAggregateTrades`(IN MYTABLE varchar(50),IN stamp1 varchar(255))
+CREATE DEFINER=`pupone_Shenrui`@`%` PROCEDURE `undoAggregateTrades`(IN MYTABLE varchar(50),IN stamp1 varchar(255))
     SQL SECURITY INVOKER
 BEGIN
     set SQL_SAFE_UPDATES=0;

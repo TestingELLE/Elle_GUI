@@ -1,4 +1,4 @@
-CREATE PROCEDURE `undoMatch`(in id int,in posid int)
+CREATE DEFINER=`pupone_Shenrui`@`%` PROCEDURE `undoMatch`(in id int,in posid int)
 BEGIN
 	set @id= id;
     set @posid=posid;

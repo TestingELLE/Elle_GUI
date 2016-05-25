@@ -1,4 +1,4 @@
-CREATE PROCEDURE `aggregatePositions`(IN MYTABLE varchar(50))
+CREATE DEFINER=`pupone_Shenrui`@`%` PROCEDURE `aggregatePositions`(IN MYTABLE varchar(50))
     SQL SECURITY INVOKER
 BEGIN
    
@@ -11,7 +11,7 @@ BEGIN
     select * from ',MYTABLE,' order by pos_id DESC');
     PREPARE STMT1 FROM @cmd1;
     EXECUTE STMT1;
-    DEALLOCATE PREPARE STMT1;   
+    DEALLOCATE PREPARE STMT1;  
     
     drop temporary table if exists aggregatedCalculation_temporary;
     SET @cmd1 = CONCAT('create temporary table if not exists aggregatedCalculation_temporary
@@ -97,5 +97,5 @@ BEGIN
     DEALLOCATE PREPARE STMT5;
     
     insert into `timeStamps` values(@`timeStamp`,'aggregatePositions');
-
+    
 END
