@@ -16,11 +16,11 @@ FIELDS OPTIONALLY ENCLOSED BY '"' TERMINATED BY ','
 LINES TERMINATED BY '\r\n'
 IGNORE 1 LINES
 (
-	inputLine,symbol,Q,@lot_Time,LS,price_adj,basis_adj,secType,filecode,account,multi,@o_type,@expiry,@strike,underlying
+	inputLine,symbol,Q,@lot_Time,LS,price_adj,basis_adj,secType,filecode,account,multi,@O_Type,@expiry,@strike,underlying
 )
 SET 
     strike = IF(@strike = '', NULL, @strike),
-    o_type = IF(@o_type = '', NULL, @o_type),
+    O_Type = IF(@O_Type = '', NULL, @O_Type),
     lot_Time = STR_TO_DATE(@lot_Time, '%m/%d/%Y %H:%i'),
     expiry = STR_TO_DATE(@expiry, '%d-%b-%y');
 

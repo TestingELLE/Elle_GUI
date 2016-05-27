@@ -359,14 +359,22 @@ Sub clean_ibtrades()
         .Cells(3, inputline).Copy
         .Range(.Cells(3, inputline), .Cells(numofrows, inputline)).PasteSpecial (xlPasteAll)
         
+        .Rows(1).Find("Symbol").Value = "symbol"
+        .Rows(1).Find("Trade_Time").Value = "trade_Time"
+        .Rows(1).Find("Underlying").Value = "underlying"
+        .Rows(1).Find("Expiry").Value = "expiry"
+        .Rows(1).Find("Strike").Value = "strike"
+        .Rows(1).Find("Proceeds").Value = "proceeds"
+        .Rows(1).Find("Basis").Value = "basis"
         .Rows(1).Find("Quantity").Value = "Q"
-        .Rows(1).Find("T. Price").Value = "Price"
-        .Rows(1).Find("Comm/Tax").Value = "CommTax"
-        .Rows(1).Find("Realized P/L").Value = "Realized_PL"
+        .Rows(1).Find("T. Price").Value = "price"
+        .Rows(1).Find("Comm/Tax").Value = "comm"
+        .Rows(1).Find("Realized P/L").Value = "realized_PL"
         .Rows(1).Find("MTM P/L").Value = "MTM_PL"
-        .Rows(1).Find("Code").Value = "Codes"
+        .Rows(1).Find("Code").Value = "codes"
         .Rows(1).Find("C. Price").Value = "C_Price"
         .Rows(1).Find("Exchange").Value = "Xchange"
+        .Rows(1).Find("SecType").Value = "secType"
         
         'Add OC Type, LS and Account
         numofcolumnsinws2 = .Cells(1, Columns.Count).End(xlToLeft).Column
@@ -437,14 +445,22 @@ Sub clean_ibtrades()
         .Range(.Cells(2, expiryinws4), .Cells(numofrows1, expiryinws4)).NumberFormat = "yyyy-mm-dd HH:mm:ss"
         .Range(.Cells(2, strikeinws4), .Cells(numofrows1, strikeinws4)).NumberFormat = "0.00"
         
+        .Rows(1).Find("Symbol").Value = "symbol"
+        .Rows(1).Find("Trade_Time").Value = "trade_Time"
+        .Rows(1).Find("Underlying").Value = "underlying"
+        .Rows(1).Find("Expiry").Value = "expiry"
+        .Rows(1).Find("Strike").Value = "strike"
+        .Rows(1).Find("Proceeds").Value = "proceeds"
+        .Rows(1).Find("Basis").Value = "basis"
         .Rows(1).Find("Quantity").Value = "Q"
-        .Rows(1).Find("T. Price").Value = "Price"
-        .Rows(1).Find("Comm/Tax").Value = "CommTax"
-        .Rows(1).Find("Realized P/L").Value = "Realized_PL"
+        .Rows(1).Find("T. Price").Value = "price"
+        .Rows(1).Find("Comm/Tax").Value = "comm"
+        .Rows(1).Find("Realized P/L").Value = "realized_PL"
         .Rows(1).Find("MTM P/L").Value = "MTM_PL"
-        .Rows(1).Find("Code").Value = "Codes"
+        .Rows(1).Find("Code").Value = "codes"
         .Rows(1).Find("C. Price").Value = "C_Price"
         .Rows(1).Find("Exchange").Value = "Xchange"
+        .Rows(1).Find("SecType").Value = "secType"
     End With
     
     ActiveWorkbook.Worksheets("Allocation and Wash").Sort.SortFields.Clear
@@ -496,13 +512,20 @@ Sub clean_ibtrades()
         
         numofcolumns2 = ws5.Cells(1, Columns.Count).End(xlToLeft).Column
         .Columns(numofcolumns2).Insert
-        .Cells(1, numofcolumns2).Value = "Account"
+        .Cells(1, numofcolumns2).Value = "account"
         .Range(.Cells(2, numofcolumns2), .Cells(numofrows2, numofcolumns2)).Value = "IB9048"
 
+        .Rows(1).Find("Symbol").Value = "symbol"
+        .Rows(1).Find("Trade_Time").Value = "trade_Time"
+        .Rows(1).Find("Underlying").Value = "underlying"
+        .Rows(1).Find("Expiry").Value = "expiry"
+        .Rows(1).Find("Strike").Value = "strike"
+        .Rows(1).Find("Basis").Value = "basis"
+        .Rows(1).Find("SecType").Value = "secType"
         .Rows(1).Find("Quantity").Value = "Q"
-        .Rows(1).Find("T. Price").Value = "Price"
-        .Rows(1).Find("Realized P/L").Value = "Realized_PL"
-        .Rows(1).Find("Code").Value = "Codes"
+        .Rows(1).Find("T. Price").Value = "price"
+        .Rows(1).Find("Realized P/L").Value = "realized_PL"
+        .Rows(1).Find("Code").Value = "codes"
     End With
     
     'Save trades, orders and section info into csv fils
