@@ -324,6 +324,7 @@ public class ELLE_GUI_Frame extends JFrame implements ITableConstants {
         tableCombined = new javax.swing.JTable();
         menuBar = new javax.swing.JMenuBar();
         menuFile = new javax.swing.JMenu();
+        menuItemVersion = new javax.swing.JMenuItem();
         menuItemRead = new javax.swing.JMenuItem();
         menuPrint = new javax.swing.JMenu();
         menuItemPrintGUI = new javax.swing.JMenuItem();
@@ -355,7 +356,6 @@ public class ELLE_GUI_Frame extends JFrame implements ITableConstants {
         viewnomatches = new javax.swing.JMenuItem();
         menuHelp = new javax.swing.JMenu();
         menuOther = new javax.swing.JMenu();
-        menuItemShowMatches = new javax.swing.JMenuItem();
         menuItemIB8949 = new javax.swing.JMenuItem();
         menuItemReconcile = new javax.swing.JMenuItem();
         menuItemTL8949 = new javax.swing.JMenuItem();
@@ -705,6 +705,14 @@ public class ELLE_GUI_Frame extends JFrame implements ITableConstants {
 
         menuFile.setText("File");
 
+        menuItemVersion.setText("Version");
+        menuItemVersion.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                menuItemVersionActionPerformed(evt);
+            }
+        });
+        menuFile.add(menuItemVersion);
+
         menuItemRead.setText("Read from CSV File");
         menuItemRead.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -916,14 +924,6 @@ public class ELLE_GUI_Frame extends JFrame implements ITableConstants {
 
         menuOther.setText("Other");
 
-        menuItemShowMatches.setText("Show Matches");
-        menuItemShowMatches.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                menuItemShowMatchesActionPerformed(evt);
-            }
-        });
-        menuOther.add(menuItemShowMatches);
-
         menuItemIB8949.setText("IB 8949");
         menuItemIB8949.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -1028,7 +1028,7 @@ public class ELLE_GUI_Frame extends JFrame implements ITableConstants {
     private void menuItemAWSActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuItemAWSActionPerformed
 
     }//GEN-LAST:event_menuItemAWSActionPerformed
-
+                                                                                    
     private void menuItemReadActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuItemReadActionPerformed
 
         int returnVal = filechooser.showOpenDialog(this);
@@ -1359,10 +1359,6 @@ public class ELLE_GUI_Frame extends JFrame implements ITableConstants {
         labelRecords.setText(recordsLabel);
     }//GEN-LAST:event_btnClearAllFiltersActionPerformed
 
-    private void menuItemShowMatchesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuItemShowMatchesActionPerformed
-
-    }//GEN-LAST:event_menuItemShowMatchesActionPerformed
-
     private void menuItemIB8949ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuItemIB8949ActionPerformed
 
     }//GEN-LAST:event_menuItemIB8949ActionPerformed
@@ -1612,9 +1608,12 @@ public class ELLE_GUI_Frame extends JFrame implements ITableConstants {
         }
     }//GEN-LAST:event_menuItemLogOutActionPerformed
 
-    /**
-     * 
-     */
+    private void menuItemVersionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuItemVersionActionPerformed
+        JOptionPane.showMessageDialog(this, "Creation Date: "
+                + creationDate + "\n"
+                + "Version: " + version);
+    }//GEN-LAST:event_menuItemVersionActionPerformed
+
     private void reloadDataAction() {
         // reload modified table data into dropdown list
         loadTables(tabs);
@@ -2814,9 +2813,9 @@ public class ELLE_GUI_Frame extends JFrame implements ITableConstants {
     private javax.swing.JMenuItem menuItemReconcile;
     private javax.swing.JMenuItem menuItemReloadTabData;
     private javax.swing.JMenuItem menuItemSave;
-    private javax.swing.JMenuItem menuItemShowMatches;
     private javax.swing.JMenuItem menuItemTL;
     private javax.swing.JMenuItem menuItemTL8949;
+    private javax.swing.JMenuItem menuItemVersion;
     private javax.swing.JMenu menuLoad;
     private javax.swing.JMenu menuOther;
     private javax.swing.JMenu menuPrint;
@@ -2846,3 +2845,4 @@ public class ELLE_GUI_Frame extends JFrame implements ITableConstants {
     // End of variables declaration//GEN-END:variables
 
 }
+
