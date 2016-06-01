@@ -30,11 +30,8 @@
       <delete dir="target"/>
       <jar jarfile="target/${jarname}.jar">
         <zipfileset src="${dist.jar}" excludes="META-INF/*" />
-        <zipfileset src="lib/mysql-connector-java-5.1.30-bin.jar" excludes="META-INF/*" />
-        <zipfileset src="lib/swingx-all-1.6.4.jar" excludes="META-INF/*" />
-        <zipfileset src="lib/org.hamcrest.core_1.1.0.v20090501071000.jar" excludes="META-INF/*" />
-        <zipfileset src="lib/miglayout-4.0.jar" excludes="META-INF/*" />
-        <zipfileset src="lib/junit.jar" excludes="META-INF/*" />
+        
+            <zipgroupfileset dir="lib" excludes="META-INF/*" />
         <manifest>
             <attribute name="Main-Class" value="com.elle.elle_gui.ELLE_GUI"/>
         </manifest>
