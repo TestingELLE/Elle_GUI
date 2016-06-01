@@ -1,0 +1,582 @@
+Sub clean_ibtrades()
+    'what are you doing now?  comment the lines.
+    Dim wb As Workbook
+    Dim ws1 As Worksheet
+    Dim ws2 As Worksheet
+    Dim ws3 As Worksheet
+    Dim ws4 As Worksheet
+    Dim ws5 As Worksheet
+    Dim ws6 As Worksheet
+    Dim trades_start As Range
+    Dim trades_end As Range
+    
+    'Close screen updating and possible alerts
+    Application.ScreenUpdating = False
+    Application.DisplayAlerts = False
+      
+    'Delete useless worksheets if exists in this workbook
+    Set wb = ThisWorkbook
+    On Error Resume Next
+    wb.Worksheets("Section Info").Delete
+    wb.Worksheets("Trades").Delete
+    wb.Worksheets("Orders").Delete
+    wb.Worksheets("Allocation and Wash").Delete
+    
+    
+    Set ws1 = wb.Worksheets("Sheet1")
+    ws1.Cells.UnMerge
+    
+    ThisWorkbook.Sheets("Sheet1").Copy _
+    After:=ThisWorkbook.Sheets(ThisWorkbook.Sheets.Count)
+    
+    Set ws2 = ThisWorkbook.Worksheets(2)
+    ws2.Name = "Trades"
+    
+    'In the sheet1, find the start along with the end row of section "trade"
+    With ws2.Columns(1)
+        Set stocks_start = .Find("Stocks", lookAt:=xlWhole, _
+        MatchCase:=True).Offset(2)
+        Set stocks_end = .Find("Equity and Index Options", lookAt:=xlWhole, _
+        MatchCase:=True).Offset(-2)
+        Set options_start = .Find("Equity and Index Options", lookAt:=xlWhole, _
+        MatchCase:=True).Offset(2)
+        Set options_end = .Find("Forex", lookAt:=xlWhole, _
+        MatchCase:=True).Offset(-2)
+        Set forex_start = .Find("Forex", lookAt:=xlWhole, _
+        MatchCase:=True).Offset(2)
+        Set forex_end = .Find("Bonds", lookAt:=xlWhole, _
+        MatchCase:=True).Offset(-2)
+        Set bonds_start = .Find("Bonds", lookAt:=xlWhole, _
+        MatchCase:=True).Offset(2)
+        Set bonds_end = .Find("Total", After:=bonds_start.Offset(1), lookAt:=xlWhole, _
+        MatchCase:=True)
+
+    End With
+       
+    'In the sheet2, display the information of trade section
+    'set the format as well
+    Set ws3 = wb.Worksheets.Add(After:=ws2)
+    ws3.Name = "Section Info"
+    With ws3
+        .Cells(1, 1).Value = "Section"
+        .Cells(1, 2).Value = "Start Row"
+        .Cells(1, 3).Value = "End Row"
+        .Cells(1, 4).Value = "Notes"
+        .Cells(2, 1).Value = "Stocks"
+        .Cells(2, 2).Value = stocks_start.Row
+        .Cells(2, 3).Value = stocks_end.Row
+        .Cells(2, 4).Value = "Info is based on original file"
+        .Cells(3, 1).Value = "Options"
+        .Cells(3, 2).Value = options_start.Row
+        .Cells(3, 3).Value = options_end.Row
+        .Cells(3, 4).Value = "Info is based on original file"
+        .Cells(4, 1).Value = "Forex"
+        .Cells(4, 2).Value = forex_start.Row
+        .Cells(4, 3).Value = forex_end.Row
+        .Cells(4, 4).Value = "Info is based on original file"
+        .Cells(5, 1).Value = "Bonds"
+        .Cells(5, 2).Value = bonds_start.Row
+        .Cells(5, 3).Value = bonds_end.Row
+        .Cells(5, 4).Value = "Info is based on original file"
+        .Range("A1:D1").Font.Bold = True
+        .Range("A1").CurrentRegion.HorizontalAlignment = Excel.xlCenter
+        .Range("A1").CurrentRegion.AutoFit
+    End With
+    
+    Dim lColumn As Integer
+    Dim lRow As Integer
+    Dim filecode As String
+    filecode = Right(Format(Date, "dd/mm/yyyy"), 1) & Mid(Format(Date, "dd/mm/yyyy"), 4, 2) & Left(Format(Date, "dd/mm/yyyy"), 2) & Chr(Int((90 - 65 + 1) * Rnd + 65))
+
+    With ws2
+
+        lColumn = .Cells(stocks_start.Row, Columns.Count).End(xlToLeft).Column
+        lRow = .Cells(Rows.Count, 1).End(xlUp).Row
+        .Cells(stocks_start.Row - 3, lColumn + 1).Value = "SecType"
+        .Range(.Cells(stocks_start.Row, lColumn + 1), .Cells(stocks_end.Row, lColumn + 1)).Value = "S"
+        .Range(.Cells(options_start.Row, lColumn + 1), .Cells(options_end.Row, lColumn + 1)).Value = "O"
+        .Range(.Cells(forex_start.Row, lColumn + 1), .Cells(forex_end.Row, lColumn + 1)).Value = "FX"
+        .Range(.Cells(bonds_start.Row, lColumn + 1), .Cells(bonds_end.Row, lColumn + 1)).Value = "B"
+        
+        .Range(.Rows(1), .Rows(stocks_start.Row - 4)).Delete
+        .Range(.Rows(bonds_end.Row + 1), .Rows(lRow)).Delete
+        
+        
+        colofsectype = .Rows(1).Find("SecType").Column
+        .Columns(colofsectype).Insert
+        .Cells(1, colofsectype) = "bkrType"
+        
+        .Cells(2, colofsectype).Formula = "=IF(ISNUMBER(FIND(""Closed"", A2)), ""allocation"", IF(ISNUMBER(FIND(""Wash"", A2)), ""wash"",IF(C2=""-"", ""order"","""")))"
+        .Cells(2, colofsectype).Copy
+        .Range(.Cells(3, colofsectype), .Cells(bonds_end.Row, colofsectype)).PasteSpecial (xlPasteAll)
+        
+        .Columns(colofsectype).Copy
+        .Columns(colofsectype).PasteSpecial Paste:=xlPasteValues, Operation:=xlNone, SkipBlanks _
+        :=False, Transpose:=False
+        
+        colofdatetime = .Rows(1).Find("Date/Time").Column
+        .Range(.Cells(2, colofdatetime), .Cells(bonds_end.Row, colofdatetime)).NumberFormat = "yyyy-mm-dd HH:mm:ss"
+        
+        .Columns(colofsectype).Insert
+        
+        .Range(.Cells(1, colofsectype), .Cells(bonds_end.Row, colofsectype)).Formula = "=IF(AND(B:B=""""),NA(),"""")"
+        .Range(.Cells(1, colofsectype), .Cells(bonds_end.Row, colofsectype)).SpecialCells(xlCellTypeFormulas, xlErrors).EntireRow.Select
+        .Range(.Cells(1, colofsectype), .Cells(bonds_end.Row, colofsectype)).SpecialCells(xlCellTypeFormulas, xlErrors).EntireRow.Delete Shift:=xlUp
+        .Range(.Cells(1, colofsectype), .Cells(bonds_end.Row, colofsectype)).Clear
+        .Columns(colofsectype).Delete
+        
+        
+        numofrows = .UsedRange.Rows.Count
+        
+        .Columns(colofsectype).Insert
+        .Cells(1, colofsectype) = "TotalQ"
+        .Cells(2, colofsectype).Formula = "=IF(ISNUMBER(FIND(""order"", N2)), D2, M1)"
+        .Cells(2, colofsectype).Copy
+        .Range(.Cells(2, colofsectype), .Cells(numofrows, colofsectype)).PasteSpecial (xlPasteAll)
+        
+        .Columns(colofsectype).Copy
+        .Columns(colofsectype).PasteSpecial Paste:=xlPasteValues, Operation:=xlNone, SkipBlanks _
+        :=False, Transpose:=False
+        
+        .Columns(1).Insert
+        .Cells(1, 1).Value = "filecode"
+        .Cells(2, 1).Value = filecode
+        .Cells(2, 1).Copy
+        .Range(.Cells(2, 1), .Cells(numofrows, 1)).PasteSpecial (xlPasteAll)
+    
+    End With
+
+    wb.Sheets.Add After:=Worksheets(Worksheets.Count)
+    Set ws4 = ThisWorkbook.Worksheets(4)
+    ws4.Name = "Orders"
+
+    
+    ws2.Activate
+    
+    'start to generate option type, expire, strike data
+    colofdatetime = Rows(1).Find("Date/Time").Column
+    Columns(colofdatetime + 1).Insert
+    Cells(1, colofdatetime + 1).Value = "O_Type"
+    
+    Columns(colofdatetime + 1).Insert
+    Cells(1, colofdatetime + 1).Value = "Strike"
+    
+    Columns(colofdatetime + 1).Insert
+    Cells(1, colofdatetime + 1).Value = "Expiry"
+    
+    Columns(colofdatetime + 1).Insert
+    Cells(1, colofdatetime + 1).Value = "Underlying"
+    
+    
+    'start to calulate total Q
+    colofdatetime = Rows(1).Find("Date/Time").Column
+    coloftotalq = Rows(1).Find("TotalQ").Column
+    colofq = Rows(1).Find("Quantity").Column
+    colofbkrtype = Rows(1).Find("bkrType").Column
+    colofsymbol = Rows(1).Find("Symbol").Column
+    colofotype = Rows(1).Find("O_Type").Column
+    colofstrike = Rows(1).Find("Strike").Column
+    colofexpiry = Rows(1).Find("Expiry").Column
+    colofunderlying = Rows(1).Find("Underlying").Column
+    Range(Cells(2, colofstrike), Cells(numofrows, colofstrike)).NumberFormat = "0.00"
+    
+    
+    years = Cells(1, Columns.Count).End(xlToLeft).Column
+    Columns(years).Insert
+    Cells(1, years).Value = "yr"
+    colofyears = Rows(1).Find("yr").Column
+    
+    ws4.Rows(1).EntireRow.Value = Rows(1).EntireRow.Value
+
+    colofsectype = Rows(1).Find("SecType").Column
+    
+    Dim h As Integer
+    Dim symbolstrings As String
+    h = 2
+    
+    For r = numofrows To 2 Step -1
+        
+        If Cells(r, colofsectype) = "O" Then
+            symbolstrings = Cells(r, colofsymbol).Text
+            stringarray = Split(symbolstrings, " ")
+            Cells(r, colofunderlying) = stringarray(0)
+            Cells(r, colofexpiry) = stringarray(1)
+            Cells(r, colofstrike) = stringarray(2)
+            Cells(r, colofotype) = stringarray(3)
+        ElseIf Cells(r, colofsectype).Text = "S" Then
+            Cells(r, colofunderlying) = Cells(r, colofsymbol)
+        ElseIf Cells(r, colofsectype).Text = "FX" Then
+            Cells(r, colofunderlying) = Cells(r, colofsymbol)
+        End If
+        
+        
+        If Cells(r, colofsymbol) = "Symbol" Then
+            Rows(r).EntireRow.Delete
+        End If
+        
+        If InStr(Cells(r, colofdatetime), ",") > 0 Then
+            Cells(r, colofdatetime) = Replace(Cells(r, colofdatetime), ",", "")
+        End If
+        
+        Cells(r, colofyears) = 12
+        
+        If Cells(r, colofbkrtype) = "allocation" Then
+            current_location = r
+            loop_ending_location = r - 15
+            
+            For t = current_location To loop_ending_location Step -1
+                If Cells(t, colofbkrtype) = "" Then
+                    Cells(current_location, coloftotalq) = Cells(t, colofq)
+                    Cells(current_location, colofsymbol) = Cells(t, colofsymbol)
+                    If Cells(t, colofq) < 0 And Cells(current_location, colofq) > 0 Then
+                        Cells(current_location, colofq) = 0 - Cells(current_location, colofq)
+                    End If
+                    Exit For
+                End If
+            Next t
+        ElseIf Cells(r, colofbkrtype) = "wash" Then
+            Cells(r, coloftotalq) = ""
+            
+            current_location1 = r
+            loop_ending_location1 = r - 10
+            
+            For p = current_location1 To loop_ending_location1 Step -1
+                If Cells(p, colofbkrtype) = "" Then
+                    Cells(current_location1, colofsymbol) = Cells(p, colofsymbol)
+                    Exit For
+                End If
+            Next p
+            
+            
+        ElseIf Cells(r, colofbkrtype) = "order" Then
+            ws4.Rows(h).EntireRow.Value = ws2.Rows(r).EntireRow.Value
+            ws2.Rows(r).EntireRow.Delete
+            h = h + 1
+        End If
+    Next r
+    
+    With ws2
+        inputline = .Cells(1, .Columns.Count).End(xlToLeft).Column
+        .Columns(inputline).Insert
+        .Cells(1, inputline).Value = "inputLine"
+        
+        numofrows = .UsedRange.Rows.Count
+
+        colofsectype = .Rows(1).Find("SecType").Column
+        
+        .Cells(2, colofsectype + 1).Formula = "=IF(ISNUMBER(FIND(""Closed"", D1)), 0, IF(ISNUMBER(FIND(""Wash"", D1)), 0,1))"
+        .Cells(2, colofsectype + 1).Copy
+        .Range(.Cells(2, colofsectype + 1), .Cells(numofrows, colofsectype + 1)).PasteSpecial (xlPasteAll)
+        
+        .Cells(1, colofsectype + 2) = 0
+        
+        letteraddress1 = Split(.Cells(1, colofsectype + 1).Address, "$")(1)
+        letteraddress2 = Split(.Cells(1, colofsectype + 2).Address, "$")(1)
+        
+        .Cells(2, colofsectype + 2).Formula = "=SUM(" & letteraddress1 & "2" & "+" & letteraddress2 & "1)"
+        .Cells(2, colofsectype + 2).Copy
+        .Range(.Cells(3, colofsectype + 2), .Cells(numofrows, colofsectype + 2)).PasteSpecial (xlPasteAll)
+        
+        .Range(.Cells(1, colofsectype + 2), .Cells(numofrows, colofsectype + 2)).Copy
+        .Range(.Cells(1, colofsectype + 1), .Cells(numofrows, colofsectype + 1)).PasteSpecial Paste:=xlPasteValues, Operation:=xlNone, SkipBlanks _
+        :=False, Transpose:=False
+        .Range(.Cells(1, colofsectype + 2), .Cells(numofrows, colofsectype + 2)).Delete
+        .Cells(1, colofsectype + 1) = "bkrGroup"
+
+    End With
+        
+    wb.Sheets.Add After:=Worksheets(Worksheets.Count)
+    Set ws5 = ThisWorkbook.Worksheets(5)
+    ws5.Name = "Allocation and Wash"
+    ws5.Rows(1).EntireRow.Value = ws2.Rows(1).EntireRow.Value
+    
+    ws2.Activate
+    Dim w As Integer
+    w = 2
+    colofbkrtype = Rows(1).Find("bkrType").Column
+    For m = numofrows To 2 Step -1
+        If Cells(m, colofbkrtype) = "allocation" Then
+            ws5.Rows(w).EntireRow.Value = ws2.Rows(m).EntireRow.Value
+            ws2.Rows(m).EntireRow.Delete
+            w = w + 1
+        ElseIf Cells(m, colofbkrtype) = "wash" Then
+            ws5.Rows(w).EntireRow.Value = ws2.Rows(m).EntireRow.Value
+            ws2.Rows(m).EntireRow.Delete
+            w = w + 1
+        End If
+    Next m
+    
+    With ws5
+        numofrowsofws5 = .UsedRange.Rows.Count
+        numpofcolumnsofws5 = .Cells(1, Columns.Count).End(xlToLeft).Column
+        colofsectypeofws5 = .Rows(1).Find("SecType").Column
+        colofsymbolofws5 = .Rows(1).Find("Symbol").Column
+        colofexpiryofws5 = .Rows(1).Find("Expiry").Column
+        colofstrikeofws5 = .Rows(1).Find("Strike").Column
+        colofunderlyingofws5 = .Rows(1).Find("Underlying").Column
+        colofotypeofws5 = .Rows(1).Find("O_Type").Column
+        
+        For j = numofrowsofws5 To 2 Step -1
+            If .Cells(j, colofsectypeofws5) = "O" Then
+                symbolstringsofws5 = .Cells(j, colofsymbolofws5).Text
+                stringarrayws5 = Split(symbolstringsofws5, " ")
+                .Cells(j, colofunderlyingofws5) = stringarrayws5(0)
+                .Cells(j, colofexpiryofws5) = stringarrayws5(1)
+                .Cells(j, colofstrikeofws5) = stringarrayws5(2)
+                .Cells(j, colofotypeofws5) = stringarrayws5(3)
+            ElseIf .Cells(j, colofsectypeofws5).Text = "S" Then
+                .Cells(j, colofunderlyingofws5) = .Cells(j, colofsymbolofws5)
+            ElseIf .Cells(j, colofsectypeofws5).Text = "FX" Then
+                .Cells(j, colofunderlyingofws5) = .Cells(j, colofsymbolofws5)
+            End If
+        
+        Next j
+    End With
+
+    
+    'Table Clean up
+    ws2.Cells(1, 3) = "Trade_Time"
+    ws4.Cells(1, 3) = "Trade_Time"
+    ws5.Cells(1, 3) = "Trade_Time"
+    
+    
+    With ws2
+        
+        num = .Rows(1).Find("Trade_Time").Column
+        numofcolumns = .Cells(1, Columns.Count).End(xlToLeft).Column
+        numofrows = .UsedRange.Rows.Count
+        With Range(Cells(2, 1), Cells(numofrows, numofcolumns))
+            .Sort key1:=Columns(num), order1:=xlAscending
+        End With
+        
+        brokertype = .Rows(1).Find("bkrType").Column
+        .Columns(brokertype).Delete
+    
+        inputline = .Rows(1).Find("inputLine").Column
+        letteraddress3 = Split(.Cells(1, inputline).Address, "$")(1)
+        .Cells(2, inputline).Value = 1
+        .Cells(3, inputline).Formula = "= 1 + " & letteraddress3 & "2"
+        .Cells(3, inputline).Copy
+        .Range(.Cells(3, inputline), .Cells(numofrows, inputline)).PasteSpecial (xlPasteAll)
+        
+        .Rows(1).Find("Symbol").Value = "symbol"
+        .Rows(1).Find("Trade_Time").Value = "trade_Time"
+        .Rows(1).Find("Underlying").Value = "underlying"
+        .Rows(1).Find("Expiry").Value = "expiry"
+        .Rows(1).Find("Strike").Value = "strike"
+        .Rows(1).Find("Proceeds").Value = "proceeds"
+        .Rows(1).Find("Basis").Value = "basis"
+        .Rows(1).Find("Quantity").Value = "Q"
+        .Rows(1).Find("T. Price").Value = "price"
+        .Rows(1).Find("Comm/Tax").Value = "comm"
+        .Rows(1).Find("Realized P/L").Value = "realized_PL"
+        .Rows(1).Find("MTM P/L").Value = "MTM_PL"
+        .Rows(1).Find("Code").Value = "codes"
+        .Rows(1).Find("C. Price").Value = "C_Price"
+        .Rows(1).Find("Exchange").Value = "Xchange"
+        .Rows(1).Find("SecType").Value = "secType"
+        
+        'Add OC Type, LS and Account
+        numofcolumnsinws2 = .Cells(1, Columns.Count).End(xlToLeft).Column
+        .Columns(numofcolumnsinws2 + 1).Insert
+        .Cells(1, numofcolumnsinws2 + 1).Value = "account"
+        .Range(.Cells(2, numofcolumnsinws2 + 1), .Cells(numofrows, numofcolumnsinws2 + 1)).Value = "IB9048"
+        
+        .Columns(numofcolumnsinws2 + 2).Insert
+        .Cells(1, numofcolumnsinws2 + 2).Value = "LS"
+        .Cells(2, numofcolumnsinws2 + 2).Formula = "=IF(I2>0, ""L"", ""S"")"
+        .Cells(2, numofcolumnsinws2 + 2).Copy
+        .Range(.Cells(3, numofcolumnsinws2 + 2), .Cells(numofrows, numofcolumnsinws2 + 2)).PasteSpecial (xlPasteAll)
+        
+        .Columns(numofcolumnsinws2 + 3).Insert
+        .Cells(1, numofcolumnsinws2 + 3).Value = "OC"
+        .Cells(2, numofcolumnsinws2 + 3).Formula = "=IF(ISNUMBER(SEARCH(""O"", Q2)), ""O"", IF(ISNUMBER(SEARCH(""C"", Q2)), ""C"", ""FX""))"
+        .Cells(2, numofcolumnsinws2 + 3).Copy
+        .Range(.Cells(3, numofcolumnsinws2 + 3), .Cells(numofrows, numofcolumnsinws2 + 3)).PasteSpecial (xlPasteAll)
+        
+        .Columns(numofcolumnsinws2 + 4).Insert
+        .Cells(1, numofcolumnsinws2 + 4).Value = "multi"
+        .Cells(2, numofcolumnsinws2 + 4).Formula = "=IF(ISNUMBER(SEARCH(""O"", U2)), 100, 1)"
+        .Cells(2, numofcolumnsinws2 + 4).Copy
+        .Range(.Cells(3, numofcolumnsinws2 + 4), .Cells(numofrows, numofcolumnsinws2 + 4)).PasteSpecial (xlPasteAll)
+        
+        proeedsinws2 = .Rows(1).Find("Proceeds").Column
+        .Range(.Cells(2, proeedsinws2), .Cells(numofrows, proeedsinws2)).NumberFormat = "0.00"
+        
+        basisinws2 = .Rows(1).Find("Basis").Column
+        .Range(.Cells(2, basisinws2), .Cells(numofrows, basisinws2)).NumberFormat = "0.00"
+        
+        rplinws2 = .Rows(1).Find("Realized_PL").Column
+        .Range(.Cells(2, rplinws2), .Cells(numofrows, rplinws2)).NumberFormat = "0.00"
+        
+    End With
+    
+    ActiveWorkbook.Worksheets("Orders").Sort.SortFields.Clear
+    ActiveWorkbook.Worksheets("Orders").Sort.SortFields.Add Key:=Range("C2:C654") _
+        , SortOn:=xlSortOnValues, Order:=xlAscending, DataOption:=xlSortNormal
+    
+ 
+    numofcolumns1 = ws4.Cells(1, Columns.Count).End(xlToLeft).Column
+    numofrows1 = ws4.UsedRange.Rows.Count
+    ws4.Range(Cells(2, 3), Cells(numofrows1, 3)).NumberFormat = "yyyy-mm-dd HH:mm:ss"
+    With ActiveWorkbook.Worksheets("Orders").Sort
+        .SetRange Range(Cells(1, 1), Cells(numofrows1, numofcolumns1))
+        .Header = xlYes
+        .MatchCase = False
+        .Orientation = xlTopToBottom
+        .SortMethod = xlPinYin
+        .Apply
+    End With
+    
+    With ws4
+        numofrows1 = .UsedRange.Rows.Count
+        
+        inputline2 = .Cells(1, Columns.Count).End(xlToLeft).Column
+        .Columns(inputline2).Insert
+        .Cells(1, inputline2).Value = "inputLine"
+        letteraddress4 = Split(.Cells(1, inputline2).Address, "$")(1)
+        .Cells(2, inputline2).Value = 1
+        .Cells(3, inputline2).Formula = "= 1 + " & letteraddress4 & "2"
+        .Cells(3, inputline2).Copy
+        .Range(.Cells(3, inputline2), .Cells(numofrows1, inputline2)).PasteSpecial (xlPasteAll)
+        
+        expiryinws4 = .Rows(1).Find("Expiry").Column
+        strikeinws4 = .Rows(1).Find("Strike").Column
+        .Range(.Cells(2, expiryinws4), .Cells(numofrows1, expiryinws4)).NumberFormat = "yyyy-mm-dd HH:mm:ss"
+        .Range(.Cells(2, strikeinws4), .Cells(numofrows1, strikeinws4)).NumberFormat = "0.00"
+        
+        .Rows(1).Find("Symbol").Value = "symbol"
+        .Rows(1).Find("Trade_Time").Value = "trade_Time"
+        .Rows(1).Find("Underlying").Value = "underlying"
+        .Rows(1).Find("Expiry").Value = "expiry"
+        .Rows(1).Find("Strike").Value = "strike"
+        .Rows(1).Find("Proceeds").Value = "proceeds"
+        .Rows(1).Find("Basis").Value = "basis"
+        .Rows(1).Find("Quantity").Value = "Q"
+        .Rows(1).Find("T. Price").Value = "price"
+        .Rows(1).Find("Comm/Tax").Value = "comm"
+        .Rows(1).Find("Realized P/L").Value = "realized_PL"
+        .Rows(1).Find("MTM P/L").Value = "MTM_PL"
+        .Rows(1).Find("Code").Value = "codes"
+        .Rows(1).Find("C. Price").Value = "C_Price"
+        .Rows(1).Find("Exchange").Value = "Xchange"
+        .Rows(1).Find("SecType").Value = "secType"
+    End With
+    
+    ActiveWorkbook.Worksheets("Allocation and Wash").Sort.SortFields.Clear
+    ActiveWorkbook.Worksheets("Allocation and Wash").Sort.SortFields.Add Key:=Range("C2:C654") _
+        , SortOn:=xlSortOnValues, Order:=xlAscending, DataOption:=xlSortNormal
+    
+    numofcolumns2 = ws5.Cells(1, Columns.Count).End(xlToLeft).Column
+    numofrows2 = ws5.UsedRange.Rows.Count
+    ws5.Range(Cells(2, 3), Cells(numofrows2, 3)).NumberFormat = "yyyy-mm-dd HH:mm:ss"
+    With ActiveWorkbook.Worksheets("Allocation and Wash").Sort
+        .SetRange Range(Cells(1, 1), Cells(numofrows2, numofcolumns2))
+        .Header = xlYes
+        .MatchCase = False
+        .Orientation = xlTopToBottom
+        .SortMethod = xlPinYin
+        .Apply
+    End With
+    
+    With ws5
+        numofrows2 = .UsedRange.Rows.Count
+        
+        exchangeinws5 = .Rows(1).Find("Exchange").Column
+        .Columns(exchangeinws5).Delete
+        
+        cpriceinws5 = .Rows(1).Find("C. Price").Column
+        .Columns(cpriceinws5).Delete
+        
+        proceedsinws5 = .Rows(1).Find("Proceeds").Column
+        .Columns(proceedsinws5).Delete
+        
+        commtaxinws5 = .Rows(1).Find("Comm/Tax").Column
+        .Columns(commtaxinws5).Delete
+        
+        mtmplinws5 = .Rows(1).Find("MTM P/L").Column
+        .Columns(mtmplinws5).Delete
+     
+        expiryinws5 = .Rows(1).Find("Expiry").Column
+        .Range(.Cells(2, expiryinws5), .Cells(numofrows2, expiryinws5)).NumberFormat = "yyyy-mm-dd HH:mm:ss"
+        
+        strikeinws5 = .Rows(1).Find("Strike").Column
+        .Range(.Cells(2, strikeinws5), .Cells(numofrows1, strikeinws5)).NumberFormat = "0.00"
+        
+        inputline3 = .Rows(1).Find("inputLine").Column
+        letteraddress5 = Split(.Cells(1, inputline3).Address, "$")(1)
+        .Cells(2, inputline3).Value = 1
+        .Cells(3, inputline3).Formula = "= 1 + " & letteraddress5 & "2"
+        .Cells(3, inputline3).Copy
+        .Range(.Cells(3, inputline3), .Cells(numofrows2, inputline3)).PasteSpecial (xlPasteAll)
+        
+        numofcolumns2 = ws5.Cells(1, Columns.Count).End(xlToLeft).Column
+        .Columns(numofcolumns2).Insert
+        .Cells(1, numofcolumns2).Value = "account"
+        .Range(.Cells(2, numofcolumns2), .Cells(numofrows2, numofcolumns2)).Value = "IB9048"
+
+        .Rows(1).Find("Symbol").Value = "symbol"
+        .Rows(1).Find("Trade_Time").Value = "trade_Time"
+        .Rows(1).Find("Underlying").Value = "underlying"
+        .Rows(1).Find("Expiry").Value = "expiry"
+        .Rows(1).Find("Strike").Value = "strike"
+        .Rows(1).Find("Basis").Value = "basis"
+        .Rows(1).Find("SecType").Value = "secType"
+        .Rows(1).Find("Quantity").Value = "Q"
+        .Rows(1).Find("T. Price").Value = "price"
+        .Rows(1).Find("Realized P/L").Value = "realized_PL"
+        .Rows(1).Find("Code").Value = "codes"
+    End With
+    
+    'Save trades, orders and section info into csv fils
+    
+    Dim savetodirectory As String
+    
+    'Set up the saving directory
+    savetodirectory = "Macintosh HD:Users:fanyichong:wei:"
+    
+    Dim tradessavefilename As String
+    Dim sectionsavefilename As String
+    Dim orderssavefilename As String
+    Dim allocationsavefilename As String
+
+    
+    'set up the filename to save
+    tradessavefilename = "U529048 Trades 2012-" & filecode & "-4SQL"
+
+    ws2.Select
+    
+    ActiveWorkbook.SaveAs Filename:= _
+        savetodirectory & tradessavefilename, _
+        FileFormat:=xlCSV, CreateBackup:=False
+
+    
+    sectionsavefilename = "U529048 Section Info 2012-" & filecode
+        
+    ws3.Select
+    
+    ActiveWorkbook.SaveAs Filename:= _
+        savetodirectory & sectionsavefilename, _
+        FileFormat:=xlCSV, CreateBackup:=False
+
+    
+    orderssavefilename = "U529048 Orders 2012-" & filecode
+        
+    ws4.Select
+    
+    ActiveWorkbook.SaveAs Filename:= _
+        savetodirectory & orderssavefilename, _
+        FileFormat:=xlCSV, CreateBackup:=False
+
+    allocationsavefilename = "U529048 Allocation and Wash 2012-" & filecode
+        
+    ws5.Select
+    
+    ActiveWorkbook.SaveAs Filename:= _
+        savetodirectory & allocationsavefilename, _
+        FileFormat:=xlCSV, CreateBackup:=False
+    
+End Sub
+
+
+
