@@ -1,20 +1,23 @@
-DELIMITER $$
-
-CREATE PROCEDURE `aggregatePositions`(IN MYTABLE varchar(50))
-SQL SECURITY INVOKER
-
-
+CREATE DEFINER=`pupone_Shenrui`@`%` PROCEDURE `aggregatePositions`(IN MYTABLE varchar(50))
+    SQL SECURITY INVOKER
 BEGIN
    
     set SQL_SAFE_UPDATES=0;
     
     set @`timeStamp`=Now();
     
+    drop temporary table if exists orderedtable;
+    SET @cmd1 = CONCAT('create temporary table if not exists orderedtable
+    select * from ',MYTABLE,' order by pos_id DESC');
+    PREPARE STMT1 FROM @cmd1;
+    EXECUTE STMT1;
+    DEALLOCATE PREPARE STMT1;  
+    
     drop temporary table if exists aggregatedCalculation_temporary;
     SET @cmd1 = CONCAT('create temporary table if not exists aggregatedCalculation_temporary
     select l2.pos_id as grp,sum(l2.Q) as sumOfQ,sum(l2.basis_adj) as sumOfBasis,
     avg(l2.multi) as avgOfMulti, sum(l2.basis_adj)/sum(l2.Q)/avg(l2.multi) as price_adj
-    from ',MYTABLE,' l2
+    from orderedtable l2
     where OCE = "O" and !field(ksflag,"ks","bk","tot")
     and 
     exists(select "X" from ',MYTABLE,' group_team
@@ -54,7 +57,7 @@ BEGIN
     
     set SQL_SAFE_UPDATES=0;
     update individualTable_temporary as t1,aggregatedTable_temporary as t2
-    set t1.ksflag='bk', t1.grp=t2.grp, t1.line=t1.line+1,t1.`timeStamp`=@`timeStamp`
+    set t1.ksflag='bk', t1.grp=t2.grp,t1.`timeStamp`=@`timeStamp`
     where t1.symbol=t2.symbol and t1.lot_Time=t2.lot_Time and
     t1.price_adj between t2.price_adj-0.01 and t2.price_adj+0.01;
     
@@ -82,7 +85,17 @@ BEGIN
     EXECUTE STMT5;
     DEALLOCATE PREPARE STMT5;
     
+    SET @cmd5 = CONCAT(   'Insert into aggregatedPositions
+    select * from ',MYTABLE,' where ksflag="bk" or ksflag="tot";');
+    PREPARE STMT5 FROM @cmd5;
+    EXECUTE STMT5;
+    DEALLOCATE PREPARE STMT5;
+    
+    SET @cmd5 = CONCAT(   'delete from ',MYTABLE,' where pos_id in (select pos_id from aggregatedPositions) and ksflag<>"tot";');
+    PREPARE STMT5 FROM @cmd5;
+    EXECUTE STMT5;
+    DEALLOCATE PREPARE STMT5;
+    
     insert into `timeStamps` values(@`timeStamp`,'aggregatePositions');
-
-END$$
-DELIMITER ;
+    
+END

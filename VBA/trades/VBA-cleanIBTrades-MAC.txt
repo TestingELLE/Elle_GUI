@@ -151,109 +151,110 @@ Sub clean_ibtrades()
     ws4.Name = "Orders"
 
     
-    ws2.Activate
-    
-    'start to generate option type, expire, strike data
-    colofdatetime = Rows(1).Find("Date/Time").Column
-    Columns(colofdatetime + 1).Insert
-    Cells(1, colofdatetime + 1).Value = "O_Type"
-    
-    Columns(colofdatetime + 1).Insert
-    Cells(1, colofdatetime + 1).Value = "Strike"
-    
-    Columns(colofdatetime + 1).Insert
-    Cells(1, colofdatetime + 1).Value = "Expiry"
-    
-    Columns(colofdatetime + 1).Insert
-    Cells(1, colofdatetime + 1).Value = "Underlying"
-    
-    
-    'start to calulate total Q
-    colofdatetime = Rows(1).Find("Date/Time").Column
-    coloftotalq = Rows(1).Find("TotalQ").Column
-    colofq = Rows(1).Find("Quantity").Column
-    colofbkrtype = Rows(1).Find("bkrType").Column
-    colofsymbol = Rows(1).Find("Symbol").Column
-    colofotype = Rows(1).Find("O_Type").Column
-    colofstrike = Rows(1).Find("Strike").Column
-    colofexpiry = Rows(1).Find("Expiry").Column
-    colofunderlying = Rows(1).Find("Underlying").Column
-    Range(Cells(2, colofstrike), Cells(numofrows, colofstrike)).NumberFormat = "0.00"
-    
-    
-    years = Cells(1, Columns.Count).End(xlToLeft).Column
-    Columns(years).Insert
-    Cells(1, years).Value = "yr"
-    colofyears = Rows(1).Find("yr").Column
-    
-    ws4.Rows(1).EntireRow.Value = Rows(1).EntireRow.Value
-
-    colofsectype = Rows(1).Find("SecType").Column
+    With ws2
+        'start to generate option type, expire, strike data
+        colofdatetime = .Rows(1).Find("Date/Time").Column
+        .Columns(colofdatetime + 1).Insert
+        .Cells(1, colofdatetime + 1).Value = "O_Type"
+        
+        .Columns(colofdatetime + 1).Insert
+        .Cells(1, colofdatetime + 1).Value = "Strike"
+        
+        .Columns(colofdatetime + 1).Insert
+        .Cells(1, colofdatetime + 1).Value = "Expiry"
+        
+        .Columns(colofdatetime + 1).Insert
+        .Cells(1, colofdatetime + 1).Value = "Underlying"
+        
+        
+        'start to calulate total Q
+        colofdatetime = .Rows(1).Find("Date/Time").Column
+        coloftotalq = .Rows(1).Find("TotalQ").Column
+        colofq = .Rows(1).Find("Quantity").Column
+        colofbkrtype = .Rows(1).Find("bkrType").Column
+        colofsymbol = .Rows(1).Find("Symbol").Column
+        colofotype = .Rows(1).Find("O_Type").Column
+        colofstrike = .Rows(1).Find("Strike").Column
+        colofexpiry = .Rows(1).Find("Expiry").Column
+        colofunderlying = .Rows(1).Find("Underlying").Column
+        .Range(Cells(2, colofstrike), Cells(numofrows, colofstrike)).NumberFormat = "0.00"
+        
+        
+        years = .Cells(1, Columns.Count).End(xlToLeft).Column
+        .Columns(years).Insert
+        .Cells(1, years).Value = "yr"
+        colofyears = .Rows(1).Find("yr").Column
+        
+        ws4.Rows(1).EntireRow.Value = .Rows(1).EntireRow.Value
+        colofsectype = .Rows(1).Find("SecType").Column
+    End With
     
     Dim h As Integer
     Dim symbolstrings As String
     h = 2
     
-    For r = numofrows To 2 Step -1
-        
-        If Cells(r, colofsectype) = "O" Then
-            symbolstrings = Cells(r, colofsymbol).Text
-            stringarray = Split(symbolstrings, " ")
-            Cells(r, colofunderlying) = stringarray(0)
-            Cells(r, colofexpiry) = stringarray(1)
-            Cells(r, colofstrike) = stringarray(2)
-            Cells(r, colofotype) = stringarray(3)
-        ElseIf Cells(r, colofsectype).Text = "S" Then
-            Cells(r, colofunderlying) = Cells(r, colofsymbol)
-        ElseIf Cells(r, colofsectype).Text = "FX" Then
-            Cells(r, colofunderlying) = Cells(r, colofsymbol)
-        End If
-        
-        
-        If Cells(r, colofsymbol) = "Symbol" Then
-            Rows(r).EntireRow.Delete
-        End If
-        
-        If InStr(Cells(r, colofdatetime), ",") > 0 Then
-            Cells(r, colofdatetime) = Replace(Cells(r, colofdatetime), ",", "")
-        End If
-        
-        Cells(r, colofyears) = 12
-        
-        If Cells(r, colofbkrtype) = "allocation" Then
-            current_location = r
-            loop_ending_location = r - 15
+
+        For r = numofrows To 2 Step -1
             
-            For t = current_location To loop_ending_location Step -1
-                If Cells(t, colofbkrtype) = "" Then
-                    Cells(current_location, coloftotalq) = Cells(t, colofq)
-                    Cells(current_location, colofsymbol) = Cells(t, colofsymbol)
-                    If Cells(t, colofq) < 0 And Cells(current_location, colofq) > 0 Then
-                        Cells(current_location, colofq) = 0 - Cells(current_location, colofq)
+            If ws2.Cells(r, colofsectype) = "O" Then
+                symbolstrings = ws2.Cells(r, colofsymbol).Text
+                stringarray = Split(symbolstrings, " ")
+                ws2.Cells(r, colofunderlying) = stringarray(0)
+                ws2.Cells(r, colofexpiry) = stringarray(1)
+                ws2.Cells(r, colofstrike) = stringarray(2)
+                ws2.Cells(r, colofotype) = stringarray(3)
+            ElseIf ws2.Cells(r, colofsectype).Text = "S" Then
+                ws2.Cells(r, colofunderlying) = ws2.Cells(r, colofsymbol)
+            ElseIf ws2.Cells(r, colofsectype).Text = "FX" Then
+                ws2.Cells(r, colofunderlying) = ws2.Cells(r, colofsymbol)
+            End If
+            
+            
+            If ws2.Cells(r, colofsymbol) = "Symbol" Then
+                ws2.Rows(r).EntireRow.Delete
+            End If
+            
+            If InStr(ws2.Cells(r, colofdatetime), ",") > 0 Then
+                ws2.Cells(r, colofdatetime) = Replace(ws2.Cells(r, colofdatetime), ",", "")
+            End If
+            
+            ws2.Cells(r, colofyears) = 12
+            
+            If ws2.Cells(r, colofbkrtype) = "allocation" Then
+                current_location = r
+                loop_ending_location = r - 15
+                
+                For t = current_location To loop_ending_location Step -1
+                    If ws2.Cells(t, colofbkrtype) = "" Then
+                        ws2.Cells(current_location, coloftotalq) = ws2.Cells(t, colofq)
+                        ws2.Cells(current_location, colofsymbol) = ws2.Cells(t, colofsymbol)
+                        If ws2.Cells(t, colofq) < 0 And ws2.Cells(current_location, colofq) > 0 Then
+                            ws2.Cells(current_location, colofq) = 0 - ws2.Cells(current_location, colofq)
+                        End If
+                        Exit For
                     End If
-                    Exit For
-                End If
-            Next t
-        ElseIf Cells(r, colofbkrtype) = "wash" Then
-            Cells(r, coloftotalq) = ""
-            
-            current_location1 = r
-            loop_ending_location1 = r - 10
-            
-            For p = current_location1 To loop_ending_location1 Step -1
-                If Cells(p, colofbkrtype) = "" Then
-                    Cells(current_location1, colofsymbol) = Cells(p, colofsymbol)
-                    Exit For
-                End If
-            Next p
-            
-            
-        ElseIf Cells(r, colofbkrtype) = "order" Then
-            ws4.Rows(h).EntireRow.Value = ws2.Rows(r).EntireRow.Value
-            ws2.Rows(r).EntireRow.Delete
-            h = h + 1
-        End If
-    Next r
+                Next t
+            ElseIf ws2.Cells(r, colofbkrtype) = "wash" Then
+                ws2.Cells(r, coloftotalq) = ""
+                
+                current_location1 = r
+                loop_ending_location1 = r - 10
+                
+                For p = current_location1 To loop_ending_location1 Step -1
+                    If ws2.Cells(p, colofbkrtype) = "" Then
+                        ws2.Cells(current_location1, colofsymbol) = ws2.Cells(p, colofsymbol)
+                        Exit For
+                    End If
+                Next p
+                
+                
+            ElseIf ws2.Cells(r, colofbkrtype) = "order" Then
+                ws4.Rows(h).EntireRow.Value = ws2.Rows(r).EntireRow.Value
+                ws2.Rows(r).EntireRow.Delete
+                h = h + 1
+            End If
+        Next r
+
     
     With ws2
         inputline = .Cells(1, .Columns.Count).End(xlToLeft).Column
@@ -264,7 +265,7 @@ Sub clean_ibtrades()
 
         colofsectype = .Rows(1).Find("SecType").Column
         
-        .Cells(2, colofsectype + 1).Formula = "=IF(ISNUMBER(FIND(""Closed"", D1)), 0, IF(ISNUMBER(FIND(""Wash"", D1)), 0,1))"
+        .Cells(2, colofsectype + 1).Formula = "=IF(ISNUMBER(FIND(""Closed"", D2)), 0, IF(ISNUMBER(FIND(""Wash"", D2)), 0,1))"
         .Cells(2, colofsectype + 1).Copy
         .Range(.Cells(2, colofsectype + 1), .Cells(numofrows, colofsectype + 1)).PasteSpecial (xlPasteAll)
         
@@ -290,21 +291,24 @@ Sub clean_ibtrades()
     ws5.Name = "Allocation and Wash"
     ws5.Rows(1).EntireRow.Value = ws2.Rows(1).EntireRow.Value
     
-    ws2.Activate
+
     Dim w As Integer
     w = 2
-    colofbkrtype = Rows(1).Find("bkrType").Column
-    For m = numofrows To 2 Step -1
-        If Cells(m, colofbkrtype) = "allocation" Then
-            ws5.Rows(w).EntireRow.Value = ws2.Rows(m).EntireRow.Value
-            ws2.Rows(m).EntireRow.Delete
-            w = w + 1
-        ElseIf Cells(m, colofbkrtype) = "wash" Then
-            ws5.Rows(w).EntireRow.Value = ws2.Rows(m).EntireRow.Value
-            ws2.Rows(m).EntireRow.Delete
-            w = w + 1
-        End If
-    Next m
+    
+    With ws2
+        colofbkrtype = .Rows(1).Find("bkrType").Column
+        For m = numofrows To 2 Step -1
+            If .Cells(m, colofbkrtype) = "allocation" Then
+                ws5.Rows(w).EntireRow.Value = ws2.Rows(m).EntireRow.Value
+                ws2.Rows(m).EntireRow.Delete
+                w = w + 1
+            ElseIf .Cells(m, colofbkrtype) = "wash" Then
+                ws5.Rows(w).EntireRow.Value = ws2.Rows(m).EntireRow.Value
+                ws2.Rows(m).EntireRow.Delete
+                w = w + 1
+            End If
+        Next m
+    End With
     
     With ws5
         numofrowsofws5 = .UsedRange.Rows.Count
@@ -528,33 +532,44 @@ Sub clean_ibtrades()
         .Rows(1).Find("Code").Value = "codes"
     End With
     
-    'Save trades, orders and section info into csv fils
+    'Save trades, orders and section info into csv file
     
     Dim savetodirectory As String
     
     'Set up the saving directory
-    savetodirectory = "C:\Users\Wei\Desktop\elle_work\"
+    savetodirectory = wb.Path
     
-    Dim savefilename As String
+    Dim tradessavefilename As String
+    Dim allocationsavefilename As String
+
+'get the filename without the extension. Does not work if hide extension is on and there are s in the name
+
+    Dim workbookname As String
+    workbookname = Left(ThisWorkbook.Name, (InStrRev(ThisWorkbook.Name, ".", -1, vbTextCompare) - 1))
     
     'set up the filename to save
-    savefilename = "U529048 Trades 2012-" & filecode & "-4SQL"
-        
-    ws2.SaveAs savetodirectory & savefilename, FileFormat:=xlCSV
-    
-    savefilename = "U529048 Section Info 2012-" & filecode
-        
-    ws3.SaveAs savetodirectory & savefilename, FileFormat:=xlCSV
-    
-    savefilename = "U529048 Orders 2012-" & filecode
-        
-    ws4.SaveAs savetodirectory & savefilename, FileFormat:=xlCSV
+    tradessavefilename = workbookname & "-Trades-" & filecode & "-4SQL.csv"
 
-    savefilename = "U529048 Allocation and Wash 2012-" & filecode
-        
-    ws5.SaveAs savetodirectory & savefilename, FileFormat:=xlCSV
+    ws2.Select
     
+    ActiveWorkbook.SaveAs Filename:= _
+        savetodirectory & ":" & tradessavefilename, _
+        FileFormat:=xlCSV
+
+    allocationsavefilename = workbookname & "-Allocation and Wash 2012-" & filecode & ".csv"
+        
+    ws5.Select
+    
+    ActiveWorkbook.SaveAs Filename:= _
+        savetodirectory & allocationsavefilename, _
+        FileFormat:=xlCSV
+    
+    Dim newworkbookname As String
+    newworkbookname = workbookname & "-Cleaned"
+    
+    wb.SaveAs Filename:=savetodirectory & ":" & newworkbookname, FileFormat:=xlOpenXMLWorkbookMacroEnabled
+    ' .xlsm should not be needed
+    ' wb.SaveAs Filename:=savetodirectory & ":" & newworkbookname & ".xlsm", FileFormat:=xlOpenXMLWorkbookMacroEnabled
+
+    Application.ScreenUpdating = True
 End Sub
-
-
-

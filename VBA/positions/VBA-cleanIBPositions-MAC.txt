@@ -1,0 +1,568 @@
+Sub clean_ib_positions()
+
+    
+
+    Dim wb As Workbook
+
+    Dim ws1 As Worksheet
+
+    Dim ws2 As Worksheet
+
+    Dim ws3 As Worksheet
+
+    Dim ws4 As Worksheet
+
+    Dim trades_start As Range
+
+    Dim trades_end As Range
+
+    
+
+    'Close screen updating and possible alerts
+
+    Application.ScreenUpdating = False
+
+    Application.DisplayAlerts = False
+
+      
+
+    'Delete useless worksheets if exists in this workbook
+
+    Set wb = ThisWorkbook
+
+    On Error Resume Next
+
+    wb.Worksheets("Section Info").Delete
+
+    wb.Worksheets("Positions").Delete
+
+    wb.Worksheets("Orders").Delete
+
+    wb.Worksheets("Total Report").Delete
+
+    
+
+    workbook_name = Left(wb.Name, Len(wb.Name) - 5)
+
+    
+
+    Set ws1 = wb.Worksheets("Sheet1")
+
+    ws1.Cells.UnMerge
+
+    
+
+    ThisWorkbook.Sheets("Sheet1").Copy After:=ThisWorkbook.Sheets(ThisWorkbook.Sheets.Count)
+
+    
+
+    Set ws2 = ThisWorkbook.Worksheets(2)
+
+    ws2.Name = "Positions"
+
+    
+
+    'In the sheet1, find the start along with the end row of section "trade"
+
+    With ws2.Columns(1)
+
+        Set stocks_start = .Find("Stocks", lookat:=xlWhole, MatchCase:=True).Offset(2)
+
+        Set stocks_end = .Find("Equity and Index Options", lookat:=xlWhole, MatchCase:=True).Offset(-2)
+
+        Set options_start = .Find("Equity and Index Options", lookat:=xlWhole, MatchCase:=True).Offset(2)
+
+        Set options_end = .Find("Total", After:=options_start.Offset(1), lookat:=xlWhole, MatchCase:=True)
+
+
+
+    End With
+
+       
+
+    'In the sheet2, display the information of trade section
+
+    'set the format as well
+
+    
+
+    Set ws3 = wb.Worksheets.Add(After:=ws2)
+
+    ws3.Name = "Section Info"
+
+    
+
+    With ws3
+
+        .Cells(1, 1).Value = "Section"
+
+        .Cells(1, 2).Value = "Start Row"
+
+        .Cells(1, 3).Value = "End Row"
+
+        .Cells(1, 4).Value = "Notes"
+
+        .Cells(2, 1).Value = "Stocks"
+
+        .Cells(2, 2).Value = stocks_start.Row
+
+        .Cells(2, 3).Value = stocks_end.Row
+
+        .Cells(2, 4).Value = "Info is based on original file"
+
+        .Cells(3, 1).Value = "Options"
+
+        .Cells(3, 2).Value = options_start.Row
+
+        .Cells(3, 3).Value = options_end.Row
+
+        .Cells(3, 4).Value = "Info is based on original file"
+
+        .Range("A1:D1").Font.Bold = True
+
+        .Range("A1").CurrentRegion.HorizontalAlignment = Excel.xlCenter
+
+        .Range("A1").CurrentRegion.AutoFit
+
+    End With
+
+    
+
+    Dim lRow As Integer
+
+    Dim filecode As String
+
+    Dim h As Integer
+
+    h = 2
+
+
+
+    'generate the filecode for file saving
+
+    filecode = Right(Format(Date, "dd/mm/yyyy"), 1) & Mid(Format(Date, "dd/mm/yyyy"), 4, 2) & Left(Format(Date, "dd/mm/yyyy"), 2) & Chr(Int((90 - 65 + 1) * Rnd + 65))
+
+    
+
+    'new worksheet for all orders
+
+    Set ws4 = wb.Worksheets.Add(After:=ws3)
+
+    ws4.Name = "Orders"
+
+    
+
+    'clean the positions sheet (second sheet).(remove useless rows and columns.)
+
+    With ws2
+
+        lRow = .Cells(Rows.Count, 1).End(xlUp).Row
+
+        .Range(.Rows(1), .Rows(stocks_start.Row - 4)).Delete
+
+        .Range(.Rows(options_end.Row), .Rows(lRow)).Delete
+
+        .Range(.Rows(stocks_start.Row - 1), .Rows(stocks_start.Row - 2)).Delete
+
+        .Range(.Rows(options_start.Row - 1), .Rows(options_start.Row - 4)).Delete
+
+        
+
+        lRow = .Cells(Rows.Count, 1).End(xlUp).Row
+
+                
+
+        colofmult = .Rows(1).Find("Mult").Column
+
+        
+
+        colofcode = .Rows(1).Find("Code").Column
+
+        .Columns(colofcode).Delete
+
+        
+
+        colofunrealizedpl = .Rows(1).Find("Unrealized P/L").Column
+
+        .Columns(colofunrealizedpl).Delete
+
+        
+
+        colofvalue = .Rows(1).Find("Value").Column
+
+        .Columns(colofvalue).Delete
+
+        
+
+        colofcloseprice = .Rows(1).Find("Close Price").Column
+
+        .Columns(colofcloseprice).Delete
+
+        
+
+        ws4.Rows(1).EntireRow.Value = .Rows(1).EntireRow.Value
+
+        
+
+        colofopen = .Rows(1).Find("Open").Column
+
+
+
+        For t = lRow To 2 Step -1
+
+            If .Cells(t, colofopen) = "-" Then
+
+                ws4.Rows(h).EntireRow.Value = .Rows(t).EntireRow.Value
+
+                .Rows(t).EntireRow.Delete
+
+                h = h + 1
+
+            End If
+
+            
+
+            If Len(.Cells(t, 1)) > 4 Then
+
+                .Cells(t, colofmult) = 100
+
+            Else
+
+                .Cells(t, colofmult) = 1
+
+            End If
+
+        Next t
+
+    End With
+
+    
+
+    Set startSheet = wb.Worksheets("Positions")
+
+    numofrows = startSheet.Cells(Rows.Count, 1).End(xlUp).Row
+
+    numOfColumns = startSheet.Cells(1, Columns.Count).End(xlToLeft).Column
+
+    Set totalReport = wb.Worksheets.Add(After:=startSheet)
+
+    ActiveSheet.Name = "Total Report"
+
+    
+
+    With ActiveSheet
+
+        Cells(1, 1).Value = "inputLine"
+
+        Cells(1, 2).Value = "symbol"
+
+        Cells(1, 3).Value = "Q"
+
+        Cells(1, 4).Value = "lot_Time"
+
+        Cells(1, 5).Value = "LS"
+
+        Cells(1, 6).Value = "price_adj"
+
+        Cells(1, 7).Value = "basis_adj"
+
+        Cells(1, 8).Value = "secType"
+
+        Cells(1, 9).Value = "filecode"
+
+        Cells(1, 10).Value = "account"
+
+        Cells(1, 11).Value = "multi"
+
+        Cells(1, 12).Value = "O_Type"
+
+        Cells(1, 13).Value = "expiry"
+
+        Cells(1, 14).Value = "strike"
+
+        Cells(1, 15).Value = "underlying"
+
+    End With
+
+    
+
+    startSheet.Activate
+
+    c1 = "Symbol"
+
+    c2 = "Open"
+
+    c3 = "Quantity"
+
+    c4 = "Mult"
+
+    c5 = "Cost Price"
+
+    c6 = "Cost Basis"
+
+    lst = Array(c1, c2, c3, c4, c5, c6)
+
+    
+
+    Date = totalReport.Rows(1).Find("expiry").Column
+
+    Columns(Date).NumberFormat = "mm/dd/yy hh:mm:ss"
+
+    Date = totalReport.Rows(1).Find("lot_Time").Column
+
+    Columns(Date).NumberFormat = "mm/dd/yy hh:mm:ss"
+
+
+
+
+
+    Dim symbolstring As String
+
+    Dim symbolstring1 As String
+
+    Dim symbolstring2 As String
+
+    Dim array1 As Variant
+
+    
+
+    
+
+    With startSheet.Range("A1").CurrentRegion
+
+        For j = 0 To UBound(lst) + 1
+
+            Header = lst(j)
+
+                    
+
+            Select Case Header
+
+                Case "Symbol"
+
+                    symbolstring = "A2:A" & numofrows
+
+                    symbolstring1 = "B2:B" & numofrows
+
+                    symbolstring2 = "O2:O" & numofrows
+
+                    array1 = startSheet.Range(symbolstring)
+
+                    totalReport.Range(symbolstring1).Value = array1
+
+                    totalReport.Range(symbolstring2).Value = array1
+
+                Case "Open"
+
+                    symbolstring = "B2:B" & numofrows
+
+                    symbolstring1 = "D2:D" & numofrows
+
+                    array1 = startSheet.Range(symbolstring)
+
+                    array1 = Replace(array1.Value, ",", "")
+
+                    totalReport.Range(symbolstring1).Value = array1
+
+                Case "Quantity"
+
+                    symbolstring = "C2:C" & numofrows
+
+                    symbolstring1 = "C2:C" & numofrows
+
+                    array1 = startSheet.Range(symbolstring)
+
+                    totalReport.Range(symbolstring1).Value = array1
+
+                Case "Mult"
+
+                    symbolstring = "D2:D" & numofrows
+
+                    symbolstring1 = "K2:K" & numofrows
+
+                    array1 = startSheet.Range(symbolstring)
+
+                    totalReport.Range(symbolstring1).Value = array1
+
+                Case "Cost Price"
+
+                    symbolstring = "E2:E" & numofrows
+
+                    symbolstring1 = "F2:F" & numofrows
+
+                    array1 = startSheet.Range(symbolstring)
+
+                    totalReport.Range(symbolstring1).Value = array1
+
+                Case "Cost Basis"
+
+                    symbolstring = "F2:F" & numofrows
+
+                    symbolstring1 = "G2:G" & numofrows
+
+                    array1 = startSheet.Range(symbolstring)
+
+                    totalReport.Range(symbolstring1).Value = array1
+
+            End Select
+
+        Next j
+
+    End With
+
+    
+
+    totalReport.Columns("D").Replace what:=",", replacement:="", lookat:=xlPart, MatchCase:=False
+
+    
+
+    symbolstring = "I2:I" & numofrows
+
+    totalReport.Range(symbolstring).Value = filecode
+
+    
+
+    symbolstring = "J2:J" & numofrows
+
+    totalReport.Range(symbolstring).Value = "IB9048"
+
+    
+
+    Dim rangestring1 As String
+
+    Dim rangestring2 As String
+
+        
+
+    Let rangestring1 = "D2:D" & numofrows
+
+    Let rangestring2 = "A1:O" & numofrows
+
+        
+
+    totalReport.Sort.SortFields.Clear
+
+    totalReport.Sort.SortFields.Add Key:=Range(rangestring1), SortOn:=xlSortOnValues, Order:=xlAscending, DataOption:=xlSortNormal
+
+    With totalReport.Sort
+
+        .SetRange Range(rangestring2)
+
+        .Header = xlYes
+
+        .MatchCase = False
+
+        .Orientation = xlTopToBottom
+
+        .SortMethod = xlPinYin
+
+        .Apply
+
+    End With
+
+    
+
+    Dim strings As String
+
+    Dim stringarray As Variant
+
+        
+
+    For i = 2 To numofrows
+
+        totalReport.Cells(i, 1).Value = i - 1
+
+        
+
+        If totalReport.Cells(i, 3) > 0 Then
+
+            totalReport.Cells(i, 5) = "L"
+
+        Else
+
+            totalReport.Cells(i, 5) = "S"
+
+        End If
+
+            
+
+        strings = totalReport.Cells(i, 15).Text
+
+            
+
+        If Len(strings) > 8 Then
+
+            
+
+            stringarray = Split(strings, " ")
+
+            totalReport.Cells(i, 15) = stringarray(0)
+
+            totalReport.Cells(i, 13) = stringarray(1)
+
+            totalReport.Cells(i, 14) = stringarray(2)
+
+            totalReport.Cells(i, 12) = stringarray(3)
+
+            totalReport.Cells(i, 8) = "O"
+
+        Else
+
+            totalReport.Cells(i, 8) = "S"
+
+        End If
+
+            
+
+    Next i
+
+    
+
+    'Save position, order and section info into csv fils
+
+    
+
+    Dim savetodirectory As String
+
+    
+
+    'Set up the saving directory
+
+    savetodirectory = "Macintosh HD:Users:fanyichong:wei:"
+
+    
+
+    Dim savefilename As String
+
+    
+
+    'set up the filename to save
+
+    savefilename = workbook_name & "-positions-" & filecode & "-4SQL"
+    
+    Sheets("Positions").Select
+    
+    ActiveWorkbook.SaveAs Filename:= _
+        savetodirectory & savefilename, _
+        FileFormat:=xlCSV, CreateBackup:=False
+    
+    sectionsavefilename = workbook_name & "-positions-section_info-" & filecode & "-4SQL"
+    
+    Sheets("Section Info").Select
+    
+    ActiveWorkbook.SaveAs Filename:= _
+        savetodirectory & sectionsavefilename, _
+        FileFormat:=xlCSV, CreateBackup:=False
+    
+    orderssavefilename = workbook_name & "-positions-orders-" & filecode & "-4SQL"
+    Sheets("Orders").Select
+    
+    ActiveWorkbook.SaveAs Filename:= _
+        savetodirectory & orderssavefilename, _
+        FileFormat:=xlCSV, CreateBackup:=False
+
+    Application.ScreenUpdating = True
+
+    
+
+End Sub

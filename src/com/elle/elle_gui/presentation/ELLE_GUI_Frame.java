@@ -26,6 +26,7 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.print.PrinterException;
@@ -1666,7 +1667,7 @@ public class ELLE_GUI_Frame extends JFrame implements ITableConstants {
                 JTable table = tab.getTable();
                 System.out.println("2: " + tableName);
                 loadTable(table, tableName, accountName);
-                setTableListeners(tab);
+                //setTableListeners(tab);
                 // set initial total records
                 int totalRecords = table.getRowCount();
                 tab.setTotalRecords(totalRecords);
@@ -2344,13 +2345,50 @@ public class ELLE_GUI_Frame extends JFrame implements ITableConstants {
 
         // this adds a mouselistener to the table header
         JTableHeader header = table.getTableHeader();
+        
+         //disable default mouse listeners
+        MouseListener[] listeners = header.getMouseListeners();
+
+        for (MouseListener ml: listeners)
+        {
+            String className = ml.getClass().toString();
+
+            if (className.contains("BasicTableHeaderUI"))
+               
+                header.removeMouseListener(ml);
+                
+           
+        }
+        
         if (header != null) {
             header.addMouseListener(new MouseAdapter() {
                 @Override
                 public void mouseClicked(MouseEvent e) {
 
                     if (e.getClickCount() == 2) {
+                        e.consume();
                         clearFilterDoubleClick(e, table);
+                        
+
+                    }
+                    
+                    if (e.getClickCount() == 1 && !e.isConsumed() && e.isControlDown()) {
+                        e.consume();
+                        columnPopupMenu.showPopupMenu(e);
+                        
+                    }
+                    
+                    
+                    if (e.getClickCount() == 1 && e.getButton() == MouseEvent.BUTTON1 && !e.isConsumed()) {
+                        
+                        int columnIndex = header.columnAtPoint(e.getPoint());
+                        if (columnIndex != -1) {
+                                columnIndex = table.convertColumnIndexToModel(columnIndex);
+                                table.getRowSorter().toggleSortOrder(columnIndex);
+                                //System.out.println("clicked " + columnIndex);
+                                
+                        }
+                        e.consume();
                     }
                 }
 
