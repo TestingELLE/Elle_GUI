@@ -1,4 +1,4 @@
-USE pupone_dummy;
+USE pupone_EG;
 DROP TABLE IF EXISTS wei_bbrokerIBmatches;
 DROP TABLE IF EXISTS wei_bkrTrades;
 CREATE TABLE wei_bbrokerIBmatches LIKE trades;
@@ -7,14 +7,13 @@ SET @max = (SELECT COUNT(*) FROM wei_bkrTrades);
 
 ALTER TABLE wei_bbrokerIBmatches DROP PRIMARY KEY;
 ALTER TABLE wei_bbrokerIBmatches ADD PRIMARY KEY(inputLine);
-ALTER TABLE wei_bbrokerIBmatches ADD bkrGroup integer;
 ALTER TABLE wei_bbrokerIBmatches ADD bkrType ENUM('', 'allocation', 'wash', 'order');
 
 LOAD DATA LOCAL INFILE
-'/Users/weiren/Desktop/trades_table_clean/loading/wei_own_version_tradesandallocationwash/U529048 Allocation and Wash 2012-60517S.csv'
+'/Users/ren/Desktop/intern/wei_new/trades/U529048 Trades 2012 TEST-Allocation and Wash 2012-60606S.csv'
 INTO TABLE wei_bbrokerIBmatches 
 FIELDS OPTIONALLY ENCLOSED BY '"' TERMINATED BY ','
-LINES TERMINATED BY '\r\n'
+LINES TERMINATED BY '\n'
 IGNORE 1 LINES
 (
 	filecode,symbol,@trade_Time,underlying,@expiry,@strike,@O_Type,Q,price,basis,realized_PL,codes,TotalQ,bkrType,yr,inputLine,secType,account,bkrGroup
@@ -23,7 +22,7 @@ SET
     strike = IF(@strike = '', NULL, @strike),
     O_Type = IF(@O_Type = '', NULL, @O_Type),
     expiry = IF(@expiry = '', NULL, @expiry), 
-    trade_Time = STR_TO_DATE(@trade_Time, '%m/%d/%Y %H:%i');
+    trade_Time = STR_TO_DATE(@trade_Time, '%Y-%m-%d %H:%i:%s');
 
 
 UPDATE wei_bbrokerIBmatches SET id = @max + inputLine;
@@ -54,22 +53,21 @@ ALTER TABLE wei_bbrokerIBmatches CHANGE price bkr_price_adj decimal(12,6) NOT NU
 ALTER TABLE wei_bbrokerIBmatches CHANGE basis bkr_basis_adj decimal(9,2) NOT NULL;
 ALTER TABLE wei_bbrokerIBmatches CHANGE realized_PL bkr_realized_PL decimal(9,2);
 
-USE pupone_dummy;
+USE pupone_EG;
 DROP TABLE IF EXISTS wei_bkrTrades;
 CREATE TABLE wei_bkrTrades LIKE trades;
 SET @max = (SELECT COUNT(*) FROM wei_bkrTrades);
 
 ALTER TABLE wei_bkrTrades DROP PRIMARY KEY;
 ALTER TABLE wei_bkrTrades ADD PRIMARY KEY(inputLine);
-ALTER TABLE wei_bkrTrades ADD bkrGroup integer;
 ALTER TABLE wei_bkrTrades DROP OC;
 ALTER TABLE wei_bkrTrades ADD OC enum('O', 'C', 'FX') NOT NULL AFTER trade_Time;
 
 LOAD DATA LOCAL INFILE
-'/Users/weiren/Desktop/trades_table_clean/loading/wei_own_version_tradesandallocationwash/U529048 Trades 2012-60518S.csv'
+'/Users/ren/Desktop/intern/wei_new/trades/U529048 Trades 2012 TEST-Trades-60606S-4SQL.csv'
 INTO TABLE wei_bkrTrades 
 FIELDS OPTIONALLY ENCLOSED BY '"' TERMINATED BY ','
-LINES TERMINATED BY '\r\n'
+LINES TERMINATED BY '\n'
 IGNORE 1 LINES
 (
 	filecode,symbol,@trade_Time,underlying,@expiry,@strike,@O_Type,Xchange,Q,price,@dummy,proceeds,comm,basis,realized_PL,@dummy,codes,TotalQ,yr,inputLine,secType,bkrGroup,account,LS,OC,multi
