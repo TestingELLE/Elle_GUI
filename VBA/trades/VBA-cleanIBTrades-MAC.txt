@@ -177,8 +177,6 @@ Sub clean_ibtrades()
         colofstrike = .Rows(1).Find("Strike").Column
         colofexpiry = .Rows(1).Find("Expiry").Column
         colofunderlying = .Rows(1).Find("Underlying").Column
-        .Range(Cells(2, colofstrike), Cells(numofrows, colofstrike)).NumberFormat = "0.00"
-        
         
         years = .Cells(1, Columns.Count).End(xlToLeft).Column
         .Columns(years).Insert
@@ -191,9 +189,11 @@ Sub clean_ibtrades()
     
     Dim h As Integer
     Dim symbolstrings As String
+    Dim datetimestrings As String
     h = 2
     
-
+        ws2.Range(ws2.Cells(2, colofstrike), ws2.Cells(numofrows, colofstrike)).NumberFormat = "0.00"
+        
         For r = numofrows To 2 Step -1
             
             If ws2.Cells(r, colofsectype) = "O" Then
@@ -217,8 +217,6 @@ Sub clean_ibtrades()
             If InStr(ws2.Cells(r, colofdatetime), ",") > 0 Then
                 ws2.Cells(r, colofdatetime) = Replace(ws2.Cells(r, colofdatetime), ",", "")
             End If
-            
-            ws2.Cells(r, colofyears) = 12
             
             If ws2.Cells(r, colofbkrtype) = "allocation" Then
                 current_location = r
@@ -255,6 +253,7 @@ Sub clean_ibtrades()
             End If
         Next r
 
+    ws2.Range(ws2.Cells(2, v), ws2.Cells(numofrows, colofdatetime)).NumberFormat = "yyyy-mm-dd HH:mm:ss"
     
     With ws2
         inputline = .Cells(1, .Columns.Count).End(xlToLeft).Column
@@ -297,7 +296,16 @@ Sub clean_ibtrades()
     
     With ws2
         colofbkrtype = .Rows(1).Find("bkrType").Column
+        colofdatetimeinws2 = .Rows(1).Find("Date/Time").Column
+        colofyearinws2 = .Rows(1).Find("yr").Column
+        
         For m = numofrows To 2 Step -1
+                
+            datetimestrings = ws2.Cells(m, colofdatetimeinws2).Text
+            datetimestringarray = Split(datetimestrings, " ")
+            ws2.Cells(m, 100) = datetimestringarray(0)
+            ws2.Cells(m, colofyearinws2) = Right(ws2.Cells(m, 100).Value, 4)
+        
             If .Cells(m, colofbkrtype) = "allocation" Then
                 ws5.Rows(w).EntireRow.Value = ws2.Rows(m).EntireRow.Value
                 ws2.Rows(m).EntireRow.Delete
@@ -308,6 +316,8 @@ Sub clean_ibtrades()
                 w = w + 1
             End If
         Next m
+        ws2.Columns(100).Delete
+		ws5.Columns(100).Delete
     End With
     
     With ws5
@@ -349,8 +359,8 @@ Sub clean_ibtrades()
         num = .Rows(1).Find("Trade_Time").Column
         numofcolumns = .Cells(1, Columns.Count).End(xlToLeft).Column
         numofrows = .UsedRange.Rows.Count
-        With Range(Cells(2, 1), Cells(numofrows, numofcolumns))
-            .Sort key1:=Columns(num), order1:=xlAscending
+        With .Range(.Cells(2, 1), .Cells(numofrows, numofcolumns))
+            .Sort key1:=.Columns(num), order1:=xlAscending
         End With
         
         brokertype = .Rows(1).Find("bkrType").Column
@@ -424,7 +434,7 @@ Sub clean_ibtrades()
     numofrows1 = ws4.UsedRange.Rows.Count
     ws4.Range(Cells(2, 3), Cells(numofrows1, 3)).NumberFormat = "yyyy-mm-dd HH:mm:ss"
     With ActiveWorkbook.Worksheets("Orders").Sort
-        .SetRange Range(Cells(1, 1), Cells(numofrows1, numofcolumns1))
+        .SetRange .Range(.Cells(1, 1), .Cells(numofrows1, numofcolumns1))
         .Header = xlYes
         .MatchCase = False
         .Orientation = xlTopToBottom
@@ -446,6 +456,8 @@ Sub clean_ibtrades()
         
         expiryinws4 = .Rows(1).Find("Expiry").Column
         strikeinws4 = .Rows(1).Find("Strike").Column
+        trade_time4 = .Rows(1).Find("Trade_Time").Column
+        .Range(.Cells(2, trade_time4), .Cells(numofrows1, trade_time4)).NumberFormat = "yyyy-mm-dd HH:mm:ss"
         .Range(.Cells(2, expiryinws4), .Cells(numofrows1, expiryinws4)).NumberFormat = "yyyy-mm-dd HH:mm:ss"
         .Range(.Cells(2, strikeinws4), .Cells(numofrows1, strikeinws4)).NumberFormat = "0.00"
         
@@ -500,6 +512,9 @@ Sub clean_ibtrades()
         
         mtmplinws5 = .Rows(1).Find("MTM P/L").Column
         .Columns(mtmplinws5).Delete
+        
+        trade_time5 = .Rows(1).Find("Trade_Time").Column
+        .Range(.Cells(2, trade_time5), .Cells(numofrows1, trade_time5)).NumberFormat = "yyyy-mm-dd HH:mm:ss"
      
         expiryinws5 = .Rows(1).Find("Expiry").Column
         .Range(.Cells(2, expiryinws5), .Cells(numofrows2, expiryinws5)).NumberFormat = "yyyy-mm-dd HH:mm:ss"
@@ -561,7 +576,7 @@ Sub clean_ibtrades()
     ws5.Select
     
     ActiveWorkbook.SaveAs Filename:= _
-        savetodirectory & allocationsavefilename, _
+        savetodirectory & ":" & allocationsavefilename, _
         FileFormat:=xlCSV
     
     Dim newworkbookname As String
@@ -573,3 +588,19 @@ Sub clean_ibtrades()
 
     Application.ScreenUpdating = True
 End Sub
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
