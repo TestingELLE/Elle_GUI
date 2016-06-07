@@ -34,7 +34,7 @@ Sub clean_ib_positions()
 
     wb.Worksheets("Section Info").Delete
 
-    wb.Worksheets("Positions").Delete
+    wb.Worksheets("Cleaned Positions").Delete
 
     wb.Worksheets("Orders").Delete
 
@@ -246,41 +246,43 @@ Sub clean_ib_positions()
 
     Set totalReport = wb.Worksheets.Add(After:=startSheet)
 
-    ActiveSheet.Name = "Total Report"
+    totalReport.Name = "Total Report"
 
     
 
-    With ActiveSheet
+    With totalReport
 
-        Cells(1, 1).Value = "inputLine"
+        .Cells(1, 1).Value = "inputLine"
 
-        Cells(1, 2).Value = "symbol"
+        .Cells(1, 2).Value = "symbol"
 
-        Cells(1, 3).Value = "Q"
+        .Cells(1, 3).Value = "Q"
 
-        Cells(1, 4).Value = "lot_Time"
+        .Cells(1, 4).Value = "lot_Time"
 
-        Cells(1, 5).Value = "LS"
+        .Cells(1, 5).Value = "LS"
 
-        Cells(1, 6).Value = "price_adj"
+        .Cells(1, 6).Value = "price_adj"
 
-        Cells(1, 7).Value = "basis_adj"
+        .Cells(1, 7).Value = "basis_adj"
 
-        Cells(1, 8).Value = "secType"
+        .Cells(1, 8).Value = "secType"
 
-        Cells(1, 9).Value = "filecode"
+        .Cells(1, 9).Value = "filecode"
 
-        Cells(1, 10).Value = "account"
+        .Cells(1, 10).Value = "account"
 
-        Cells(1, 11).Value = "multi"
+        .Cells(1, 11).Value = "multi"
 
-        Cells(1, 12).Value = "O_Type"
+        .Cells(1, 12).Value = "O_Type"
 
-        Cells(1, 13).Value = "expiry"
+        .Cells(1, 13).Value = "expiry"
 
-        Cells(1, 14).Value = "strike"
+        .Cells(1, 14).Value = "strike"
 
-        Cells(1, 15).Value = "underlying"
+        .Cells(1, 15).Value = "underlying"
+        
+        .Cells(1, 16).Value = "yr"
 
     End With
 
@@ -301,19 +303,6 @@ Sub clean_ib_positions()
     c6 = "Cost Basis"
 
     lst = Array(c1, c2, c3, c4, c5, c6)
-
-    
-
-    Date = totalReport.Rows(1).Find("expiry").Column
-
-    Columns(Date).NumberFormat = "mm/dd/yy hh:mm:ss"
-
-    Date = totalReport.Rows(1).Find("lot_Time").Column
-
-    Columns(Date).NumberFormat = "mm/dd/yy hh:mm:ss"
-
-
-
 
 
     Dim symbolstring As String
@@ -471,7 +460,15 @@ Sub clean_ib_positions()
     For i = 2 To numofrows
 
         totalReport.Cells(i, 1).Value = i - 1
+        
 
+        datetimestring = totalReport.Cells(i, 4).Value
+        
+        datetimestringarray = Split(datetimestring, " ")
+        
+        totalReport.Cells(i, 17).Value = datetimestringarray
+        
+        totalReport.Cells(i, 16).Value = Right(totalReport.Cells(i, 17).Value, 4)
         
 
         If totalReport.Cells(i, 3) > 0 Then
@@ -515,10 +512,23 @@ Sub clean_ib_positions()
             
 
     Next i
+    
+    
+    totalReport.Columns(17).Delete
+    
+    
+    date1 = totalReport.Rows(1).Find("expiry").Column
+
+    totalReport.Columns(date1).NumberFormat = "yyyy-mm-dd hh:mm:ss"
+
+    date2 = totalReport.Rows(1).Find("lot_Time").Column
+
+    totalReport.Columns(date2).NumberFormat = "yyyy-mm-dd hh:mm:ss"
+
 
     
 
-    'Save position, order and section info into csv fils
+    'Save position, order and section info into csv file
 
     
 
@@ -528,41 +538,39 @@ Sub clean_ib_positions()
 
     'Set up the saving directory
 
-    savetodirectory = "Macintosh HD:Users:fanyichong:wei:"
-
+    savetodirectory = wb.Path 'current path where workbook is
     
 
+    
     Dim savefilename As String
 
-    
 
     'set up the filename to save
 
-    savefilename = workbook_name & "-positions-" & filecode & "-4SQL"
-    
-    Sheets("Positions").Select
-    
-    ActiveWorkbook.SaveAs Filename:= _
-        savetodirectory & savefilename, _
-        FileFormat:=xlCSV, CreateBackup:=False
-    
-    sectionsavefilename = workbook_name & "-positions-section_info-" & filecode & "-4SQL"
-    
-    Sheets("Section Info").Select
+    savefilename = workbook_name & "-positions-" & filecode & "-4SQL.csv"
+
+    Sheets("Total Report").Select
     
     ActiveWorkbook.SaveAs Filename:= _
-        savetodirectory & sectionsavefilename, _
-        FileFormat:=xlCSV, CreateBackup:=False
+        savetodirectory & ":" & savefilename, _
+        FileFormat:=xlCSV
     
-    orderssavefilename = workbook_name & "-positions-orders-" & filecode & "-4SQL"
-    Sheets("Orders").Select
+    ws2.Name = "Cleaned Positions"
     
-    ActiveWorkbook.SaveAs Filename:= _
-        savetodirectory & orderssavefilename, _
-        FileFormat:=xlCSV, CreateBackup:=False
+    newworkbookname = workbook_name & "-Cleaned"
+    wb.SaveAs Filename:=savetodirectory & ":" & newworkbookname, FileFormat:=xlOpenXMLWorkbookMacroEnabled
 
     Application.ScreenUpdating = True
 
     
 
 End Sub
+
+
+
+
+
+
+
+
+
