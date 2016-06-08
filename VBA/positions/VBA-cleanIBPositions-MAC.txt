@@ -139,6 +139,7 @@ Sub clean_ib_positions()
 
 
     'generate the filecode for file saving
+	Randomize 
 
     filecode = Right(Format(Date, "dd/mm/yyyy"), 1) & Mid(Format(Date, "dd/mm/yyyy"), 4, 2) & Left(Format(Date, "dd/mm/yyyy"), 2) & Chr(Int((90 - 65 + 1) * Rnd + 65))
 
