@@ -427,7 +427,7 @@ Sub clean_ibtrades()
 		
 		wb.Sheets.Add After:=Worksheets(Worksheets.Count)
 		Set ws6 = ThisWorkbook.Worksheets(6)
-		ws6.Name = "FOREX"
+		ws6.Name = "FOREX and Bonds"
 		ws6.Rows(1).EntireRow.Value = ws2.Rows(1).EntireRow.Value
 		
 		colofsectype = ws2.Rows(1).Find("secType").Column
@@ -435,6 +435,10 @@ Sub clean_ibtrades()
 	
 		For r = numofrows To 2 Step -1
 			If ws2.Cells(r, colofsectype) = "FX" Then
+                ws6.Rows(h).EntireRow.Value = ws2.Rows(r).EntireRow.Value
+                ws2.Rows(r).EntireRow.Delete
+                h = h + 1
+            ElseIf ws2.Cells(r, colofsectype) = "B" Then
                 ws6.Rows(h).EntireRow.Value = ws2.Rows(r).EntireRow.Value
                 ws2.Rows(r).EntireRow.Delete
                 h = h + 1
@@ -616,6 +620,14 @@ Sub clean_ibtrades()
     
     ActiveWorkbook.SaveAs Filename:= _
         savetodirectory & ":" & tradessavefilename, _
+        FileFormat:=xlCSV
+	
+	forexandbondstradessavefilename = workbookname & "-Trades-forex and bonds-" & filecode & "-4SQL.csv"
+
+    ws6.Select
+    
+    ActiveWorkbook.SaveAs Filename:= _
+        savetodirectory & ":" & forexandbondstradessavefilename, _
         FileFormat:=xlCSV
 
     allocationsavefilename = workbookname & "-Allocation and Wash 2012-" & filecode & ".csv"
