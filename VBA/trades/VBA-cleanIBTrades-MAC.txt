@@ -627,7 +627,11 @@ Sub clean_ibtrades()
         basisinws5 = .Rows(1).Find("basis").Column
         .Columns(basisinws5).Delete
         
-        .Name = "Wash"
+		numofrowsofnewws5 = .UsedRange.Rows.Count
+		lottimeinws5 = .Rows(1).Find("lot_Time").Column
+        .Range(.Cells(2, lottimeinws5), .Cells(numofrowsofnewws5, lottimeinws5)).NumberFormat = "yyyy-mm-dd HH:mm:ss"
+        
+		.Name = "Wash"
     End With
     
     With ws7
