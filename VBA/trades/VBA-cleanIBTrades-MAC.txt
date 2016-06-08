@@ -196,7 +196,7 @@ Sub clean_ibtrades()
     
         ws2.Range(ws2.Cells(2, colofstrike), ws2.Cells(numofrows, colofstrike)).NumberFormat = "0.00"
         ws2.Range(ws2.Cells(2, colofstrike), ws2.Cells(numofrows, colofstrike)).NumberFormat = "0.00"
-		ws2.Range(ws2.Cells(2, colofstrike), ws2.Cells(numofrows, colofstrike)).NumberFormat = "0.00"
+        ws2.Range(ws2.Cells(2, colofstrike), ws2.Cells(numofrows, colofstrike)).NumberFormat = "0.00"
         For r = numofrows To 2 Step -1
             
             If ws2.Cells(r, colofsectype) = "O" Then
@@ -417,24 +417,24 @@ Sub clean_ibtrades()
         
         rplinws2 = .Rows(1).Find("Realized_PL").Column
         .Range(.Cells(2, rplinws2), .Cells(numofrows, rplinws2)).NumberFormat = "0.00"
-		
-		qinws2 = .Rows(1).Find("Q").Column
+        
+        qinws2 = .Rows(1).Find("Q").Column
         .Range(.Cells(2, qinws2), .Cells(numofrows, qinws2)).NumberFormat = "0.00"
         
-		mtmplinws2 = .Rows(1).Find("MTM_PL").Column
+        mtmplinws2 = .Rows(1).Find("MTM_PL").Column
         .Range(.Cells(2, mtmplinws2), .Cells(numofrows, mtmplinws2)).NumberFormat = "0.00"
-		
-		
-		wb.Sheets.Add After:=Worksheets(Worksheets.Count)
-		Set ws6 = ThisWorkbook.Worksheets(6)
-		ws6.Name = "FOREX and Bonds"
-		ws6.Rows(1).EntireRow.Value = ws2.Rows(1).EntireRow.Value
-		
-		colofsectype = ws2.Rows(1).Find("secType").Column
-		h = 2
-	
-		For r = numofrows To 2 Step -1
-			If ws2.Cells(r, colofsectype) = "FX" Then
+        
+        
+        wb.Sheets.Add After:=Worksheets(Worksheets.Count)
+        Set ws6 = ThisWorkbook.Worksheets(6)
+        ws6.Name = "FOREX and Bonds"
+        ws6.Rows(1).EntireRow.Value = ws2.Rows(1).EntireRow.Value
+        
+        colofsectype = ws2.Rows(1).Find("secType").Column
+        h = 2
+    
+        For r = numofrows To 2 Step -1
+            If ws2.Cells(r, colofsectype) = "FX" Then
                 ws6.Rows(h).EntireRow.Value = ws2.Rows(r).EntireRow.Value
                 ws2.Rows(r).EntireRow.Delete
                 h = h + 1
@@ -442,39 +442,40 @@ Sub clean_ibtrades()
                 ws6.Rows(h).EntireRow.Value = ws2.Rows(r).EntireRow.Value
                 ws2.Rows(r).EntireRow.Delete
                 h = h + 1
-			End If
-		Next r
-		
-		numofrowsnew = .UsedRange.Rows.Count
-				
-		inputline = .Rows(1).Find("inputLine").Column
+            End If
+        Next r
+        
+        numofrowsnew = .UsedRange.Rows.Count
+                
+        inputline = .Rows(1).Find("inputLine").Column
         letteraddress3 = Split(.Cells(1, inputline).Address, "$")(1)
         .Cells(2, inputline).Value = 1
         .Cells(3, inputline).Formula = "= 1 + " & letteraddress3 & "2"
         .Cells(3, inputline).Copy
         .Range(.Cells(3, inputline), .Cells(numofrowsnew, inputline)).PasteSpecial (xlPasteAll)
-		
+        
     End With
     
-	with ws6
-		
-		numofws6 = .Rows(1).Find("trade_Time").Column
+    With ws6
+        
+        numofws6 = .Rows(1).Find("trade_Time").Column
         numofcolumnsofws6 = .Cells(1, Columns.Count).End(xlToLeft).Column
         numofrowsofws62 = .UsedRange.Rows.Count
         With .Range(.Cells(2, 1), .Cells(numofrowsofws62, numofcolumnsofws6))
             .Sort key1:=.Columns(numofws6), order1:=xlAscending
         End With
-		
-		inputlineofws6 = .Rows(1).Find("inputLine").Column
+        
+        inputlineofws6 = .Rows(1).Find("inputLine").Column
         letteraddress4 = Split(.Cells(1, inputlineofws6).Address, "$")(1)
         .Cells(2, inputlineofws6).Value = 1
         .Cells(3, inputlineofws6).Formula = "= 1 + " & letteraddress4 & "2"
         .Cells(3, inputlineofws6).Copy
-        .Range(ws6.Cells(3, inputlineofws6), .Cells(numofrowsofws62, inputlineofws6)).PasteSpecial (xlPasteAll)
-	
-	End with 
-	
-	
+        .Range(.Cells(3, inputlineofws6), .Cells(numofrowsofws62, inputlineofws6)).PasteSpecial (xlPasteAll)
+        
+        .Range(.Cells(2, numofws6), .Cells(numofrowsofws62, numofws6)).NumberFormat = "yyyy-mm-dd HH:mm:ss"
+    End With
+    
+    
     ActiveWorkbook.Worksheets("Orders").Sort.SortFields.Clear
     ActiveWorkbook.Worksheets("Orders").Sort.SortFields.Add Key:=Range("C2:C654") _
         , SortOn:=xlSortOnValues, Order:=xlAscending, DataOption:=xlSortNormal
@@ -573,13 +574,6 @@ Sub clean_ibtrades()
         strikeinws5 = .Rows(1).Find("Strike").Column
         .Range(.Cells(2, strikeinws5), .Cells(numofrows1, strikeinws5)).NumberFormat = "0.00"
         
-        inputline3 = .Rows(1).Find("inputLine").Column
-        letteraddress5 = Split(.Cells(1, inputline3).Address, "$")(1)
-        .Cells(2, inputline3).Value = 1
-        .Cells(3, inputline3).Formula = "= 1 + " & letteraddress5 & "2"
-        .Cells(3, inputline3).Copy
-        .Range(.Cells(3, inputline3), .Cells(numofrows2, inputline3)).PasteSpecial (xlPasteAll)
-        
         numofcolumns2 = ws5.Cells(1, Columns.Count).End(xlToLeft).Column
         .Columns(numofcolumns2).Insert
         .Cells(1, numofcolumns2).Value = "account"
@@ -596,7 +590,59 @@ Sub clean_ibtrades()
         .Rows(1).Find("T. Price").Value = "price"
         .Rows(1).Find("Realized P/L").Value = "realized_PL"
         .Rows(1).Find("Code").Value = "codes"
+        
+        priceinws5 = .Rows(1).Find("price").Column
+        .Columns(priceinws5).Delete
+        
+        expiryinws5 = .Rows(1).Find("expiry").Column
+        .Columns(expiryinws5).Delete
+        
+        wb.Sheets.Add After:=Worksheets(Worksheets.Count)
+        Set ws7 = ThisWorkbook.Worksheets(7)
+        ws7.Name = "Allocation"
+        ws7.Rows(1).EntireRow.Value = ws5.Rows(1).EntireRow.Value
+        
+        colofsectypeinws5 = ws5.Rows(1).Find("bkrType").Column
+        q = 2
+    
+        For r = numofrows2 To 2 Step -1
+            If ws5.Cells(r, colofsectypeinws5) = "allocation" Then
+                ws7.Rows(q).EntireRow.Value = ws5.Rows(r).EntireRow.Value
+                ws5.Rows(r).EntireRow.Delete
+                q = q + 1
+                numofrows2 = numofrows2 - 1
+            End If
+        Next r
+        
+        inputline3 = .Rows(1).Find("inputLine").Column
+        letteraddress5 = Split(.Cells(1, inputline3).Address, "$")(1)
+        .Cells(2, inputline3).Value = 1
+        .Cells(3, inputline3).Formula = "= 1 + " & letteraddress5 & "2"
+        .Cells(3, inputline3).Copy
+        .Range(.Cells(3, inputline3), .Cells(numofrows2, inputline3)).PasteSpecial (xlPasteAll)
+        
+        .Name = "Wash"
     End With
+    
+    With ws7
+        numofws7 = .Rows(1).Find("lot_Time").Column
+        numofcolumnsofws7 = .Cells(1, Columns.Count).End(xlToLeft).Column
+        numofrowsofws72 = .UsedRange.Rows.Count
+        With .Range(.Cells(2, 1), .Cells(numofrowsofws72, numofcolumnsofws7))
+            .Sort key1:=.Columns(numofws7), order1:=xlAscending
+        End With
+        
+        inputlineofws7 = .Rows(1).Find("inputLine").Column
+        letteraddress7 = Split(.Cells(1, inputlineofws7).Address, "$")(1)
+        .Cells(2, inputlineofws7).Value = 1
+        .Cells(3, inputlineofws7).Formula = "= 1 + " & letteraddress7 & "2"
+        .Cells(3, inputlineofws7).Copy
+        .Range(.Cells(3, inputlineofws7), .Cells(numofrowsofws72, inputlineofws7)).PasteSpecial (xlPasteAll)
+        
+        lottimeinws7 = .Rows(1).Find("lot_Time").Column
+        .Range(.Cells(2, lottimeinws7), .Cells(numofrowsofws72, lottimeinws7)).NumberFormat = "yyyy-mm-dd HH:mm:ss"
+    End With
+    
     
     'Save trades, orders and section info into csv file
     
@@ -608,7 +654,7 @@ Sub clean_ibtrades()
     Dim tradessavefilename As String
     Dim allocationsavefilename As String
 
-	'get the filename without the extension. Does not work if hide extension is on and there are s in the name
+    'get the filename without the extension. Does not work if hide extension is on and there are s in the name
 
     Dim workbookname As String
     workbookname = Left(ThisWorkbook.Name, (InStrRev(ThisWorkbook.Name, ".", -1, vbTextCompare) - 1))
@@ -621,18 +667,26 @@ Sub clean_ibtrades()
     ActiveWorkbook.SaveAs Filename:= _
         savetodirectory & ":" & tradessavefilename, _
         FileFormat:=xlCSV
-	
-	forexandbondstradessavefilename = workbookname & "-Trades-forex and bonds-" & filecode & "-4SQL.csv"
-
-    ws6.Select
     
-    ActiveWorkbook.SaveAs Filename:= _
+    'forexandbondstradessavefilename = workbookname & "-Trades-forex and bonds-" & filecode & "-4SQL.csv"
+
+    'ws6.Select
+    
+    'ActiveWorkbook.SaveAs Filename:= _
         savetodirectory & ":" & forexandbondstradessavefilename, _
         FileFormat:=xlCSV
 
-    allocationsavefilename = workbookname & "-Allocation and Wash 2012-" & filecode & ".csv"
+    washsavefilename = workbookname & "-Wash 2012-" & filecode & ".csv"
         
     ws5.Select
+    
+    ActiveWorkbook.SaveAs Filename:= _
+        savetodirectory & ":" & washsavefilename, _
+        FileFormat:=xlCSV
+    
+    allocationsavefilename = workbookname & "-Allocation 2012-" & filecode & ".csv"
+        
+    ws7.Select
     
     ActiveWorkbook.SaveAs Filename:= _
         savetodirectory & ":" & allocationsavefilename, _
@@ -647,3 +701,4 @@ Sub clean_ibtrades()
 
     Application.ScreenUpdating = True
 End Sub
+
