@@ -131,7 +131,7 @@ Sub clean_ibtrades()
         numofrows = .UsedRange.Rows.Count
         
         .Columns(colofsectype).Insert
-        .Cells(1, colofsectype) = "TotalQ"
+        .Cells(1, colofsectype) = "totalQ"
         .Cells(2, colofsectype).Formula = "=IF(ISNUMBER(FIND(""order"", N2)), D2, M1)"
         .Cells(2, colofsectype).Copy
         .Range(.Cells(2, colofsectype), .Cells(numofrows, colofsectype)).PasteSpecial (xlPasteAll)
@@ -171,7 +171,7 @@ Sub clean_ibtrades()
         
         'start to calulate total Q
         colofdatetime = .Rows(1).Find("Date/Time").Column
-        coloftotalq = .Rows(1).Find("TotalQ").Column
+        coloftotalQ = .Rows(1).Find("totalQ").Column
         colofq = .Rows(1).Find("Quantity").Column
         colofbkrtype = .Rows(1).Find("bkrType").Column
         colofsymbol = .Rows(1).Find("Symbol").Column
@@ -227,7 +227,7 @@ Sub clean_ibtrades()
                 
                 For t = current_location To loop_ending_location Step -1
                     If ws2.Cells(t, colofbkrtype) = "" Then
-                        ws2.Cells(current_location, coloftotalq) = ws2.Cells(t, colofq)
+                        ws2.Cells(current_location, coloftotalQ) = ws2.Cells(t, colofq)
                         ws2.Cells(current_location, colofsymbol) = ws2.Cells(t, colofsymbol)
                         If ws2.Cells(t, colofq) < 0 And ws2.Cells(current_location, colofq) > 0 Then
                             ws2.Cells(current_location, colofq) = 0 - ws2.Cells(current_location, colofq)
@@ -236,7 +236,7 @@ Sub clean_ibtrades()
                     End If
                 Next t
             ElseIf ws2.Cells(r, colofbkrtype) = "wash" Then
-                ws2.Cells(r, coloftotalq) = ""
+                ws2.Cells(r, coloftotalQ) = ""
                 
                 current_location1 = r
                 loop_ending_location1 = r - 10
@@ -621,6 +621,12 @@ Sub clean_ibtrades()
         .Cells(3, inputline3).Copy
         .Range(.Cells(3, inputline3), .Cells(numofrows2, inputline3)).PasteSpecial (xlPasteAll)
         
+        totalQinws5 = .Rows(1).Find("totalQ").Column
+        .Columns(totalQinws5).Delete
+        
+        basisinws5 = .Rows(1).Find("basis").Column
+        .Columns(basisinws5).Delete
+        
         .Name = "Wash"
     End With
     
@@ -660,7 +666,7 @@ Sub clean_ibtrades()
     workbookname = Left(ThisWorkbook.Name, (InStrRev(ThisWorkbook.Name, ".", -1, vbTextCompare) - 1))
     
     'set up the filename to save
-    tradessavefilename = workbookname & "-Trades-" & filecode & "-4SQL.csv"
+    tradessavefilename = workbookname & "-trades-" & filecode & "-4SQL.csv"
 
     ws2.Select
     
@@ -676,7 +682,7 @@ Sub clean_ibtrades()
         savetodirectory & ":" & forexandbondstradessavefilename, _
         FileFormat:=xlCSV
 
-    washsavefilename = workbookname & "-Wash 2012-" & filecode & ".csv"
+    washsavefilename = workbookname & "-washes-" & filecode & "-4SQL.csv"
         
     ws5.Select
     
@@ -684,7 +690,7 @@ Sub clean_ibtrades()
         savetodirectory & ":" & washsavefilename, _
         FileFormat:=xlCSV
     
-    allocationsavefilename = workbookname & "-Allocation 2012-" & filecode & ".csv"
+    allocationsavefilename = workbookname & "-allocations-" & filecode & "-4SQL.csv"
         
     ws7.Select
     
@@ -701,4 +707,6 @@ Sub clean_ibtrades()
 
     Application.ScreenUpdating = True
 End Sub
+
+
 
