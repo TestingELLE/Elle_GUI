@@ -18,7 +18,7 @@ public class Trade {
     private String comm;
     private String proceeds;
     private String basis;
-    private String priceAdj;
+    private String adjProceeds;
     private String processed;
     private String lotTime;
     private String realizedPl;
@@ -37,11 +37,11 @@ public class Trade {
     private String expiry;
     private String strike;
     private String oType;
-    private String lNotes;
+    private String bkrGroup;
     private String stategy;
     private String xChange;
     private String order;
-    private String fill;
+    private String fills;
     private String totalQ;
     private String tGrp;
     private String matching;
@@ -126,14 +126,6 @@ public class Trade {
 
     public void setBasis(String basis) {
         this.basis = basis;
-    }
-
-    public String getPriceAdj() {
-        return priceAdj;
-    }
-
-    public void setPriceAdj(String priceAdj) {
-        this.priceAdj = priceAdj;
     }
 
     public String getProcessed() {
@@ -280,12 +272,19 @@ public class Trade {
         this.oType = oType;
     }
 
-    public String getlNotes() {
-        return lNotes;
+    public String getBkrGroup() {
+        return bkrGroup;
     }
 
-    public void setlNotes(String lNotes) {
-        this.lNotes = lNotes;
+    public void setBkrGroup(String bkrGroup) {
+        this.bkrGroup = bkrGroup;
+    }
+    public String getAdjProceeds() {
+        return adjProceeds;
+    }
+
+    public void setAdjProceeds(String adjProceeds) {
+        this.adjProceeds = adjProceeds;
     }
 
     public String getStategy() {
@@ -312,12 +311,12 @@ public class Trade {
         this.order = order;
     }
 
-    public String getFill() {
-        return fill;
+    public String getFills() {
+        return fills;
     }
 
-    public void setFill(String fill) {
-        this.fill = fill;
+    public void setFills(String fills) {
+        this.fills = fills;
     }
 
     public String getTotalQ() {

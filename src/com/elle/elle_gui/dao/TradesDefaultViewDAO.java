@@ -18,7 +18,7 @@ public class TradesDefaultViewDAO {
     private final String COL_COMM = "comm";
     private final String COL_PROCEEDS = "proceeds";
     private final String COL_BASIS = "basis";
-    private final String COL_PRICE_ADJ = "price_adj";
+    private final String COL_ADJ_PROCEEDS = "adj_proceeds";
     private final String COL_PROCESSED = "processed";
     private final String COL_LOT_TIME = "lot_Time";
     private final String COL_REALIZED_PL = "realized_PL";

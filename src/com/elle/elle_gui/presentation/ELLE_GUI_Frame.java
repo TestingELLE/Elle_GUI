@@ -1865,7 +1865,7 @@ public class ELLE_GUI_Frame extends JFrame implements ITableConstants {
         rowData[7] = trade.getComm();
         rowData[8] = trade.getProceeds();
         rowData[9] = trade.getBasis();
-        rowData[10] = trade.getPriceAdj();
+        rowData[10] = trade.getAdjProceeds();
         rowData[11] = trade.getProcessed();
         rowData[12] = trade.getLotTime();
         rowData[13] = trade.getRealizedPl();
@@ -1884,11 +1884,11 @@ public class ELLE_GUI_Frame extends JFrame implements ITableConstants {
         rowData[26] = trade.getExpiry();
         rowData[27] = trade.getStrike();
         rowData[28] = trade.getoType();
-        rowData[29] = trade.getlNotes();
+        rowData[29] = trade.getBkrGroup();
         rowData[30] = trade.getStategy();
         rowData[31] = trade.getxChange();
         rowData[32] = trade.getOrder();
-        rowData[33] = trade.getFill();
+        rowData[33] = trade.getFills();
         rowData[34] = trade.getTotalQ();
         rowData[35] = trade.gettGrp();
         rowData[36] = trade.getMatching();
@@ -1913,7 +1913,6 @@ public class ELLE_GUI_Frame extends JFrame implements ITableConstants {
         rowData[5] = position.getOce();
         rowData[6] = position.getOceTime();
         rowData[7] = position.getLs();
-        rowData[8] = position.getQori();
         rowData[9] = position.getPriceAdj();
         rowData[10] = position.getBasisAdj();
         rowData[11] = position.getPrice();
@@ -2061,7 +2060,6 @@ public class ELLE_GUI_Frame extends JFrame implements ITableConstants {
                     || table.getColumnName(i).toLowerCase().equals("q")
                     || table.getColumnName(i).toLowerCase().equals("basis")
                     || table.getColumnName(i).toLowerCase().equals("strike")
-                    || table.getColumnName(i).toLowerCase().equals("qori")
                     || table.getColumnName(i).toLowerCase().equals("adj_basis")
                     || table.getColumnName(i).toLowerCase().equals("totalq")
                     || table.getColumnName(i).toLowerCase().equals("realized_pl")

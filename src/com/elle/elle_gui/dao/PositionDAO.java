@@ -25,7 +25,6 @@ public class PositionDAO {
     public static final String COL_OCE = "OCE";
     public static final String COL_OCE_TIME = "OCE_Time";
     public static final String COL_LS = "LS";
-    public static final String COL_QORI = "Qori";
     public static final String COL_PRICE_ADJ = "price_adj";
     public static final String COL_BASIS_ADJ = "basis_adj";
     public static final String COL_PRICE = "price";
@@ -37,7 +36,6 @@ public class PositionDAO {
     public static final String COL_CODES = "codes";
     public static final String COL_ACCOUNT = "account";
     public static final String COL_YR = "yr";
-    public static final String COL_L_CODES = "L_codes";
     public static final String COL_SEC_TYPE = "secType";
     public static final String COL_MULTI = "multi";
     public static final String COL_UNDERLYING = "underlying";
@@ -80,7 +78,6 @@ public class PositionDAO {
                 position.setOce(rs.getString(COL_OCE));
                 position.setOceTime(rs.getString(COL_OCE_TIME));
                 position.setLs(rs.getString(COL_LS));
-                position.setQori(rs.getString(COL_QORI));
                 position.setPriceAdj(rs.getString(COL_PRICE_ADJ));
                 position.setBasisAdj(rs.getString(COL_BASIS_ADJ));
                 position.setPrice(rs.getString(COL_PRICE));
@@ -92,7 +89,6 @@ public class PositionDAO {
                 position.setCodes(rs.getString(COL_CODES));
                 position.setAccount(rs.getString(COL_ACCOUNT));
                 position.setYr(rs.getString(COL_YR));
-                position.setlCodes(rs.getString(COL_L_CODES));
                 position.setSecType(rs.getString(COL_SEC_TYPE));
                 position.setMulti(rs.getString(COL_MULTI));
                 position.setUnderlying(rs.getString(COL_UNDERLYING));
