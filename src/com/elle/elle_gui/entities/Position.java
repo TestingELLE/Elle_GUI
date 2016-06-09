@@ -16,7 +16,6 @@ public class Position {
     private String oce;
     private String oceTime;
     private String ls;
-    private String Qori;
     private String priceAdj;
     private String basisAdj;
     private String price;
@@ -103,14 +102,6 @@ public class Position {
 
     public void setLs(String ls) {
         this.ls = ls;
-    }
-
-    public String getQori() {
-        return Qori;
-    }
-
-    public void setQori(String Qori) {
-        this.Qori = Qori;
     }
 
     public String getPriceAdj() {

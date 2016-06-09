@@ -46,7 +46,7 @@ public interface ITableConstants {
         TradeDAO.COL_COMM,
         TradeDAO.COL_PROCEEDS,
         TradeDAO.COL_BASIS,
-        TradeDAO.COL_PRICE_ADJ,
+        TradeDAO.COL_ADJ_PROCEEDS,
         TradeDAO.COL_PROCESSED,
         TradeDAO.COL_LOT_TIME,
         TradeDAO.COL_REALIZED_PL,
@@ -65,11 +65,11 @@ public interface ITableConstants {
         TradeDAO.COL_EXPIRY,
         TradeDAO.COL_STRIKE,
         TradeDAO.COL_O_TYPE,
-        TradeDAO.COL_L_NOTES,
+        TradeDAO.COL_BKRGROUP,
         TradeDAO.COL_STRATEGY,
         TradeDAO.COL_XCHANGE,
         TradeDAO.COL_ORDER,
-        TradeDAO.COL_FILL,
+        TradeDAO.COL_FILLS,
         TradeDAO.COL_TOTAL_Q,
         TradeDAO.COL_T_GRP,
         TradeDAO.COL_MATCHING,
@@ -88,7 +88,6 @@ public interface ITableConstants {
         PositionDAO.COL_OCE,
         PositionDAO.COL_OCE_TIME,
         PositionDAO.COL_LS,
-        PositionDAO.COL_QORI,
         PositionDAO.COL_PRICE_ADJ,
         PositionDAO.COL_BASIS_ADJ,
         PositionDAO.COL_PRICE,
@@ -100,7 +99,6 @@ public interface ITableConstants {
         PositionDAO.COL_CODES,
         PositionDAO.COL_ACCOUNT,
         PositionDAO.COL_YR,
-        PositionDAO.COL_L_CODES,
         PositionDAO.COL_SEC_TYPE,
         PositionDAO.COL_MULTI,
         PositionDAO.COL_UNDERLYING,
@@ -149,7 +147,6 @@ public interface ITableConstants {
                     put(PositionDAO.COL_OCE, 40);
                     put(PositionDAO.COL_OCE_TIME, 160);
                     put(PositionDAO.COL_LS, 25);
-                    put(PositionDAO.COL_QORI, 70);
                     put(PositionDAO.COL_PRICE_ADJ, 90);
                     put(PositionDAO.COL_BASIS_ADJ, 75);
                     put(PositionDAO.COL_PRICE, 45);
@@ -161,7 +158,6 @@ public interface ITableConstants {
                     put(PositionDAO.COL_CODES, 55);
                     put(PositionDAO.COL_ACCOUNT, 65);
                     put(PositionDAO.COL_YR, 65);
-                    put(PositionDAO.COL_L_CODES, 40);
                     put(PositionDAO.COL_SEC_TYPE, 58);
                     put(PositionDAO.COL_MULTI, 40);
                     put(PositionDAO.COL_UNDERLYING, 85);
@@ -188,7 +184,6 @@ public interface ITableConstants {
                     put(PositionDAO.COL_OCE, 40);
                     put(PositionDAO.COL_OCE_TIME, 160);
                     put(PositionDAO.COL_LS, 25);
-                    put(PositionDAO.COL_QORI, 70);
                     put(PositionDAO.COL_PRICE_ADJ, 90);
                     put(PositionDAO.COL_BASIS_ADJ, 75);
                     put(PositionDAO.COL_PRICE, 45);
@@ -200,7 +195,6 @@ public interface ITableConstants {
                     put(PositionDAO.COL_CODES, 55);
                     put(PositionDAO.COL_ACCOUNT, 65);
                     put(PositionDAO.COL_YR, 65);
-                    put(PositionDAO.COL_L_CODES, 40);
                     put(PositionDAO.COL_SEC_TYPE, 58);
                     put(PositionDAO.COL_MULTI, 40);
                     put(PositionDAO.COL_UNDERLYING, 85);
@@ -273,7 +267,7 @@ public interface ITableConstants {
             put(TradeDAO.COL_COMM, 0);
             put(TradeDAO.COL_PROCEEDS, 90);
             put(TradeDAO.COL_BASIS, 75);
-            put(TradeDAO.COL_PRICE_ADJ, 0);
+            put(TradeDAO.COL_ADJ_PROCEEDS, 0);
             put(TradeDAO.COL_PROCESSED, 0);
             put(TradeDAO.COL_LOT_TIME, 160);
             put(TradeDAO.COL_REALIZED_PL, 90);
@@ -292,11 +286,11 @@ public interface ITableConstants {
             put(TradeDAO.COL_EXPIRY, 0);
             put(TradeDAO.COL_STRIKE, 0);
             put(TradeDAO.COL_O_TYPE, 0);
-            put(TradeDAO.COL_L_NOTES, 0);
+            put(TradeDAO.COL_BKRGROUP, 0);
             put(TradeDAO.COL_STRATEGY, 0);
             put(TradeDAO.COL_XCHANGE, 0);
             put(TradeDAO.COL_ORDER, 50);
-            put(TradeDAO.COL_FILL, 30);
+            put(TradeDAO.COL_FILLS, 30);
             put(TradeDAO.COL_TOTAL_Q, 0);
             put(TradeDAO.COL_T_GRP, 0);
             put(TradeDAO.COL_MATCHING, 0);
@@ -319,7 +313,7 @@ public interface ITableConstants {
             put(TradeDAO.COL_COMM, 80);
             put(TradeDAO.COL_PROCEEDS, 90);
             put(TradeDAO.COL_BASIS, 75);
-            put(TradeDAO.COL_PRICE_ADJ, 90);
+            put(TradeDAO.COL_ADJ_PROCEEDS, 90);
             put(TradeDAO.COL_PROCESSED, 80);
             put(TradeDAO.COL_LOT_TIME, 160);
             put(TradeDAO.COL_REALIZED_PL, 90);
@@ -338,11 +332,11 @@ public interface ITableConstants {
             put(TradeDAO.COL_EXPIRY, 88);
             put(TradeDAO.COL_STRIKE, 75);
             put(TradeDAO.COL_O_TYPE, 55);
-            put(TradeDAO.COL_L_NOTES, 55);
+            put(TradeDAO.COL_BKRGROUP, 55);
             put(TradeDAO.COL_STRATEGY, 60);
             put(TradeDAO.COL_XCHANGE, 85);
             put(TradeDAO.COL_ORDER, 50);
-            put(TradeDAO.COL_FILL, 30);
+            put(TradeDAO.COL_FILLS, 30);
             put(TradeDAO.COL_TOTAL_Q, 50);
             put(TradeDAO.COL_T_GRP, 60);
             put(TradeDAO.COL_MATCHING, 50);

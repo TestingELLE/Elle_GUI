@@ -27,7 +27,7 @@ public class TradeDAO {
     public static final String COL_COMM = "comm";
     public static final String COL_PROCEEDS = "proceeds";
     public static final String COL_BASIS = "basis";
-    public static final String COL_PRICE_ADJ = "price_adj";
+    public static final String COL_ADJ_PROCEEDS = "adj_proceeds";
     public static final String COL_PROCESSED = "processed";
     public static final String COL_LOT_TIME = "lot_Time";
     public static final String COL_REALIZED_PL = "realized_PL";
@@ -46,11 +46,11 @@ public class TradeDAO {
     public static final String COL_EXPIRY = "expiry";
     public static final String COL_STRIKE = "strike";
     public static final String COL_O_TYPE = "O_Type";
-    public static final String COL_L_NOTES = "Lnotes";
+    public static final String COL_BKRGROUP = "bkrGroup";
     public static final String COL_STRATEGY = "strategy";
     public static final String COL_XCHANGE = "Xchange";
     public static final String COL_ORDER = "order";
-    public static final String COL_FILL = "fill";
+    public static final String COL_FILLS = "fills";
     public static final String COL_TOTAL_Q = "TotalQ";
     public static final String COL_T_GRP = "t_grp";
     public static final String COL_MATCHING = "matching";
@@ -94,7 +94,7 @@ public class TradeDAO {
                 trade.setComm(rs.getString(COL_COMM));
                 trade.setProceeds(rs.getString(COL_PROCEEDS));
                 trade.setBasis(rs.getString(COL_BASIS));
-                trade.setPriceAdj(rs.getString(COL_PRICE_ADJ));
+                trade.setAdjProceeds(rs.getString(COL_ADJ_PROCEEDS));
                 trade.setProcessed(rs.getString(COL_PROCESSED));
                 trade.setLotTime(rs.getString(COL_LOT_TIME));
                 trade.setRealizedPl(rs.getString(COL_REALIZED_PL));
@@ -113,17 +113,18 @@ public class TradeDAO {
                 trade.setExpiry(rs.getString(COL_EXPIRY));
                 trade.setStrike(rs.getString(COL_STRIKE));
                 trade.setoType(rs.getString(COL_O_TYPE));
-                trade.setlNotes(rs.getString(COL_L_NOTES));
+                trade.setBkrGroup(rs.getString(COL_BKRGROUP));
                 trade.setStategy(rs.getString(COL_STRATEGY));
                 trade.setxChange(rs.getString(COL_XCHANGE));
                 trade.setOrder(rs.getString(COL_ORDER));
-                trade.setFill(rs.getString(COL_FILL));
+                trade.setFills(rs.getString(COL_FILLS));
                 trade.setTotalQ(rs.getString(COL_TOTAL_Q));
                 trade.settGrp(rs.getString(COL_T_GRP));
                 trade.setMatching(rs.getString(COL_MATCHING));
                 trade.setMethod(rs.getString(COL_METHOD));
                 trade.setTimeStamp(rs.getString(COL_TIMESTAMP));
                 trades.add(trade);
+                
             }
             
             LoggingAspect.afterReturn("Loaded table " + DB_TABLE_NAME + " for " + accountName);
