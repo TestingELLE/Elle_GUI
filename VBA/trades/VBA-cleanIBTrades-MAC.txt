@@ -185,18 +185,44 @@ Sub clean_ibtrades()
         .Cells(1, years).Value = "yr"
         colofyears = .Rows(1).Find("yr").Column
         
+        orders = .Cells(1, Columns.Count).End(xlToLeft).Column
+        .Columns(orders).Insert
+        .Cells(1, orders).Value = "useless"
+        
+        .Columns(100).Insert
+        .Cells(1, 100).Value = "order"
+        
+        .Cells(2, orders).Formula = "=IF(ISNUMBER(FIND(""order"", S2)),1,0)"
+        .Cells(2, orders).Copy
+        .Range(.Cells(3, orders), .Cells(numofrows, orders)).PasteSpecial (xlPasteAll)
+        
+        letteraddressnew1 = Split(.Cells(1, orders).Address, "$")(1)
+        letteraddressnew2 = Split(.Cells(1, 100).Address, "$")(1)
+        
+        .Cells(2, 100) = 1
+        .Cells(3, 100).Formula = "=" & letteraddressnew2 & "2 + " & letteraddressnew1 & "3"
+        .Cells(3, 100).Copy
+        .Range(.Cells(3, 100), .Cells(numofrows, 100)).PasteSpecial (xlPasteAll)
+        
+        .Columns(100).Copy
+
+        .Columns(orders).PasteSpecial xlPasteValues
+        .Columns(100).Delete
+
         ws4.Rows(1).EntireRow.Value = .Rows(1).EntireRow.Value
         colofsectype = .Rows(1).Find("SecType").Column
     End With
     
+    
     Dim h As Integer
+    Dim u As Integer
     Dim symbolstrings As String
     Dim datetimestrings As String
     h = 2
+    u = 1
     
         ws2.Range(ws2.Cells(2, colofstrike), ws2.Cells(numofrows, colofstrike)).NumberFormat = "0.00"
-        ws2.Range(ws2.Cells(2, colofstrike), ws2.Cells(numofrows, colofstrike)).NumberFormat = "0.00"
-        ws2.Range(ws2.Cells(2, colofstrike), ws2.Cells(numofrows, colofstrike)).NumberFormat = "0.00"
+        
         For r = numofrows To 2 Step -1
             
             If ws2.Cells(r, colofsectype) = "O" Then
@@ -405,7 +431,7 @@ Sub clean_ibtrades()
         
         .Columns(numofcolumnsinws2 + 4).Insert
         .Cells(1, numofcolumnsinws2 + 4).Value = "multi"
-        .Cells(2, numofcolumnsinws2 + 4).Formula = "=IF(ISNUMBER(SEARCH(""O"", U2)), 100, 1)"
+        .Cells(2, numofcolumnsinws2 + 4).Formula = "=IF(ISNUMBER(SEARCH(""O"", V2)), 100, 1)"
         .Cells(2, numofcolumnsinws2 + 4).Copy
         .Range(.Cells(3, numofcolumnsinws2 + 4), .Cells(numofrows, numofcolumnsinws2 + 4)).PasteSpecial (xlPasteAll)
         
@@ -627,11 +653,11 @@ Sub clean_ibtrades()
         basisinws5 = .Rows(1).Find("basis").Column
         .Columns(basisinws5).Delete
         
-		numofrowsofnewws5 = .UsedRange.Rows.Count
-		lottimeinws5 = .Rows(1).Find("lot_Time").Column
+        numofrowsofnewws5 = .UsedRange.Rows.Count
+        lottimeinws5 = .Rows(1).Find("lot_Time").Column
         .Range(.Cells(2, lottimeinws5), .Cells(numofrowsofnewws5, lottimeinws5)).NumberFormat = "yyyy-mm-dd HH:mm:ss"
         
-		.Name = "Wash"
+        .Name = "Wash"
     End With
     
     With ws7
