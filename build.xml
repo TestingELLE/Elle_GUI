@@ -29,12 +29,14 @@
     <target name="-post-jar"> 
       <delete dir="target"/>
       <jar jarfile="target/${jarname}.jar">
-        <zipfileset src="${dist.jar}" excludes="META-INF/*" />
+        <zipfileset src="${dist.jar}" excludes="META-INF/*"/>
         
             <zipgroupfileset dir="lib" excludes="META-INF/*" />
         <manifest>
             <attribute name="Main-Class" value="com.elle.elle_gui.ELLE_GUI"/>
+            <attribute name="SplashScreen-Image" value="com/elle/elle_gui/image.png"/>
         </manifest>
+        
       </jar>
       <delete dir="dist"/>
     </target> 
