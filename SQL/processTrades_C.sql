@@ -6,8 +6,6 @@ BEGIN
     
     set @`timeStamp`=Now();
     
-    
-    
     drop temporary table if exists position_temp;
 	create temporary table position_temp
     SELECT s1.*
@@ -21,18 +19,23 @@ BEGIN
     
     
 	#Get the record with OC='C' in trades table
-	drop temporary table if exists temp3;
-	create temporary table temp3
+	drop temporary table if exists temp9;
+	create temporary table temp9
 	select l1.* from trades l1
 	where OC='C' and ksflag<>'bk'
 	order by underlying, trade_time;
 
+	drop temporary table if exists temp3;
+	create temporary table temp3
+	select l1.* ,l2.Q as IBQ, l2.lot_Time as IBlot_time from temp9 l1
+	left join brokerIBmatches l2
+	on l1.bkrGroup=l2.bkrGroup;
 
 	#Using left join to find match record for temp3 from position_temp table. 
 	#match record have same symbol, lot_Time, 
 	drop temporary table if exists temp4;
 	create temporary table temp4
-	select temp3.id as t_id, temp3.underlying as t_underlying, temp3.symbol as t_symbol, temp3.Q as t_Q, temp3.lot_Time as t_lot_Time,
+	select temp3.id as t_id, temp3.underlying as t_underlying, temp3.symbol as t_symbol, temp3.IBQ as t_Q, temp3.IBlot_Time as t_lot_Time,
 	temp3.trade_Time as t_trade_Time, temp3.basis as t_basis, temp3.realized_PL as t_realized_PL, 
 	temp3.proceeds as t_proceeds, 
 	l1.symbol as p_symbol, l1.Q as p_Q,l1.lot_time as p_lot_Time,
@@ -41,7 +44,7 @@ BEGIN
 	l1.basis_adj as p_basis_adj, l1.price as p_price, l1.basis as p_basis, l1.ksflag as p_ksflag,l1.yr as p_yr, l1.account as p_account
 	from temp3
 	left join position_temp l1
-	on temp3.symbol = l1.symbol and if(TIME (temp3.lot_time)='00:00:00',date (temp3.lot_Time) =date (l1.lot_Time),temp3.lot_Time=l1.lot_Time)
+	on temp3.symbol = l1.symbol and if(TIME (temp3.IBlot_time)='00:00:00',date (temp3.IBlot_Time) =date (l1.lot_Time),temp3.IBlot_Time=l1.lot_Time)
 	where l1.ksflag<>'bk' or isnull(l1.ksflag);
 
 

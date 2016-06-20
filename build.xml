@@ -7,8 +7,8 @@
     <import file="nbproject/build-impl.xml"/>
     
     <!-- set the date and version here -->
-    <property name="creation-date" value="2016-06-15"/>
-    <property name="version" value="1.2.1c"/>
+    <property name="creation-date" value="2016-06-20"/>
+    <property name="version" value="1.2.2b"/>
     
     <!-- this is the jar name when it is created -->
     <property name="jarname" value="ELLE_GUI-${version}"/>
@@ -29,12 +29,14 @@
     <target name="-post-jar"> 
       <delete dir="target"/>
       <jar jarfile="target/${jarname}.jar">
-        <zipfileset src="${dist.jar}" excludes="META-INF/*" />
+        <zipfileset src="${dist.jar}" excludes="META-INF/*"/>
         
             <zipgroupfileset dir="lib" excludes="META-INF/*" />
         <manifest>
             <attribute name="Main-Class" value="com.elle.elle_gui.ELLE_GUI"/>
+            <attribute name="SplashScreen-Image" value="com/elle/elle_gui/image.png"/>
         </manifest>
+        
       </jar>
       <delete dir="dist"/>
     </target> 
