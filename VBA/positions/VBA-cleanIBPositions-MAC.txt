@@ -139,7 +139,7 @@ Sub clean_ib_positions()
 
 
     'generate the filecode for file saving
-	Randomize 
+    Randomize
 
     filecode = Right(Format(Date, "dd/mm/yyyy"), 1) & Mid(Format(Date, "dd/mm/yyyy"), 4, 2) & Left(Format(Date, "dd/mm/yyyy"), 2) & Chr(Int((90 - 65 + 1) * Rnd + 65))
 
@@ -470,7 +470,6 @@ Sub clean_ib_positions()
         totalReport.Cells(i, 17).Value = datetimestringarray
         
         totalReport.Cells(i, 16).Value = Right(totalReport.Cells(i, 17).Value, 4)
-        
 
         If totalReport.Cells(i, 3) > 0 Then
 
@@ -510,7 +509,12 @@ Sub clean_ib_positions()
 
         End If
 
-            
+        If totalReport.Cells(i, 2).Value = "Total" Then
+        
+            totalReport.Rows(i).EntireRow.Delete
+        
+        End If
+        
 
     Next i
     
@@ -554,7 +558,7 @@ Sub clean_ib_positions()
     
     ActiveWorkbook.SaveAs Filename:= _
         savetodirectory & ":" & savefilename, _
-        FileFormat:=xlCSV
+        FileFormat:=xlCSVMac
     
     ws2.Name = "Cleaned Positions"
     
@@ -566,12 +570,3 @@ Sub clean_ib_positions()
     
 
 End Sub
-
-
-
-
-
-
-
-
-
