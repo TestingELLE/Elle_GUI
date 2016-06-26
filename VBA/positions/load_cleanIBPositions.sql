@@ -1,23 +1,19 @@
-USE pupone_EG;
-DROP TABLE IF EXISTS w_positions111231;
-CREATE TABLE w_positions111231 LIKE positions;
-SET @max = (SELECT COUNT(*) FROM w_positions111231);
+USE pupone_EG_LOAD;
+
+
+SET @max = (SELECT COUNT(*) FROM positions);
 SET @max = - @max;
 SET sql_mode = 'NO_UNSIGNED_SUBTRACTION';
 
-/*
-ALTER TABLE w_positions111231 DROP PRIMARY KEY;
-ALTER TABLE w_positions111231 ADD PRIMARY KEY(inputLine);
-*/
 
 LOAD DATA LOCAL INFILE
-'/Users/ren/Desktop/intern/wei_new/positions/PositionsDL 111231 TEST_wei_06012016-positions-60605S-4SQL.csv'
-INTO TABLE w_positions111231 
+'/Users/luca/Dropbox/ELLE/ELLE Portfolio Management/4SQL/positions 4SQL/PositionsDL 111231 TEST-positions-60626R-4SQL.csv'
+INTO TABLE positions
 FIELDS OPTIONALLY ENCLOSED BY '"' TERMINATED BY ','
 LINES TERMINATED BY '\n'
 IGNORE 1 LINES
 (
-	inputLine,symbol,Q,@lot_Time,LS,price_adj,basis_adj,secType,filecode,account,multi,@O_Type,@expiry,@strike,underlying
+	inputLine,symbol,Q,@lot_Time,LS,price_adj,basis_adj,secType,filecode,account,multi,@O_Type,@expiry,@strike,underlying,yr
 )
 SET 
     strike = IF(@strike = '', NULL, @strike),
@@ -29,10 +25,4 @@ SET
     pos_id = @max - inputLine,
     yr = Date_Format(lot_Time, "%Y");
 
-UPDATE w_positions111231 SET expiry = NULL WHERE expiry = '0000-00-00';
-
-
-/*
-ALTER TABLE w_positions111231 DROP PRIMARY KEY;
-ALTER TABLE w_positions111231 ADD PRIMARY KEY(pos_id, line, ksflag, account, yr);
-*/
+UPDATE positions SET expiry = NULL WHERE expiry = '0000-00-00';
