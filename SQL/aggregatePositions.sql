@@ -1,4 +1,4 @@
-CREATE DEFINER=`pupone_Shenrui`@`%` PROCEDURE `aggregatePositions`(IN MYTABLE varchar(50))
+CREATE PROCEDURE `aggregatePositions`(IN MYTABLE varchar(50))
     SQL SECURITY INVOKER
 BEGIN
    
