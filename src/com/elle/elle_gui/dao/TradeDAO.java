@@ -3,10 +3,13 @@ package com.elle.elle_gui.dao;
 
 import com.elle.elle_gui.database.DBConnection;
 import com.elle.elle_gui.entities.Trade;
+import com.elle.elle_gui.logic.ITableConstants;
 import com.elle.elle_gui.logic.LoggingAspect;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * TradeDAO
@@ -57,82 +60,144 @@ public class TradeDAO {
     public static final String COL_METHOD = "method";
     public static final String COL_TIMESTAMP = "timeStamp";
     
-    /**
-     * 
-     * @param accountName
-     * @return 
-     */
-    public ArrayList<Trade> get(String accountName) {
-        
-        ArrayList<Trade> trades = new ArrayList<>();
-        ResultSet rs = null;
-        String sql = "";
-        
-        if (accountName == "Combined") {
-            sql = "SELECT * FROM " + DB_TABLE_NAME
-                    + " ORDER BY symbol ASC";
-        } else {
-            sql = "SELECT * FROM " + DB_TABLE_NAME
-                    + " WHERE Account = '" + accountName
-                    + "' ORDER BY symbol ASC";
+    //Names of columns in the database
+    public static final String DATABASE_COL_PK_ID = "id";
+    public static final String DATABASE_COL_TRADE_TIME = "trade_Time";
+    public static final String DATABASE_COL_OC = "OC";
+    public static final String DATABASE_COL_LS = "LS";
+    public static final String DATABASE_COL_SYMBOL = "symbol";
+    public static final String DATABASE_COL_Q = "Q";
+    public static final String DATABASE_COL_PRICE = "price";
+    public static final String DATABASE_COL_COMM = "comm";
+    public static final String DATABASE_COL_PROCEEDS = "proceeds";
+    public static final String DATABASE_COL_BASIS = "basis";
+    public static final String DATABASE_COL_ADJ_PROCEEDS = "adj_proceeds";
+    public static final String DATABASE_COL_PROCESSED = "processed";
+    public static final String DATABASE_COL_LOT_TIME = "lot_Time";
+    public static final String DATABASE_COL_REALIZED_PL = "realized_PL";
+    public static final String DATABASE_COL_CODES = "codes";
+    public static final String DATABASE_COL_KSFLAG = "ksflag";
+    public static final String DATABASE_COL_NOTES = "notes";
+    public static final String DATABASE_COL_ACCOUNT = "account";
+    public static final String DATABASE_COL_YR = "yr";
+    public static final String DATABASE_COL_FILE_CODE = "filecode";
+    public static final String DATABASE_COL_INPUT_LINE = "inputLine";
+    public static final String DATABASE_COL_LOCKED = "locked";
+    public static final String DATABASE_COL_MFLAG = "mflag";
+    public static final String DATABASE_COL_SEC_TYPE = "secType";
+    public static final String DATABASE_COL_MULTI = "multi";
+    public static final String DATABASE_COL_UNDERLYING = "underlying";
+    public static final String DATABASE_COL_EXPIRY = "expiry";
+    public static final String DATABASE_COL_STRIKE = "strike";
+    public static final String DATABASE_COL_O_TYPE = "O_Type";
+    public static final String DATABASE_COL_BKRGROUP = "bkrGroup";
+    public static final String DATABASE_COL_STRATEGY = "strategy";
+    public static final String DATABASE_COL_XCHANGE = "Xchange";
+    public static final String DATABASE_COL_ORDER = "order";
+    public static final String DATABASE_COL_FILLS = "fills";
+    public static final String DATABASE_COL_TOTAL_Q = "TotalQ";
+    public static final String DATABASE_COL_T_GRP = "t_grp";
+    public static final String DATABASE_COL_MATCHING = "matching";
+    public static final String DATABASE_COL_METHOD = "method";
+    public static final String DATABASE_COL_TIMESTAMP = "timeStamp";
+    
+    // Array of trades table column names to display in Elle_GUI
+    public static final String[] TRADES_COL_NAMES = new String[]
+    {
+        COL_PK_ID,
+        COL_TRADE_TIME,
+        COL_OC,
+        COL_LS,
+        COL_SYMBOL,
+        COL_Q,
+        COL_PRICE,
+        COL_COMM,
+        COL_PROCEEDS,
+        COL_BASIS,
+        COL_ADJ_PROCEEDS,
+        COL_PROCESSED,
+        COL_LOT_TIME,
+        COL_REALIZED_PL,
+        COL_CODES,
+        COL_KSFLAG,
+        COL_NOTES,
+        COL_ACCOUNT,
+        COL_YR,
+        COL_FILE_CODE,
+        COL_INPUT_LINE,
+        COL_LOCKED,
+        COL_MFLAG,
+        COL_SEC_TYPE,
+        COL_MULTI,
+       COL_UNDERLYING,
+        COL_EXPIRY,
+        COL_STRIKE,
+        COL_O_TYPE,
+        COL_BKRGROUP,
+        COL_STRATEGY,
+        COL_XCHANGE,
+        COL_ORDER,
+        COL_FILLS,
+        COL_TOTAL_Q,
+        COL_T_GRP,
+        COL_MATCHING,
+        COL_METHOD,
+        COL_TIMESTAMP
+    };
+    
+    //Array of trades database column Names 
+    public static final String[] TRADES_DATABASE_COL_NAMES = new String[]
+    {
+        DATABASE_COL_PK_ID,
+        DATABASE_COL_TRADE_TIME,
+        DATABASE_COL_OC,
+        DATABASE_COL_LS,
+        DATABASE_COL_SYMBOL,
+        DATABASE_COL_Q,
+        DATABASE_COL_PRICE,
+        DATABASE_COL_COMM,
+        DATABASE_COL_PROCEEDS,
+        DATABASE_COL_BASIS,
+        DATABASE_COL_ADJ_PROCEEDS,
+        DATABASE_COL_PROCESSED,
+        DATABASE_COL_LOT_TIME,
+        DATABASE_COL_REALIZED_PL,
+        DATABASE_COL_CODES,
+        DATABASE_COL_KSFLAG,
+        DATABASE_COL_NOTES,
+        DATABASE_COL_ACCOUNT,
+        DATABASE_COL_YR,
+        DATABASE_COL_FILE_CODE,
+        DATABASE_COL_INPUT_LINE,
+        DATABASE_COL_LOCKED,
+        DATABASE_COL_MFLAG,
+        DATABASE_COL_SEC_TYPE,
+        DATABASE_COL_MULTI,
+        DATABASE_COL_UNDERLYING,
+        DATABASE_COL_EXPIRY,
+        DATABASE_COL_STRIKE,
+        DATABASE_COL_O_TYPE,
+        DATABASE_COL_BKRGROUP,
+        DATABASE_COL_STRATEGY,
+        DATABASE_COL_XCHANGE,
+        DATABASE_COL_ORDER,
+        DATABASE_COL_FILLS,
+        DATABASE_COL_TOTAL_Q,
+        DATABASE_COL_T_GRP,
+        DATABASE_COL_MATCHING,
+        DATABASE_COL_METHOD,
+        DATABASE_COL_TIMESTAMP
+    };
+ //map of the column names in the database to the column names to display 
+    public static Map<String, String>  columnNameConstants = getColumnNameConstants();
+           
+    
+    public static Map getColumnNameConstants(){
+        Map<String, String> constants = new HashMap <String, String>();
+        for (int col = 0; col < TRADES_DATABASE_COL_NAMES.length; col++){
+            constants.put(TRADES_DATABASE_COL_NAMES[col],
+                    TRADES_COL_NAMES[col]);
         }
-        
-        try {
-
-            DBConnection.close();
-            DBConnection.open();
-            rs = DBConnection.getStatement().executeQuery(sql);
-            while(rs.next()){
-                Trade trade = new Trade();
-                trade.setId(rs.getString(COL_PK_ID));
-                trade.setTradeTime(rs.getString(COL_TRADE_TIME));
-                trade.setOc(rs.getString(COL_OC));
-                trade.setLs(rs.getString(COL_LS));
-                trade.setSymbol(rs.getString(COL_SYMBOL));
-                trade.setQ(rs.getString(COL_Q));
-                trade.setPrice(rs.getString(COL_PRICE));
-                trade.setComm(rs.getString(COL_COMM));
-                trade.setProceeds(rs.getString(COL_PROCEEDS));
-                trade.setBasis(rs.getString(COL_BASIS));
-                trade.setAdjProceeds(rs.getString(COL_ADJ_PROCEEDS));
-                trade.setProcessed(rs.getString(COL_PROCESSED));
-                trade.setLotTime(rs.getString(COL_LOT_TIME));
-                trade.setRealizedPl(rs.getString(COL_REALIZED_PL));
-                trade.setCodes(rs.getString(COL_CODES));
-                trade.setKsflag(rs.getString(COL_KSFLAG));
-                trade.setNotes(rs.getString(COL_NOTES));
-                trade.setAccount(rs.getString(COL_ACCOUNT));
-                trade.setYr(rs.getString(COL_YR));
-                trade.setFileCode(rs.getString(COL_FILE_CODE));
-                trade.setInputLine(rs.getString(COL_INPUT_LINE));
-                trade.setLocked(rs.getString(COL_LOCKED));
-                trade.setMflag(rs.getString(COL_MFLAG));
-                trade.setSecType(rs.getString(COL_SEC_TYPE));
-                trade.setMulti(rs.getString(COL_MULTI));
-                trade.setUnderlying(rs.getString(COL_UNDERLYING));
-                trade.setExpiry(rs.getString(COL_EXPIRY));
-                trade.setStrike(rs.getString(COL_STRIKE));
-                trade.setoType(rs.getString(COL_O_TYPE));
-                trade.setBkrGroup(rs.getString(COL_BKRGROUP));
-                trade.setStategy(rs.getString(COL_STRATEGY));
-                trade.setxChange(rs.getString(COL_XCHANGE));
-                trade.setOrder(rs.getString(COL_ORDER));
-                trade.setFills(rs.getString(COL_FILLS));
-                trade.setTotalQ(rs.getString(COL_TOTAL_Q));
-                trade.settGrp(rs.getString(COL_T_GRP));
-                trade.setMatching(rs.getString(COL_MATCHING));
-                trade.setMethod(rs.getString(COL_METHOD));
-                trade.setTimeStamp(rs.getString(COL_TIMESTAMP));
-                trades.add(trade);
-                
-            }
-            
-            LoggingAspect.afterReturn("Loaded table " + DB_TABLE_NAME + " for " + accountName);
-        } 
-        catch (SQLException e) {
-            LoggingAspect.afterThrown(e);
-        }
-        
-        return trades;
+        return constants;
     }
 }
