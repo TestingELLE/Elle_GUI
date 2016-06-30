@@ -93,6 +93,7 @@ public class ELLE_GUI {
             BufferedImage img = null;
             try {
                 img = ImageIO.read(loadingScreen.getImageURL());
+                System.out.print(loadingScreen.getImageURL());
             } catch (IOException e) {
                 LoggingAspect.afterThrown(e);
             }
@@ -154,7 +155,7 @@ public class ELLE_GUI {
             loadingText("Loading...");
             loadingProgress(i * 20);
             try {
-                Thread.sleep(400);
+                Thread.sleep(800);
             } catch (InterruptedException e) {
                 LoggingAspect.afterThrown(e);
                 JOptionPane.showMessageDialog(null, "error: " + e.getMessage());

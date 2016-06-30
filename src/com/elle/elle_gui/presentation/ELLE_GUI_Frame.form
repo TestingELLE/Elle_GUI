@@ -199,7 +199,11 @@
             </MenuItem>
             <MenuItem class="javax.swing.JMenuItem" name="menuItemAViewATrades">
               <Properties>
-                <Property name="text" type="java.lang.String" value="Display Selected Trade"/>
+                <Property name="text" type="java.lang.String" value="Display Record"/>
+                <Property name="toolTipText" type="java.lang.String" value=""/>
+                <Property name="enabled" type="boolean" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+                  <Connection code="false" type="code"/>
+                </Property>
               </Properties>
               <Events>
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="menuItemAViewATradesActionPerformed"/>
@@ -246,6 +250,14 @@
               </Properties>
               <Events>
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="viewnomatchesActionPerformed"/>
+              </Events>
+            </MenuItem>
+            <MenuItem class="javax.swing.JMenuItem" name="menuItemDefaultColumnWidths">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="Default Column Widths"/>
+              </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="menuItemDefaultColumnWidthsActionPerformed"/>
               </Events>
             </MenuItem>
           </SubComponents>

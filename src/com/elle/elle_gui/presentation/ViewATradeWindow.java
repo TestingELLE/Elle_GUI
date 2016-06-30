@@ -12,7 +12,7 @@ import java.awt.Dimension;
 import java.util.Vector;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
-
+import com.elle.elle_gui.logic.ITableConstants;
 /**
  *
  * @author fuxiaoqian
@@ -21,12 +21,14 @@ public class ViewATradeWindow extends javax.swing.JFrame {
     
     private ATrade aTradeInView;
     private ELLE_GUI_Frame ELLEGUI;
-
+    String tableName;
+    String title;
     /**
      * Creates new form SelectionRowView
      */
-    public ViewATradeWindow(ATrade tradeInView) {
-        
+    public ViewATradeWindow(ATrade tradeInView, String tableName) {
+        this.tableName = tableName;
+        setTitle();
         aTradeInView = tradeInView;
        
         initComponents();
@@ -53,7 +55,7 @@ public class ViewATradeWindow extends javax.swing.JFrame {
         aTradeTable = new javax.swing.JTable();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
-        setTitle("View Trade");
+        setTitle(title);
         setName("viewATrade"); // NOI18N
 
         aTradeTable.setModel(new javax.swing.table.DefaultTableModel(
@@ -91,6 +93,24 @@ public class ViewATradeWindow extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
+    private void setTitle(){
+        switch(tableName){
+            case (ITableConstants.POSITIONS_TABLE_NAME):
+                title = "View Position";
+                break;
+            case(ITableConstants.TRADES_TABLE_NAME):
+                title = "View Trade";
+                break;
+            case(ITableConstants.ALLOCATIONS_TABLE_NAME):
+                title = "View Allocation";
+                break;
+            default:
+                title = "View Record";
+                break;
+                
+        }
+    }
+    
     public void loadATradeToTable(){
         Vector<String> aTradeColumnName = new Vector<String>();
         aTradeColumnName.addElement("field name");
