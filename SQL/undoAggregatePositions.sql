@@ -1,56 +1,40 @@
-CREATE DEFINER=`pupone_Shenrui`@`%` PROCEDURE `undoAggregatePositions`(IN MYTABLE varchar(50),IN stamp1 varchar(255))
+CREATE DEFINER=`pupone_Corinne`@`%` PROCEDURE `undoAggregatePositions`(IN stamp1 varchar(255))
     SQL SECURITY INVOKER
 BEGIN
     set SQL_SAFE_UPDATES=0;
     
     set @stamp = stamp1;
     /*
-    SET @cmd1 = CONCAT('update ',MYTABLE,'
+   update positions
     set ksflag = "0"
-    where ksflag="bk" and FIND_IN_SET(grp,@numlist);');
-    PREPARE STMT1 FROM @cmd1;
-    EXECUTE STMT1;
-    DEALLOCATE PREPARE STMT1;
+    where ksflag="bk" and FIND_IN_SET(grp,@numlist);
+    
     #FIND_IN_SET function can deal with list-like input. 
     #For example, find_in_set(1,'1,2,3')=1 will return the index the thing we are looking for.
     #find_in_set(2,'1,2,3')=2. find_in_set(4,'1,2.3')=0;    
     */
-    SET @cmd2 = CONCAT('delete from aggregatedPositions
-    where ksflag="tot"  and `timeStamp`=@stamp;');
-    PREPARE STMT2 FROM @cmd2;
-    EXECUTE STMT2;
-    DEALLOCATE PREPARE STMT2;
+    delete from aggregatedPositions
+    where ksflag="tot"  and `timeStamp`=@stamp;
     
-    SET @cmd2 = CONCAT('update aggregatedPositions
+    
+    update aggregatedPositions
     set ksflag = "0", grp = NULL
-    where ksflag="bk"  and `timeStamp`=@stamp;');
-    PREPARE STMT2 FROM @cmd2;
-    EXECUTE STMT2;
-    DEALLOCATE PREPARE STMT2;
-    
-    SET @cmd2 = CONCAT('insert into ',MYTABLE,'
-    select * from aggregatedPositions where ksflag="0" and `timeStamp`=@stamp;');
-    PREPARE STMT2 FROM @cmd2;
-    EXECUTE STMT2;
-    DEALLOCATE PREPARE STMT2;
-    
-    SET @cmd2 = CONCAT('delete from ',MYTABLE,'
-    where ksflag="tot" and `timeStamp`=@stamp;');
-    PREPARE STMT2 FROM @cmd2;
-    EXECUTE STMT2;
-    DEALLOCATE PREPARE STMT2;
-    
-    SET @cmd2 = CONCAT('update ',MYTABLE,'
-    set `timeStamp`=NULL where `timeStamp`=@stamp;');
-    PREPARE STMT2 FROM @cmd2;
-    EXECUTE STMT2;
-    DEALLOCATE PREPARE STMT2;
+    where ksflag="bk"  and `timeStamp`=@stamp;
 
-    SET @cmd2 = CONCAT('delete from aggregatedPositions
-    where `timeStamp`=@stamp;');
-    PREPARE STMT2 FROM @cmd2;
-    EXECUTE STMT2;
-    DEALLOCATE PREPARE STMT2;
+    
+    insert into positions
+    select * from aggregatedPositions where ksflag="0" and `timeStamp`=@stamp;
+    
+    delete from positions
+    where ksflag="tot" and `timeStamp`=@stamp;
+    
+   update positions
+    set `timeStamp`=NULL where `timeStamp`=@stamp;
+    
+
+    delete from aggregatedPositions
+    where `timeStamp`=@stamp;
+    
 
     delete from `timeStamps`
     where `timeStamp`=@stamp;
