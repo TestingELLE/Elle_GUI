@@ -18,6 +18,8 @@ import com.elle.elle_gui.logic.LoggingAspect;
 import com.elle.elle_gui.logic.PrintWindow;
 import com.elle.elle_gui.logic.TableFilter;
 import com.elle.elle_gui.logic.Validator;
+import com.elle.elle_gui.logic.TableColumnAdjuster;
+import com.elle.elle_gui.logic.TableFromServer;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
@@ -44,7 +46,6 @@ import java.sql.Statement;
 import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -68,6 +69,10 @@ import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableModel;
 import javax.swing.text.AbstractDocument;
+import java.awt.event.*;
+import javax.swing.JComponent;
+import javax.swing.JButton;
+
 
 /**
  * ELLE_GUI_Frame
@@ -85,6 +90,17 @@ public class ELLE_GUI_Frame extends JFrame implements ITableConstants {
     private Map<String, Map<String, AccountTable>> tabs; // stores individual accountTable objects 
     private static Statement statement;
     private String database;
+    
+    //maps store whether an alert logging column changes in the database has been displayed for this table
+    //prevents the same alert message from being displayed more than once for the same table
+    Map<String, Boolean> hasDeletedColumnAlert = new HashMap<String,Boolean>();
+    Map<String, Boolean> hasUnexpectedColumnAlert = new HashMap<String,Boolean>();
+    String tableColumnAlertMessage;
+    //Stores a message which logs columns which are contained in the column name constants,
+    //but are missing from the resultSet
+    String missingColumnLog; 
+    String unexpectedColumnLog; //logs columns not contained in the column name constants
+    
 
     // components
     private static ELLE_GUI_Frame instance;
@@ -127,7 +143,16 @@ public class ELLE_GUI_Frame extends JFrame implements ITableConstants {
 
         // initialize tabs
         tabs = new HashMap();
-
+        
+        tableColumnAlertMessage = "";
+        
+        hasDeletedColumnAlert.put(TRADES_TABLE_NAME, false);
+        hasDeletedColumnAlert.put(POSITIONS_TABLE_NAME, false);
+        hasDeletedColumnAlert.put(ALLOCATIONS_TABLE_NAME, false);
+        
+        hasUnexpectedColumnAlert.put(TRADES_TABLE_NAME, false);
+        hasUnexpectedColumnAlert.put(POSITIONS_TABLE_NAME, false);
+        hasUnexpectedColumnAlert.put(ALLOCATIONS_TABLE_NAME, false);
         /**
          * *************** IB9048 Account ***************************
          */
@@ -139,22 +164,22 @@ public class ELLE_GUI_Frame extends JFrame implements ITableConstants {
         // initialize tables for IB9048 -Postions table
         tabIB9048.get(POSITIONS_TABLE_NAME).setTable(new JTable());
         tabIB9048.get(POSITIONS_TABLE_NAME).setTableName(POSITIONS_TABLE_NAME);
-        tabIB9048.get(POSITIONS_TABLE_NAME).setColWidthPercentDefaultView(COL_WIDTH_PER_POSITIONS_DEFAULT_VIEW);
-        tabIB9048.get(POSITIONS_TABLE_NAME).setColWidthPercentAllFields(COL_WIDTH_PER_POSITIONS_ALL_FIELDS);
+        //tabIB9048.get(POSITIONS_TABLE_NAME).setColWidthPercentDefaultView(COL_WIDTH_PER_POSITIONS_DEFAULT_VIEW);
+        //tabIB9048.get(POSITIONS_TABLE_NAME).setColWidthPercentAllFields(COL_WIDTH_PER_POSITIONS_ALL_FIELDS);
         tabIB9048.get(POSITIONS_TABLE_NAME).setFilter(new TableFilter(tabIB9048.get(POSITIONS_TABLE_NAME).getTable()));
         tabIB9048.get(POSITIONS_TABLE_NAME).setColumnPopupMenu(new ColumnPopupMenu(tabIB9048.get(POSITIONS_TABLE_NAME).getFilter()));
         // initialize tables for IB9048 -Trades table
         tabIB9048.get(TRADES_TABLE_NAME).setTable(new JTable());
         tabIB9048.get(TRADES_TABLE_NAME).setTableName(TRADES_TABLE_NAME);
-        tabIB9048.get(TRADES_TABLE_NAME).setColWidthPercentDefaultView(COL_WIDTH_PER_TRADES_DEFAULT_VIEW);
-        tabIB9048.get(TRADES_TABLE_NAME).setColWidthPercentAllFields(COL_WIDTH_PER_TRADES_ALL_FIELDS);
+        //tabIB9048.get(TRADES_TABLE_NAME).setColWidthPercentDefaultView(COL_WIDTH_PER_TRADES_DEFAULT_VIEW);
+        //tabIB9048.get(TRADES_TABLE_NAME).setColWidthPercentAllFields(COL_WIDTH_PER_TRADES_ALL_FIELDS);
         tabIB9048.get(TRADES_TABLE_NAME).setFilter(new TableFilter(tabIB9048.get(TRADES_TABLE_NAME).getTable()));
         tabIB9048.get(TRADES_TABLE_NAME).setColumnPopupMenu(new ColumnPopupMenu(tabIB9048.get(TRADES_TABLE_NAME).getFilter()));
         // initialize tables for IB9048 -Allocations table
         tabIB9048.get(ALLOCATIONS_TABLE_NAME).setTable(new JTable());
         tabIB9048.get(ALLOCATIONS_TABLE_NAME).setTableName(ALLOCATIONS_TABLE_NAME);
-        tabIB9048.get(ALLOCATIONS_TABLE_NAME).setColWidthPercentDefaultView(COL_WIDTH_PER_ALLOCATIONS_DEFAULT_VIEW);
-        tabIB9048.get(ALLOCATIONS_TABLE_NAME).setColWidthPercentAllFields(COL_WIDTH_PER_ALLOCATIONS_ALL_FIELDS);
+        //tabIB9048.get(ALLOCATIONS_TABLE_NAME).setColWidthPercentDefaultView(COL_WIDTH_PER_ALLOCATIONS_DEFAULT_VIEW);
+        //tabIB9048.get(ALLOCATIONS_TABLE_NAME).setColWidthPercentAllFields(COL_WIDTH_PER_ALLOCATIONS_ALL_FIELDS);
         tabIB9048.get(ALLOCATIONS_TABLE_NAME).setFilter(new TableFilter(tabIB9048.get(ALLOCATIONS_TABLE_NAME).getTable()));
         tabIB9048.get(ALLOCATIONS_TABLE_NAME).setColumnPopupMenu(new ColumnPopupMenu(tabIB9048.get(ALLOCATIONS_TABLE_NAME).getFilter()));
         // add tables to the IB9048 account accountTable
@@ -171,22 +196,22 @@ public class ELLE_GUI_Frame extends JFrame implements ITableConstants {
         // initialize tables for TOS3622 -Postions table
         tabTOS3622.get(POSITIONS_TABLE_NAME).setTable(new JTable());
         tabTOS3622.get(POSITIONS_TABLE_NAME).setTableName(POSITIONS_TABLE_NAME);
-        tabTOS3622.get(POSITIONS_TABLE_NAME).setColWidthPercentDefaultView(COL_WIDTH_PER_POSITIONS_DEFAULT_VIEW);
-        tabTOS3622.get(POSITIONS_TABLE_NAME).setColWidthPercentAllFields(COL_WIDTH_PER_POSITIONS_ALL_FIELDS);
+        //tabTOS3622.get(POSITIONS_TABLE_NAME).setColWidthPercentDefaultView(COL_WIDTH_PER_POSITIONS_DEFAULT_VIEW);
+        //tabTOS3622.get(POSITIONS_TABLE_NAME).setColWidthPercentAllFields(COL_WIDTH_PER_POSITIONS_ALL_FIELDS);
         tabTOS3622.get(POSITIONS_TABLE_NAME).setFilter(new TableFilter(tabTOS3622.get(POSITIONS_TABLE_NAME).getTable()));
         tabTOS3622.get(POSITIONS_TABLE_NAME).setColumnPopupMenu(new ColumnPopupMenu(tabTOS3622.get(POSITIONS_TABLE_NAME).getFilter()));
         // initialize tables for TOS3622 -Trades table
         tabTOS3622.get(TRADES_TABLE_NAME).setTable(new JTable());
         tabTOS3622.get(TRADES_TABLE_NAME).setTableName(TRADES_TABLE_NAME);
-        tabTOS3622.get(TRADES_TABLE_NAME).setColWidthPercentDefaultView(COL_WIDTH_PER_TRADES_DEFAULT_VIEW);
-        tabTOS3622.get(TRADES_TABLE_NAME).setColWidthPercentAllFields(COL_WIDTH_PER_TRADES_ALL_FIELDS);
+        //tabTOS3622.get(TRADES_TABLE_NAME).setColWidthPercentDefaultView(COL_WIDTH_PER_TRADES_DEFAULT_VIEW);
+        //tabTOS3622.get(TRADES_TABLE_NAME).setColWidthPercentAllFields(COL_WIDTH_PER_TRADES_ALL_FIELDS);
         tabTOS3622.get(TRADES_TABLE_NAME).setFilter(new TableFilter(tabTOS3622.get(TRADES_TABLE_NAME).getTable()));
         tabTOS3622.get(TRADES_TABLE_NAME).setColumnPopupMenu(new ColumnPopupMenu(tabTOS3622.get(TRADES_TABLE_NAME).getFilter()));
         // initialize tables for TOS3622 -Allocations table
         tabTOS3622.get(ALLOCATIONS_TABLE_NAME).setTable(new JTable());
         tabTOS3622.get(ALLOCATIONS_TABLE_NAME).setTableName(ALLOCATIONS_TABLE_NAME);
-        tabTOS3622.get(ALLOCATIONS_TABLE_NAME).setColWidthPercentDefaultView(COL_WIDTH_PER_ALLOCATIONS_DEFAULT_VIEW);
-        tabTOS3622.get(ALLOCATIONS_TABLE_NAME).setColWidthPercentAllFields(COL_WIDTH_PER_ALLOCATIONS_ALL_FIELDS);
+        //tabTOS3622.get(ALLOCATIONS_TABLE_NAME).setColWidthPercentDefaultView(COL_WIDTH_PER_ALLOCATIONS_DEFAULT_VIEW);
+        //tabTOS3622.get(ALLOCATIONS_TABLE_NAME).setColWidthPercentAllFields(COL_WIDTH_PER_ALLOCATIONS_ALL_FIELDS);
         tabTOS3622.get(ALLOCATIONS_TABLE_NAME).setFilter(new TableFilter(tabTOS3622.get(ALLOCATIONS_TABLE_NAME).getTable()));
         tabTOS3622.get(ALLOCATIONS_TABLE_NAME).setColumnPopupMenu(new ColumnPopupMenu(tabTOS3622.get(ALLOCATIONS_TABLE_NAME).getFilter()));
         // add tables to the TOS3622 account accountTable
@@ -203,22 +228,22 @@ public class ELLE_GUI_Frame extends JFrame implements ITableConstants {
         // initialize tables for Combined -Postions table
         tabCombined.get(POSITIONS_TABLE_NAME).setTable(new JTable());
         tabCombined.get(POSITIONS_TABLE_NAME).setTableName(POSITIONS_TABLE_NAME);
-        tabCombined.get(POSITIONS_TABLE_NAME).setColWidthPercentDefaultView(COL_WIDTH_PER_POSITIONS_DEFAULT_VIEW);
-        tabCombined.get(POSITIONS_TABLE_NAME).setColWidthPercentAllFields(COL_WIDTH_PER_POSITIONS_ALL_FIELDS);
+        //tabCombined.get(POSITIONS_TABLE_NAME).setColWidthPercentDefaultView(COL_WIDTH_PER_POSITIONS_DEFAULT_VIEW);
+        //tabCombined.get(POSITIONS_TABLE_NAME).setColWidthPercentAllFields(COL_WIDTH_PER_POSITIONS_ALL_FIELDS);
         tabCombined.get(POSITIONS_TABLE_NAME).setFilter(new TableFilter(tabCombined.get(POSITIONS_TABLE_NAME).getTable()));
         tabCombined.get(POSITIONS_TABLE_NAME).setColumnPopupMenu(new ColumnPopupMenu(tabCombined.get(POSITIONS_TABLE_NAME).getFilter()));
         // initialize tables for Combined -Trades table
         tabCombined.get(TRADES_TABLE_NAME).setTable(new JTable());
         tabCombined.get(TRADES_TABLE_NAME).setTableName(TRADES_TABLE_NAME);
-        tabCombined.get(TRADES_TABLE_NAME).setColWidthPercentDefaultView(COL_WIDTH_PER_TRADES_DEFAULT_VIEW);
-        tabCombined.get(TRADES_TABLE_NAME).setColWidthPercentAllFields(COL_WIDTH_PER_TRADES_ALL_FIELDS);
+        //tabCombined.get(TRADES_TABLE_NAME).setColWidthPercentDefaultView(COL_WIDTH_PER_TRADES_DEFAULT_VIEW);
+        //tabCombined.get(TRADES_TABLE_NAME).setColWidthPercentAllFields(COL_WIDTH_PER_TRADES_ALL_FIELDS);
         tabCombined.get(TRADES_TABLE_NAME).setFilter(new TableFilter(tabCombined.get(TRADES_TABLE_NAME).getTable()));
         tabCombined.get(TRADES_TABLE_NAME).setColumnPopupMenu(new ColumnPopupMenu(tabCombined.get(TRADES_TABLE_NAME).getFilter()));
         // initialize tables for Combined -Allocations table
         tabCombined.get(ALLOCATIONS_TABLE_NAME).setTable(new JTable());
         tabCombined.get(ALLOCATIONS_TABLE_NAME).setTableName(ALLOCATIONS_TABLE_NAME);
-        tabCombined.get(ALLOCATIONS_TABLE_NAME).setColWidthPercentDefaultView(COL_WIDTH_PER_ALLOCATIONS_DEFAULT_VIEW);
-        tabCombined.get(ALLOCATIONS_TABLE_NAME).setColWidthPercentAllFields(COL_WIDTH_PER_ALLOCATIONS_ALL_FIELDS);
+        //tabCombined.get(ALLOCATIONS_TABLE_NAME).setColWidthPercentDefaultView(COL_WIDTH_PER_ALLOCATIONS_DEFAULT_VIEW);
+        //tabCombined.get(ALLOCATIONS_TABLE_NAME).setColWidthPercentAllFields(COL_WIDTH_PER_ALLOCATIONS_ALL_FIELDS);
         tabCombined.get(ALLOCATIONS_TABLE_NAME).setFilter(new TableFilter(tabCombined.get(ALLOCATIONS_TABLE_NAME).getTable()));
         tabCombined.get(ALLOCATIONS_TABLE_NAME).setColumnPopupMenu(new ColumnPopupMenu(tabCombined.get(ALLOCATIONS_TABLE_NAME).getFilter()));
         // add tables to the Combined account accountTable
@@ -228,6 +253,9 @@ public class ELLE_GUI_Frame extends JFrame implements ITableConstants {
         //setKeyboardFocusManager();
         // load data from database to tables
         loadTables(tabs);
+        
+        //display an alert message for any column changes in the database
+        displayTableColumnAlert();
 
         // now that the tables are loaded, 
         // the columnnames string array can be loaded for each table
@@ -354,6 +382,7 @@ public class ELLE_GUI_Frame extends JFrame implements ITableConstants {
         menuItemLoadsTable = new javax.swing.JMenuItem();
         viewmatches = new javax.swing.JMenuItem();
         viewnomatches = new javax.swing.JMenuItem();
+        menuItemDefaultColumnWidths = new javax.swing.JMenuItem();
         menuHelp = new javax.swing.JMenu();
         menuOther = new javax.swing.JMenu();
         menuItemIB8949 = new javax.swing.JMenuItem();
@@ -866,7 +895,9 @@ public class ELLE_GUI_Frame extends JFrame implements ITableConstants {
         });
         menuView.add(menuItemCheckBoxSQL);
 
-        menuItemAViewATrades.setText("Display Selected Trade");
+        menuItemAViewATrades.setText("Display Record");
+        menuItemAViewATrades.setToolTipText("");
+        menuItemAViewATrades.setEnabled(false);
         menuItemAViewATrades.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 menuItemAViewATradesActionPerformed(evt);
@@ -916,6 +947,14 @@ public class ELLE_GUI_Frame extends JFrame implements ITableConstants {
             }
         });
         menuView.add(viewnomatches);
+
+        menuItemDefaultColumnWidths.setText("Default Column Widths");
+        menuItemDefaultColumnWidths.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                menuItemDefaultColumnWidthsActionPerformed(evt);
+            }
+        });
+        menuView.add(menuItemDefaultColumnWidths);
 
         menuBar.add(menuView);
 
@@ -1496,9 +1535,10 @@ public class ELLE_GUI_Frame extends JFrame implements ITableConstants {
     private void menuItemAViewATradesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuItemAViewATradesActionPerformed
         AccountTable selectedTab = getSelectedTab();
         JTable selectedTable = selectedTab.getTable();
+        String tableName = selectedTab.getTableName();
         int row = selectedTable.getSelectedRow();
         aTradeInView = new ATrade(row, selectedTab);
-        viewATradeWindow = new ViewATradeWindow(aTradeInView);
+        viewATradeWindow = new ViewATradeWindow(aTradeInView, tableName);
         viewATradeWindow.setVisible(true);
     }//GEN-LAST:event_menuItemAViewATradesActionPerformed
 
@@ -1530,7 +1570,7 @@ public class ELLE_GUI_Frame extends JFrame implements ITableConstants {
             btnTableDisplayState.setText(accountTable.getView());
         }
 
-        setColumnFormat(colWidths, accountTable.getTable());
+        setColumnFormat(accountTable.getTable());
         displayTable(tabName, tableName);
     }//GEN-LAST:event_btnTableDisplayStateMouseClicked
 
@@ -1614,6 +1654,64 @@ public class ELLE_GUI_Frame extends JFrame implements ITableConstants {
                 + "Version: " + version);
     }//GEN-LAST:event_menuItemVersionActionPerformed
 
+    private void menuItemDefaultColumnWidthsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuItemDefaultColumnWidthsActionPerformed
+       adjustCurrentTabColumnWidths(); 
+    }//GEN-LAST:event_menuItemDefaultColumnWidthsActionPerformed
+    
+    //Returns the columns of all of the tables in the selected tab to their default widths
+    public void adjustCurrentTabColumnWidths(){
+        for(String table: tables)
+        adjustTableColumnWidths(table);
+    }
+    
+    // Returns columns of the the specified table in selected tab to their default widths
+    public void adjustTableColumnWidths(String tableName){
+        String tabName = getSelectedTabName();
+        JTable table = tabs.get(tabName).get(tableName).getTable();
+        TableColumnAdjuster tableColumnAdjuster = new TableColumnAdjuster(table);
+        tableColumnAdjuster.adjustColumns();
+    }
+    
+    // Corinne Martus  
+    //June 30, 2016
+    //Called after tables load to display an alert message for 
+    //any column changes on the server
+    public void displayTableColumnAlert(){
+        if (hasUnexpectedColumnAlert.containsValue(true) 
+                || hasDeletedColumnAlert.containsValue(true)){
+            System.out.print(tableColumnAlertMessage + "\n");
+            
+            if(hasUnexpectedColumnAlert.containsValue(true)){
+                System.out.print(unexpectedColumnLog);
+            }
+            if (hasDeletedColumnAlert.containsValue(true)){
+                System.out.print(missingColumnLog);
+            }
+            
+            
+            
+            Object[] optionViewLog = {"View Log", "OK"};
+            
+         
+            int n = JOptionPane.showOptionDialog(null, tableColumnAlertMessage, 
+                    "Alert", JOptionPane.OK_CANCEL_OPTION,JOptionPane.INFORMATION_MESSAGE, null, optionViewLog, optionViewLog[0] );
+           
+                if(n == 0){
+                LogWindow logWindow = new LogWindow();
+                logWindow.setLocationRelativeTo(this);
+                logWindow.setVisible(true); // show log window
+
+                // remove check if window is closed from the window
+                logWindow.addWindowListener(new WindowAdapter() {
+                    @Override
+                    public void windowClosing(WindowEvent e) {
+                        menuItemCheckBoxLog.setSelected(false);
+                    }
+                });
+            } 
+        }
+    }
+    
     private void reloadDataAction() {
         // reload modified table data into dropdown list
         loadTables(tabs);
@@ -1676,6 +1774,7 @@ public class ELLE_GUI_Frame extends JFrame implements ITableConstants {
 
         return tabs;
     }
+    
 
     /**
      * loadTable This method takes a table and loads it Does not need to pass
@@ -1685,21 +1784,40 @@ public class ELLE_GUI_Frame extends JFrame implements ITableConstants {
      * @param table
      */
     public JTable loadTable(JTable table, String tableName, String accountName) {
-
+        TableFromServer tableFromServer;
+        DefaultTableModel tableModel = new DefaultTableModel();
         // check what table it is
         switch (tableName) {
             case TRADES_TABLE_NAME:
-                loadTableTrades(table,accountName);
+                tableFromServer = new TableFromServer(tableName, accountName, TRADE_COLUMN_NAME_CONSTANTS,
+                hasDeletedColumnAlert, hasUnexpectedColumnAlert);
                 break;
             case POSITIONS_TABLE_NAME:
-                loadTablePositions(table,accountName);
+                tableFromServer = new TableFromServer(tableName, accountName, POSITIONS_COLUMN_NAME_CONSTANTS,
+                hasDeletedColumnAlert, hasUnexpectedColumnAlert);
                 break;
             case ALLOCATIONS_TABLE_NAME:
-                loadTableAllocations(table,accountName);
+                tableFromServer = new TableFromServer(tableName, accountName, ALLOCATIONS_COLUMN_NAME_CONSTANTS,
+                hasDeletedColumnAlert, hasUnexpectedColumnAlert);
                 break;
             default:
-                break;
+                System.out.print("Not a valid table name");
+                throw new RuntimeException();
         }
+        //Update maps so that alerts will not display more than once for this table 
+        hasDeletedColumnAlert = tableFromServer.updatehasDeletedColumnAlert();
+        hasUnexpectedColumnAlert = tableFromServer.updatehasUnexpectedColumnAlert();
+        
+        //Update log messages
+        missingColumnLog += tableFromServer.getMissingColumnLog();
+        unexpectedColumnLog += tableFromServer.getUnexpectedColumnLog();
+        
+        //store any alert messages for changes to the table's column(s) on the server
+        tableColumnAlertMessage += tableFromServer.getTableColumnAlert();
+        
+        tableModel = tableFromServer.getTableModel();
+        EditableTableModel etm = new EditableTableModel(tableModel, tableFromServer.getColumnClasses());
+        table.setModel(etm);
         
         // check that the filter items are initialized
         AccountTable accountTable = tabs.get(accountName).get(tableName);
@@ -1716,16 +1834,7 @@ public class ELLE_GUI_Frame extends JFrame implements ITableConstants {
         ColumnPopupMenu columnPopupMenu = accountTable.getColumnPopupMenu();
         columnPopupMenu.loadAllCheckBoxItems();
 
-        // set column format
-        Map<String, Integer> colWidthPercent;
-
-        if(accountTable.isAllFields()){
-            colWidthPercent = accountTable.getColWidthPercentAllFields();
-        }
-        else{
-            colWidthPercent = accountTable.getColWidthPercentDefaultView();
-        }
-        setColumnFormat(colWidthPercent, table);
+        setColumnFormat(table);
 
         // set the listeners for the table
         setTableListeners(accountTable);
@@ -1734,117 +1843,6 @@ public class ELLE_GUI_Frame extends JFrame implements ITableConstants {
         formatTable(table);
 
         return table;
-    }
-    
-    private void loadTableTrades(JTable table,String accountName){
-        
-        // clear table model
-        DefaultTableModel model = (DefaultTableModel)table.getModel();
-        model.setRowCount(0);
-        model.setColumnCount(TRADES_COL_NAMES.length);
-        
-        // DAO
-        ArrayList<Trade> trades = tradeDAO.get(accountName);
-        if(!trades.isEmpty() && trades != null){
-            for(Trade trade: trades){
-                inserTableRow(table, trade);
-            }
-        }
-
-        // get the data from the table model	
-        Vector data = new Vector();
-        model = (DefaultTableModel)table.getModel();
-        data = model.getDataVector();
-        
-        // get the column names
-        Vector columnNames = new Vector();
-        for(String colName: TRADES_COL_NAMES){
-            columnNames.addElement(colName);
-        }
-
-        // get the column classes
-        Vector columnClasses = new Vector();
-        model.setColumnCount(columnNames.size());
-        for(int i = 0; i < model.getColumnCount();i++){
-            columnClasses.addElement(model.getColumnClass(i).toString());
-        }
-        
-        EditableTableModel etm = new EditableTableModel(data, columnNames, columnClasses);
-        table.setModel(etm);
-    }
-    
-    private void loadTablePositions(JTable table,String accountName){
-
-        // clear table model
-        DefaultTableModel model = (DefaultTableModel)table.getModel();
-        model.setRowCount(0);
-        model.setColumnCount(POSITIONS_COL_NAMES.length);
-        
-        // DAO
-        ArrayList<Position> positions = PositionDAO.get(accountName);
-        if(!positions.isEmpty() && positions != null){
-            for(Position position: positions){
-                inserTableRow(table, position);
-            }
-        }
-
-        // get the data from the table model	
-        Vector data = new Vector();
-        model = (DefaultTableModel)table.getModel();
-        data = model.getDataVector();
-        
-        // get the column names
-        Vector columnNames = new Vector();
-        for(String colName: POSITIONS_COL_NAMES){
-            columnNames.addElement(colName);
-        }
-
-        // get the column classes
-        Vector columnClasses = new Vector();
-        model.setColumnCount(columnNames.size());
-        for(int i = 0; i < model.getColumnCount();i++){
-            columnClasses.addElement(model.getColumnClass(i).toString());
-        }
-        
-        EditableTableModel etm = new EditableTableModel(data, columnNames, columnClasses);
-        table.setModel(etm);
-    }
-    
-    private void loadTableAllocations(JTable table,String accountName){
-
-        // clear table model
-        DefaultTableModel model = (DefaultTableModel)table.getModel();
-        model.setRowCount(0);
-        model.setColumnCount(ALLOCATIONS_COL_NAMES.length);
-        
-        // DAO
-        ArrayList<Allocation> allocations = AllocationDAO.get(accountName);
-        if(!allocations.isEmpty() && allocations != null){
-            for(Allocation allocation: allocations){
-                inserTableRow(table, allocation);
-            }
-        }
-
-        // get the data from the table model	
-        Vector data = new Vector();
-        model = (DefaultTableModel)table.getModel();
-        data = model.getDataVector();
-        
-        // get the column names
-        Vector columnNames = new Vector();
-        for(String colName: ALLOCATIONS_COL_NAMES){
-            columnNames.addElement(colName);
-        }
-
-        // get the column classes
-        Vector columnClasses = new Vector();
-        model.setColumnCount(columnNames.size());
-        for(int i = 0; i < model.getColumnCount();i++){
-            columnClasses.addElement(model.getColumnClass(i).toString());
-        }
-        
-        EditableTableModel etm = new EditableTableModel(data, columnNames, columnClasses);
-        table.setModel(etm);
     }
     
     /**
@@ -2434,7 +2432,7 @@ public class ELLE_GUI_Frame extends JFrame implements ITableConstants {
 //                                if (jLabelEdit.getText().equals("ON ")) {
 //                                    selectAllText(e);
 //                                }
-
+                                menuItemAViewATrades.setEnabled(true);
                             }
                         } // end if left mouse clicks
                         // if right mouse clicks
@@ -2579,21 +2577,34 @@ public class ELLE_GUI_Frame extends JFrame implements ITableConstants {
      * @param width
      * @param table
      */
-    public void setColumnFormat(Map<String, Integer> colWidths, JTable table) {
+    
+    public void setColumnFormat(JTable table) {
 
         // this is needed for the horizontal scrollbar to appear
         table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
-        int colWidth;
+         table.getTableHeader().setResizingAllowed(true);
+         TableColumnAdjuster tableColumnAdjuster = new TableColumnAdjuster(table);
+         tableColumnAdjuster.adjustColumns();
+         
+         table.getTableHeader().addMouseListener(new MouseAdapter() {
+        @Override
+        public void mousePressed(MouseEvent e) {
+        int col = table.columnAtPoint(e.getPoint());
+         table.getTableHeader().setResizingColumn(table.getColumnModel().getColumn(col));
+        }
+        
+         /*int colWidth;
         for (int i = 0; i < table.getColumnCount(); i++) {
 
             TableColumn column = table.getColumnModel().getColumn(i);
             String tableColName = table.getColumnName(i);
             colWidth = colWidths.get(tableColName);
             column.setMinWidth(colWidth);
-            column.setMaxWidth(colWidth);
+            column.setMaxWidth(colWidth + 100);
             column.setPreferredWidth(colWidth);
-        }
-    }
+        }*/
+                 });
+                 }
 
     /**
      * applySymbolSearchFilter apply symbol search filter.
@@ -2798,6 +2809,7 @@ public class ELLE_GUI_Frame extends JFrame implements ITableConstants {
     private javax.swing.JCheckBoxMenuItem menuItemCheckBoxLog;
     private javax.swing.JCheckBoxMenuItem menuItemCheckBoxSQL;
     private javax.swing.JMenuItem menuItemConnection;
+    private javax.swing.JMenuItem menuItemDefaultColumnWidths;
     private javax.swing.JMenuItem menuItemIB;
     private javax.swing.JMenuItem menuItemIB8949;
     private javax.swing.JMenuItem menuItemLoadFile;

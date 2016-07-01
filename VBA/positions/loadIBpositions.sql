@@ -1,5 +1,18 @@
+/* loadIBpositions script for loading positions from IB.
+Professor 2016-06-26
+
+The following tables are loaded:
+- positions
+
+The Excel download of the trades is first cleaned in VBA through cleanIBpositions VBA Macro.
+This Macro cleans and formats the file and produces 4SQL.cvs files ready for upload later
+*/
+
 USE pupone_EG_LOAD;
 
+set @`timeStamp`=Now();
+ 
+ 
 
 SET @max = (SELECT COUNT(*) FROM positions);
 SET @max = - @max;
@@ -7,7 +20,7 @@ SET sql_mode = 'NO_UNSIGNED_SUBTRACTION';
 
 
 LOAD DATA LOCAL INFILE
-'/Users/luca/Dropbox/ELLE/ELLE Portfolio Management/4SQL/positions 4SQL/PositionsDL 111231 TEST-positions-60626R-4SQL.csv'
+'/Users/luca/Dropbox/ELLE/ELLE Portfolio Management/4SQL/positions 4SQL/PositionsDL 111231 TEST-positions-60626I-4SQL.csv'
 INTO TABLE positions
 FIELDS OPTIONALLY ENCLOSED BY '"' TERMINATED BY ','
 LINES TERMINATED BY '\n'
@@ -26,3 +39,5 @@ SET
     yr = Date_Format(lot_Time, "%Y");
 
 UPDATE positions SET expiry = NULL WHERE expiry = '0000-00-00';
+
+insert into timeStamps (timeStamp,script,file) values(@`timeStamp`,'loadIBpositions','PositionsDL 111231 TEST-positions-60626I-4SQL.csv');

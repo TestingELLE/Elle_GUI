@@ -16,40 +16,47 @@ import java.util.Vector;
  * @author Carlos Igreja
  * @since June 10, 2015
  * @version 0.6.3
+ * 
+ * Modified by Corinne Martus
+ * June 27, 2016
+ * Version 1.2.3
+ * To receive a DefaultTableModel and retrieve the column names, 
+ * class types, and data from the model
  */
 public class EditableTableModel extends DefaultTableModel {
-
+    Class[] columnClasses;
     private boolean cellEditable;
-    private Vector columnClass;
-
+   Vector columnNames;
+   
     /**
      * CONSTRUCTOR EditableTableModel
-     *
-     * @param data
-     * @param columnNames
-     * @param isCellEditable
      */
-    public EditableTableModel(Vector data, Vector columnNames, Vector colClass) {
-        super(data, columnNames);
+    public EditableTableModel(DefaultTableModel sourceModel,Class[] columnClasses) {  
+        super(sourceModel.getDataVector(),getColumnNamesFromModel(sourceModel));
         cellEditable = false;
-        columnClass = colClass;
+      this.columnClasses = columnClasses;
+    }
+    public static Vector getColumnNamesFromModel (DefaultTableModel sourceModel){
+       Vector names = new Vector();
+        for (int col = 0; col < sourceModel.getColumnCount(); col ++){
+            names.addElement(sourceModel.getColumnName(col));
+        }
+        return names;
     }
 
     /**
      * isCellEditable Makes table editable or non editable
-     *
-     * @param row
-     * @param col
+     * @param rowIndex
+     * @param columnIndex
      * @return
      */
     @Override
-    public boolean isCellEditable(int row, int col) {
-        return cellEditable;
+    public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return cellEditable;
     }
-
+    
     /**
      * isCellEditable
-     *
      * @return
      */
     public boolean isCellEditable() {
@@ -65,62 +72,39 @@ public class EditableTableModel extends DefaultTableModel {
         this.cellEditable = cellEditable;
     }
     
-    
-    public Vector<Object> getRowAt(int row) {
-        Vector rowData = new Vector(columnClass.size());
-        for (int i = 0; i < columnClass.size(); i++) {
-            rowData.add(this.getValueAt(row, i));
-        }
-        return rowData;
-    }
-    
-    public Vector<Object> getColumnAt(int col) {
-        Vector colData = new Vector(this.getRowCount());
-        for (int i = 0; i < this.getRowCount(); i++) {
-            colData.add(this.getValueAt(i, col));
-        }
-        return colData;
-    }
-
-    /**
-     * Override getColumnClass() in DefaultTableModel
-     *
-     * @param col
-     * @return class
-     */
-    @Override
-    public Class getColumnClass(int col) {
-        // get class name of that column
-        String columnClassName = (String) columnClass.get(col);
-
-        int indexOfDotInClassName = columnClassName.indexOf(".", 5)+1;
-        columnClassName = columnClassName.substring(indexOfDotInClassName).toLowerCase();
+    /*public void getSelectedRowContent(int Id){
         
-        switch(columnClassName){
-            case "string":
-                return String.class;
-            case "integer": case "int": case "long":
-                return Integer.class;
-            case "date":
-                return Date.class;
-            case "bigdecimal":
-                return BigDecimal.class;
-            case "timestamp":
-                return Timestamp.class;
-            default:
-                return Object.class;
-                
-        }
-
-    }
-
-    public Vector getColumnClass() {
-        return columnClass;
-    }
-
-    public void setColumnClass(Vector columnClass) {
-        this.columnClass = columnClass;
-    }
-
+    }*/
+    /**
+     * Override getColumnClass() in DefaultTableModel     *
+     * @param columnIndex
+     */
+    //@Override
+    /*public Class getColumnClass(int columnIndex){
+        Class columnClassType;
+        columnClassType = colClassTypes[columnIndex];
+        return columnClassType;
+    }*/
     
+   /* @Override
+     public Class<?> getColumnClass(int col) {
+         Class columnClass;
+         if (columnClasses != null && columnClasses[col] != null){
+            columnClass = columnClasses[col]; 
+         }
+         else{
+             columnClass = String.class;
+         }
+         return columnClass;
+         
+         
+     }
+    /*private void copyColumnClasses(DefaultTableModel sourceModel) {
+        {
+            colClassTypes = new Class[sourceModel.getColumnCount()];
+               for (int col = 0; col < sourceModel.getColumnCount(); col++){
+                   colClassTypes[col] = this.getColumnClass(col);
+               }
+            }
+    }*/
 }
