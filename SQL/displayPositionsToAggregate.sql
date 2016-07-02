@@ -1,7 +1,8 @@
-CREATE PROCEDURE `displayPositionsToAggregate`(IN MYTABLE varchar(50))
+CREATE PROCEDURE `displayPositionsToAggregate`()
 BEGIN	
 	drop temporary table if exists aggregatedCalculation_temporary;
-	SET @cmd1 = CONCAT('create temporary table if not exists aggregatedCalculation_temporary
+	
+create temporary table if not exists aggregatedCalculation_temporary;
     select l2.pos_id as grp,sum(l2.Q) as sumOfQ,sum(l2.basis_adj) as sumOfBasis,
     avg(l2.multi) as avgOfMulti, sum(l2.basis_adj)/sum(l2.Q)/avg(l2.multi) as price_adj
     from ',MYTABLE,' l2
