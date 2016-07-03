@@ -15,7 +15,7 @@ import javax.swing.table.TableColumn;
 
 /**
  *
- * @author ren
+ * @author Wei, class for loading data (either from csv or server) into a table.
  */
 public class read_csv extends javax.swing.JFrame {
 

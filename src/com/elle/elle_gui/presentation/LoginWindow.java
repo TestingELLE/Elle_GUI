@@ -348,14 +348,14 @@ public class LoginWindow extends JFrame {
         // connect to database
         logWindow.addMessageWithDate("Start to connect local database...");
         if (DBConnection.connect(selectedServer, selectedDB, userName, userPassword)) {
-            logWindow.addMessageWithDate("Connect successfully!");
+            logWindow.addMessageWithDate("Connection successful!");
 
             // authorize user
             if (!Authorization.getInfoFromDB()) {
 
                 logWindow.addMessageWithDate("This user has not been authorized!"
                         + "\n Access denied!");
-                JOptionPane.showMessageDialog(this, "You have not been authorized. Default user access.");
+                JOptionPane.showMessageDialog(this, "Logged in as default user.");
             }
 
             // create an Analyster object
