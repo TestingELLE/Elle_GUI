@@ -380,7 +380,13 @@ public class TableFilter extends RowFilter<TableModel, Integer> {
      */
     public boolean isDateRangeFiltering() {
         int col = getDateColumnIndex();
-        return !filterItems.get(col).isEmpty();
+        
+        if (filterItems.get(col) == null) {
+            return false;
+        } else {
+            return !filterItems.get(col).isEmpty();
+        }
+
     }
 
     /**

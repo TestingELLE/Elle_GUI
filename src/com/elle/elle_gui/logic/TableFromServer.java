@@ -162,7 +162,7 @@ public class TableFromServer  {
         }
         
         if(newColumn && !hasUnexpectedColumnAlert.get(tableName)){            
-           tableColumnAlert +=  "Unexpected column(s) exists in the " + tableName+ " table on the server-\n"
+           tableColumnAlert +=  "\nUnexpected column(s) exists in the " + tableName+ " table on the server-\n"
                         + " This column(s) will be added to the end of the " + tableName+ " table\n\n";
             
             //Update map so that this alert will not display again for this table
@@ -187,7 +187,7 @@ public class TableFromServer  {
         }
         
         if(missingColumn && !hasDeletedColumnAlert.get(tableName)){
-           tableColumnAlert += "Other column(s) are expected in the " + tableName +
+           tableColumnAlert += "\nOther column(s) are expected in the " + tableName +
                     " table, but do not exist on the server\n\n"; 
             
             //Update map so that this alert will not display again for this table
