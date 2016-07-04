@@ -1,9 +1,5 @@
-DELIMITER $$
-
-CREATE PROCEDURE`displayTradesToAggregate`()
-
-SQL SECURITY INVOKER
-
+CREATE DEFINER=`pupone_Shenrui`@`%` PROCEDURE `displayTradesToAggregate`()
+    SQL SECURITY INVOKER
 BEGIN
     
     -- creates a temporary table from orderTable grouped by symbol and Trade_time with aggregate columns
@@ -11,11 +7,11 @@ BEGIN
     # Then it only aggregates the records which need to be aggregated
     drop temporary table if exists aggregatedCalculation_temporary;
     create temporary table if not exists aggregatedCalculation_temporary
-    select min(l2.id) as grp,sum(l2.Q) as sumOfQ,sum(l2.basis) as sumOfBasis,
+    select min(abs(l2.id)) as grp,sum(l2.Q) as sumOfQ,sum(l2.basis) as sumOfBasis,
     avg(l2.multi) as avgOfMulti, -sum(l2.proceeds)/sum(l2.Q)/avg(l2.multi) as price,sum(l2.comm) as sumOfComm,
     sum(l2.proceeds) as sumOfProceeds
     from trades l2
-    where OC = "O" and !field(ksflag,"ks","bk","tot")
+    where OC = "O" and !field(ksflag,"ks","bk")
     and 
     exists(select "X" from trades group_team
     where group_team.symbol=l2.symbol and group_team.trade_Time=l2.trade_Time and
@@ -63,6 +59,4 @@ BEGIN
     order by underlying, symbol, t_grp,FIELD(ksflag,'bk','tot'),id;
     
 
-END$$
-
-DELIMITER ;
+END
