@@ -1,19 +1,15 @@
-DELIMITER $$
-
-create procedure `displayPositionsToAggregate`()
-
-SQL SECURITY INVOKER
-
+CREATE DEFINER=`pupone_Shenrui`@`%` PROCEDURE `displayPositionsToAggregate`()
+    SQL SECURITY INVOKER
 BEGIN
-	# creates a temporary table from orderTable grouped by symbol and Trade_time with aggregate columns
+    # creates a temporary table from orderTable grouped by symbol and Trade_time with aggregate columns
     # only for the record which have close price, same symbol and same lot_time. The records which don't need to be aggregated will be filter out
     # Then it only aggregates the records which need to be aggregated
     drop temporary table if exists aggregatedCalculation_temporary;
     create temporary table if not exists aggregatedCalculation_temporary
-    select min(l2.pos_id) as grp,sum(l2.Q) as sumOfQ,sum(l2.basis_adj) as sumOfBasis,
+    select max(l2.pos_id) as grp,sum(l2.Q) as sumOfQ,sum(l2.basis_adj) as sumOfBasis,
     avg(l2.multi) as avgOfMulti, sum(l2.basis_adj)/sum(l2.Q)/avg(l2.multi) as price_adj
     from positions l2
-    where OCE = "O" and !field(ksflag,"ks","bk","tot")
+    where OCE = "O" and !field(ksflag,"ks","bk")
     and 
     exists(select "X" from positions group_team
     where group_team.symbol=l2.symbol and group_team.lot_Time=l2.lot_Time and
@@ -26,6 +22,7 @@ BEGIN
     -- creates a temporary table with all of the fields from the current table and 
     -- showing records which exist in the current table and the aggregatedCalculation_temporary 
     -- table (grouped trades). Since we need to get data from the first bk record.
+    drop temporary table if exists aggregatedTable_temporary;
     create temporary table if not exists aggregatedTable_temporary 
     select t1.* from positions t1
     right join 
@@ -51,7 +48,7 @@ BEGIN
     update individualTable_temporary as t1,aggregatedTable_temporary as t2
     set t1.ksflag='bk', t1.grp=t2.grp
     where t1.symbol=t2.symbol and t1.lot_Time=t2.lot_Time and
-    t1.price_adj between t2.price_adj-0.01 and t2.price_adj+0.01;
+    t1.price_adj between t2.price_adj-0.02 and t2.price_adj+0.02;
     
     -- display the table by order
     select * from individualTable_temporary t1
@@ -60,6 +57,4 @@ BEGIN
     (select * from aggregatedTable_temporary)
     order by underlying, symbol, grp,FIELD(ksflag,'bk','tot'), pos_id DESC;
 
-END$$
-
-DELIMITER ;
+END

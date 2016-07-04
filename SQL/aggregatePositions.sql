@@ -1,8 +1,5 @@
-DELIMITER $$
-
-CREATE PROCEDURE `aggregatePositions`()
+CREATE DEFINER=`pupone_Shenrui`@`%` PROCEDURE `aggregatePositions`()
     SQL SECURITY INVOKER
-    
 BEGIN
     # turn safe mode off
     set SQL_SAFE_UPDATES=0;
@@ -22,10 +19,10 @@ BEGIN
     
     drop temporary table if exists aggregatedCalculation_temporary;
     create temporary table if not exists aggregatedCalculation_temporary
-    select min(l2.pos_id) as grp,sum(l2.Q) as sumOfQ,sum(l2.basis_adj) as sumOfBasis,
+    select max(l2.pos_id) as grp,sum(l2.Q) as sumOfQ,sum(l2.basis_adj) as sumOfBasis,
     avg(l2.multi) as avgOfMulti, sum(l2.basis_adj)/sum(l2.Q)/avg(l2.multi) as price_adj
     from orderedtable l2
-    where OCE = "O" and !field(ksflag,"ks","bk","tot")
+    where OCE = "O" and !field(ksflag,"ks","bk")
     and 
     exists(select "X" from positions group_team
     where group_team.symbol=l2.symbol and group_team.lot_Time=l2.lot_Time and
@@ -62,7 +59,7 @@ BEGIN
     update individualTable_temporary as t1,aggregatedTable_temporary as t2
     set t1.ksflag='bk', t1.grp=t2.grp,t1.`timeStamp`=@`timeStamp`
     where t1.symbol=t2.symbol and t1.lot_Time=t2.lot_Time and
-    t1.price_adj between t2.price_adj-0.01 and t2.price_adj+0.01;
+    t1.price_adj between t2.price_adj-0.02 and t2.price_adj+0.02;
     
     /*
     set SQL_SAFE_UPDATES=0;
@@ -88,6 +85,4 @@ BEGIN
     delete from positions where pos_id in (select pos_id from aggregatedPositions) and ksflag<>"tot";
     
 
-END$$
-
-DELIMITER ;
+END
