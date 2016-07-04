@@ -73,16 +73,14 @@ BEGIN
     Insert into positions
     select * from aggregatedTable_temporary;
     
-    -- inserts the bk records into the current table 
-    Insert into positions
-    select * from individualTable_temporary where ksflag="bk";
-    
     -- inserts the aggregated records into the aggregated table 
     Insert into aggregatedPositions
-    select * from positions where ksflag="bk" or ksflag="tot";
+    select * from aggregatedTable_temporary;
+    
+    Insert into aggregatedPositions
+    select * from individualTable_temporary where ksflag="bk";
     
     -- delete original and bk records from the current table 
     delete from positions where pos_id in (select pos_id from aggregatedPositions) and ksflag<>"tot";
     
-
 END

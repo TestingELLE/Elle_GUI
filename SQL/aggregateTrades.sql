@@ -65,8 +65,11 @@ BEGIN
 
     -- inserts the aggregated trades into the aggregatedTrades table 
     Insert into aggregatedTrades
-    select * from trades where ksflag="bk" or ksflag="tot"
-    order by underlying, symbol, t_grp,FIELD(ksflag,'bk','tot'),id;
+    select * from aggregatedTable_temporary;
+    
+    Insert into aggregatedTrades
+    select * from trades
+    where ksflag="bk";
     
     #remove trades with ksflag = bk from the current table
     delete from trades where ksflag = "bk";
