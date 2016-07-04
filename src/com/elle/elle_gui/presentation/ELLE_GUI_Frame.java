@@ -2145,7 +2145,7 @@ public class ELLE_GUI_Frame extends JFrame implements ITableConstants {
         readcsvfiles.setVisible(true);
         readcsvfiles.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
     }
-
+    
     private String removeAnyCommas(String src) {
         if(src == null) {
             return "";
