@@ -1,27 +1,28 @@
-DELIMITER //
-CREATE DEFINER=`pupone_Corinne`@`%` PROCEDURE `aggregateTrades`()
-SQL SECURITY INVOKER
+CREATE DEFINER=`pupone_Shenrui`@`%` PROCEDURE `aggregateTrades`()
+    SQL SECURITY INVOKER
 BEGIN 
     -- turn safe mode off
     set SQL_SAFE_UPDATES=0;
       
     set @`timeStamp`=Now();
     
-	insert into `timeStamps` (timeStamp, script) values (@`timeStamp`, 'aggregateTrades');
+    insert into `timeStamps` (timeStamp, script) values (@`timeStamp`, 'aggregateTrades');
     
    -- creates a temporary table sorted by ID
     drop temporary table if exists orderedtable;
     create temporary table if not exists orderedtable
-    select * from trades order by id DESC;
+    select * from trades order by id;
    
-    -- creates a temporary table from orderTable grouped by symbol and Trade_time with aggregate columns
+    # creates a temporary table from orderTable grouped by symbol and Trade_time with aggregate columns
+    #only for the record which have close price, same symbol and same lot_time. The records which don't need to be aggregated will be filter out
+    #Then it only aggregates the records which need to be aggregated
     drop temporary table if exists aggregatedCalculation_temporary;
     create temporary table if not exists aggregatedCalculation_temporary
-    select l2.id as grp,sum(l2.Q) as sumOfQ,sum(l2.basis) as sumOfBasis,
+    select min(abs(l2.id)) as grp,sum(l2.Q) as sumOfQ,sum(l2.basis) as sumOfBasis,
     avg(l2.multi) as avgOfMulti, -sum(l2.proceeds)/sum(l2.Q)/avg(l2.multi) as price,sum(l2.comm) as sumOfComm,
     sum(l2.proceeds) as sumOfProceeds
     from orderedtable l2
-    where OC = "O" and !field(ksflag,"ks","bk","tot")
+    where OC = "O" and !field(ksflag,"ks","bk")
     and 
     exists(select "X" from trades group_team
     where group_team.symbol=l2.symbol and group_team.trade_Time=l2.trade_Time and
@@ -32,16 +33,13 @@ BEGIN
    
     -- creates a temporary table with all of the fields from the current table and 
     -- showing records which exist in the current table and the aggregatedCalculation_temporary 
-    -- table (grouped trades)
+    -- table (grouped trades) Since we need to get data from the first bk record.
     drop temporary table if exists aggregatedTable_temporary;    
     create temporary table if not exists aggregatedTable_temporary 
     select t1.* from trades t1
     right join 
     aggregatedCalculation_temporary t2
     on t1.id=t2.grp;
-    
-    -- turns off safe mode
-    set SQL_SAFE_UPDATES=0;
     
     -- replaces the fields in the above table
     -- with the aggregates created in the temporary table aggregatedCalculation_temporary
@@ -62,14 +60,19 @@ BEGIN
     
     -- inserts the aggregated fields and records into the current table
     Insert into trades
-    select * from aggregatedTable_temporary;
+    select * from aggregatedTable_temporary
+    order by underlying, symbol, t_grp,FIELD(ksflag,'bk','tot'),id;
 
     -- inserts the aggregated trades into the aggregatedTrades table 
     Insert into aggregatedTrades
-    select * from trades where ksflag="bk" or ksflag="tot";
+    select * from aggregatedTable_temporary;
     
-    -- remove trades with ksflag = bk from the current table
+    Insert into aggregatedTrades
+    select * from trades
+    where ksflag="bk";
+    
+    #remove trades with ksflag = bk from the current table
     delete from trades where ksflag = "bk";
     
-     END //
-     DELIMITER ;
+
+END
