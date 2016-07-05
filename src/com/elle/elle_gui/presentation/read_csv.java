@@ -42,7 +42,23 @@ public class read_csv extends javax.swing.JFrame {
     read_csv(Vector data, Vector columnNames) {
         DefaultTableModel model = new DefaultTableModel(data, columnNames);
         JTable table = new JTable(model);
-
+        
+        if (columnNames.size() == 6 && "author".equals(columnNames.lastElement().toString())){
+            
+            TableColumn column = null;
+            for (int i = 0; i < 6; i++) {
+                    column = table.getColumnModel().getColumn(i);
+                if (i == 0) {
+                    column.setPreferredWidth(40); 
+                } else if (i == 1){
+                    column.setPreferredWidth(160);
+                } else if (i == 4) {
+                    column.setPreferredWidth(500);
+                } else {
+                    column.setPreferredWidth(90);
+                }
+            }  
+        }
         table.setPreferredScrollableViewportSize(table.getPreferredSize());
 
         JScrollPane scrollPane = new JScrollPane(table);
@@ -51,7 +67,7 @@ public class read_csv extends javax.swing.JFrame {
         table.setFillsViewportHeight(true);
         pack();
     }
-
+    
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
