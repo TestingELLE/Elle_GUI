@@ -98,8 +98,8 @@ public class ELLE_GUI_Frame extends JFrame implements ITableConstants {
     String tableColumnAlertMessage;
     //Stores a message which logs columns which are contained in the column name constants,
     //but are missing from the resultSet
-    String missingColumnLog; 
-    String unexpectedColumnLog; //logs columns not contained in the column name constants
+    String missingColumnLog = ""; 
+    String unexpectedColumnLog = ""; //logs columns not contained in the column name constants
     
 
     // components
@@ -304,6 +304,11 @@ public class ELLE_GUI_Frame extends JFrame implements ITableConstants {
         // start the other tables initially on positions
         tabs.get(TOS3622_ACCOUNT_NAME).get(POSITIONS_TABLE_NAME).setTableSelected(true);
         tabs.get(COMBINED_ACCOUNT_NAME).get(POSITIONS_TABLE_NAME).setTableSelected(true);
+        
+        //gray out the existign three taps in other menu
+        menuItemIB8949.setEnabled(false);
+        menuItemReconcile.setEnabled(false);
+        menuItemTL8949.setEnabled(false);
 
         Authorization.authorize(this);
     }
@@ -371,8 +376,6 @@ public class ELLE_GUI_Frame extends JFrame implements ITableConstants {
         menuTools = new javax.swing.JMenu();
         menuItemBackup = new javax.swing.JMenuItem();
         menuItemReloadTabData = new javax.swing.JMenuItem();
-        menuLoad = new javax.swing.JMenu();
-        menuItemLoadFile = new javax.swing.JMenuItem();
         menuView = new javax.swing.JMenu();
         menuItemCheckBoxLog = new javax.swing.JCheckBoxMenuItem();
         menuItemCheckBoxSQL = new javax.swing.JCheckBoxMenuItem();
@@ -383,6 +386,7 @@ public class ELLE_GUI_Frame extends JFrame implements ITableConstants {
         viewmatches = new javax.swing.JMenuItem();
         viewnomatches = new javax.swing.JMenuItem();
         menuItemDefaultColumnWidths = new javax.swing.JMenuItem();
+        menuItemObjectTable = new javax.swing.JMenuItem();
         menuHelp = new javax.swing.JMenu();
         menuOther = new javax.swing.JMenu();
         menuItemIB8949 = new javax.swing.JMenuItem();
@@ -864,19 +868,6 @@ public class ELLE_GUI_Frame extends JFrame implements ITableConstants {
 
         menuBar.add(menuTools);
 
-        menuLoad.setText("Load");
-
-        menuItemLoadFile.setText("Load File...");
-        menuItemLoadFile.setEnabled(false);
-        menuItemLoadFile.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                menuItemLoadFileActionPerformed(evt);
-            }
-        });
-        menuLoad.add(menuItemLoadFile);
-
-        menuBar.add(menuLoad);
-
         menuView.setText("View");
 
         menuItemCheckBoxLog.setText("Log");
@@ -955,6 +946,14 @@ public class ELLE_GUI_Frame extends JFrame implements ITableConstants {
             }
         });
         menuView.add(menuItemDefaultColumnWidths);
+
+        menuItemObjectTable.setText("Table Objects");
+        menuItemObjectTable.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                menuItemObjectTableActionPerformed(evt);
+            }
+        });
+        menuView.add(menuItemObjectTable);
 
         menuBar.add(menuView);
 
@@ -1138,10 +1137,6 @@ public class ELLE_GUI_Frame extends JFrame implements ITableConstants {
         print(panelAccounts);
 
     }//GEN-LAST:event_menuItemPrintDisplayWindowActionPerformed
-
-    private void menuItemLoadFileActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuItemLoadFileActionPerformed
-
-    }//GEN-LAST:event_menuItemLoadFileActionPerformed
 
     private void btnAllocationsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAllocationsActionPerformed
 
@@ -1657,6 +1652,11 @@ public class ELLE_GUI_Frame extends JFrame implements ITableConstants {
     private void menuItemDefaultColumnWidthsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuItemDefaultColumnWidthsActionPerformed
        adjustCurrentTabColumnWidths(); 
     }//GEN-LAST:event_menuItemDefaultColumnWidthsActionPerformed
+
+    private void menuItemObjectTableActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuItemObjectTableActionPerformed
+        //Wei 2016/07/03 using the same functions designed for loading matches or noMatchs and csv reading. 
+        loadtablematchesornomatches("select * from tableObjects");
+    }//GEN-LAST:event_menuItemObjectTableActionPerformed
     
     //Returns the columns of all of the tables in the selected tab to their default widths
     public void adjustCurrentTabColumnWidths(){
@@ -1682,10 +1682,10 @@ public class ELLE_GUI_Frame extends JFrame implements ITableConstants {
             System.out.print(tableColumnAlertMessage + "\n");
             
             if(hasUnexpectedColumnAlert.containsValue(true)){
-                System.out.print(unexpectedColumnLog);
+                System.out.print("\n" + unexpectedColumnLog + "\n");
             }
             if (hasDeletedColumnAlert.containsValue(true)){
-                System.out.print(missingColumnLog);
+                System.out.print("\n" + missingColumnLog + "\n");
             }
             
             
@@ -1699,6 +1699,8 @@ public class ELLE_GUI_Frame extends JFrame implements ITableConstants {
                 if(n == 0){
                 LogWindow logWindow = new LogWindow();
                 logWindow.setLocationRelativeTo(this);
+                logWindow.readCurrentMessages("\n" + unexpectedColumnLog + "\n");
+                logWindow.readCurrentMessages("\n" + missingColumnLog + "\n");
                 logWindow.setVisible(true); // show log window
 
                 // remove check if window is closed from the window
@@ -2099,6 +2101,7 @@ public class ELLE_GUI_Frame extends JFrame implements ITableConstants {
      * 
      * @param sql 
      */
+    //Wei general class function for loading tables from mysql server. 
     private void loadtablematchesornomatches(String sql) {
         Vector data = new Vector();
         Vector columnNames = new Vector();
@@ -2142,7 +2145,7 @@ public class ELLE_GUI_Frame extends JFrame implements ITableConstants {
         readcsvfiles.setVisible(true);
         readcsvfiles.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
     }
-
+    
     private String removeAnyCommas(String src) {
         if(src == null) {
             return "";
@@ -2364,7 +2367,6 @@ public class ELLE_GUI_Frame extends JFrame implements ITableConstants {
                     if (e.getClickCount() == 2) {
                         e.consume();
                         clearFilterDoubleClick(e, table);
-                        
 
                     }
                     
@@ -2522,18 +2524,24 @@ public class ELLE_GUI_Frame extends JFrame implements ITableConstants {
      */
     public void filterByDoubleClick(JTable table) {
 
-        int columnIndex = table.getSelectedColumn(); // this returns the column i
-        int rowIndex = table.getSelectedRow(); // this returns the rowIndex i
+        //int columnIndex = table.getSelectedColumn(); // this returns the column i
+        
+        //Wei, make the filter working with underlying only.
+        int columnIndex = 20; 
+                
+        int rowIndex = table.getSelectedRow(); // this returns the rowIndex i 
         if (rowIndex != -1) {
             Object selectedField = table.getValueAt(rowIndex, columnIndex);
-            //String tabName = getSelectedTabName();
             AccountTable tab = getSelectedTab();
             TableFilter filter = tab.getFilter();
+            
+            
             filter.addFilterItem(columnIndex, selectedField);
             filter.applyFilter();
             String recordsLabel = tab.getRecordsLabel();
             labelRecords.setText(recordsLabel);
-
+            labelRecords.repaint();
+                
             // apply checkbox selection
             int dateColIndex = filter.getDateColumnIndex();
             if (columnIndex == dateColIndex) {
@@ -2569,6 +2577,7 @@ public class ELLE_GUI_Frame extends JFrame implements ITableConstants {
         // update records label
         String recordsLabel = tab.getRecordsLabel();
         labelRecords.setText(recordsLabel);
+        
     }
 
     /**
@@ -2812,10 +2821,10 @@ public class ELLE_GUI_Frame extends JFrame implements ITableConstants {
     private javax.swing.JMenuItem menuItemDefaultColumnWidths;
     private javax.swing.JMenuItem menuItemIB;
     private javax.swing.JMenuItem menuItemIB8949;
-    private javax.swing.JMenuItem menuItemLoadFile;
     private javax.swing.JMenuItem menuItemLoadsTable;
     private javax.swing.JMenuItem menuItemLocal;
     private javax.swing.JMenuItem menuItemLogOut;
+    private javax.swing.JMenuItem menuItemObjectTable;
     private javax.swing.JMenuItem menuItemPrintDisplayWindow;
     private javax.swing.JMenuItem menuItemPrintGUI;
     private javax.swing.JMenuItem menuItemPupone;
@@ -2826,7 +2835,6 @@ public class ELLE_GUI_Frame extends JFrame implements ITableConstants {
     private javax.swing.JMenuItem menuItemTL;
     private javax.swing.JMenuItem menuItemTL8949;
     private javax.swing.JMenuItem menuItemVersion;
-    private javax.swing.JMenu menuLoad;
     private javax.swing.JMenu menuOther;
     private javax.swing.JMenu menuPrint;
     private javax.swing.JMenu menuReports;
