@@ -1655,7 +1655,13 @@ public class ELLE_GUI_Frame extends JFrame implements ITableConstants {
 
     private void menuItemObjectTableActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuItemObjectTableActionPerformed
         //Wei 2016/07/03 using the same functions designed for loading matches or noMatchs and csv reading. 
-        loadtablematchesornomatches("select * from tableObjects");
+        //loadltableojects("select * from tableObjects");
+        
+        viewTableObjects tableobjectswindow = new viewTableObjects();        
+        tableobjectswindow.setLocation(200,200);
+        tableobjectswindow.setVisible(true);
+        tableobjectswindow.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        
     }//GEN-LAST:event_menuItemObjectTableActionPerformed
     
     //Returns the columns of all of the tables in the selected tab to their default widths
@@ -2145,7 +2151,7 @@ public class ELLE_GUI_Frame extends JFrame implements ITableConstants {
         readcsvfiles.setVisible(true);
         readcsvfiles.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
     }
-    
+      
     private String removeAnyCommas(String src) {
         if(src == null) {
             return "";
