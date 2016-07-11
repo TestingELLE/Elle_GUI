@@ -70,6 +70,7 @@ import javax.swing.table.TableColumn;
 import javax.swing.table.TableModel;
 import javax.swing.text.AbstractDocument;
 import java.awt.event.*;
+import javax.swing.Box;
 import javax.swing.JComponent;
 import javax.swing.JButton;
 
@@ -90,6 +91,7 @@ public class ELLE_GUI_Frame extends JFrame implements ITableConstants {
     private Map<String, Map<String, AccountTable>> tabs; // stores individual accountTable objects 
     private static Statement statement;
     private String database;
+    private String server;
     
     //maps store whether an alert logging column changes in the database has been displayed for this table
     //prevents the same alert message from being displayed more than once for the same table
@@ -113,6 +115,9 @@ public class ELLE_GUI_Frame extends JFrame implements ITableConstants {
     // button colors
     private Color colorBtnDefault;
     private Color colorBtnSelected;
+    
+    // create a jlabel to show the database and server used
+    private JLabel databaseLabel;
     
     // DAO
     private AllocationDAO allocationDAO;
@@ -228,22 +233,17 @@ public class ELLE_GUI_Frame extends JFrame implements ITableConstants {
         // initialize tables for Combined -Postions table
         tabCombined.get(POSITIONS_TABLE_NAME).setTable(new JTable());
         tabCombined.get(POSITIONS_TABLE_NAME).setTableName(POSITIONS_TABLE_NAME);
-        //tabCombined.get(POSITIONS_TABLE_NAME).setColWidthPercentDefaultView(COL_WIDTH_PER_POSITIONS_DEFAULT_VIEW);
-        //tabCombined.get(POSITIONS_TABLE_NAME).setColWidthPercentAllFields(COL_WIDTH_PER_POSITIONS_ALL_FIELDS);
         tabCombined.get(POSITIONS_TABLE_NAME).setFilter(new TableFilter(tabCombined.get(POSITIONS_TABLE_NAME).getTable()));
         tabCombined.get(POSITIONS_TABLE_NAME).setColumnPopupMenu(new ColumnPopupMenu(tabCombined.get(POSITIONS_TABLE_NAME).getFilter()));
         // initialize tables for Combined -Trades table
         tabCombined.get(TRADES_TABLE_NAME).setTable(new JTable());
         tabCombined.get(TRADES_TABLE_NAME).setTableName(TRADES_TABLE_NAME);
-        //tabCombined.get(TRADES_TABLE_NAME).setColWidthPercentDefaultView(COL_WIDTH_PER_TRADES_DEFAULT_VIEW);
-        //tabCombined.get(TRADES_TABLE_NAME).setColWidthPercentAllFields(COL_WIDTH_PER_TRADES_ALL_FIELDS);
         tabCombined.get(TRADES_TABLE_NAME).setFilter(new TableFilter(tabCombined.get(TRADES_TABLE_NAME).getTable()));
         tabCombined.get(TRADES_TABLE_NAME).setColumnPopupMenu(new ColumnPopupMenu(tabCombined.get(TRADES_TABLE_NAME).getFilter()));
         // initialize tables for Combined -Allocations table
         tabCombined.get(ALLOCATIONS_TABLE_NAME).setTable(new JTable());
         tabCombined.get(ALLOCATIONS_TABLE_NAME).setTableName(ALLOCATIONS_TABLE_NAME);
-        //tabCombined.get(ALLOCATIONS_TABLE_NAME).setColWidthPercentDefaultView(COL_WIDTH_PER_ALLOCATIONS_DEFAULT_VIEW);
-        //tabCombined.get(ALLOCATIONS_TABLE_NAME).setColWidthPercentAllFields(COL_WIDTH_PER_ALLOCATIONS_ALL_FIELDS);
+        
         tabCombined.get(ALLOCATIONS_TABLE_NAME).setFilter(new TableFilter(tabCombined.get(ALLOCATIONS_TABLE_NAME).getTable()));
         tabCombined.get(ALLOCATIONS_TABLE_NAME).setColumnPopupMenu(new ColumnPopupMenu(tabCombined.get(ALLOCATIONS_TABLE_NAME).getFilter()));
         // add tables to the Combined account accountTable
@@ -252,7 +252,7 @@ public class ELLE_GUI_Frame extends JFrame implements ITableConstants {
         // this sets the KeyboardFocusManger
         //setKeyboardFocusManager();
         // load data from database to tables
-        loadTables(tabs);
+       loadTables(tabs);
         
         //display an alert message for any column changes in the database
         displayTableColumnAlert();
@@ -285,6 +285,7 @@ public class ELLE_GUI_Frame extends JFrame implements ITableConstants {
 
         // show IB9048 positions table (initial start up)
         AccountTable IB9048_positions = tabs.get(IB9048_ACCOUNT_NAME).get(POSITIONS_TABLE_NAME);
+        IB9048_positions.setTableSelected(true);
         JTable table = IB9048_positions.getTable();
         JScrollPane scroll = new JScrollPane(table);
         setScrollBarFormat(scroll, table);                  // fix issue with scroll bar dissappearing
@@ -304,7 +305,7 @@ public class ELLE_GUI_Frame extends JFrame implements ITableConstants {
         // start the other tables initially on positions
         tabs.get(TOS3622_ACCOUNT_NAME).get(POSITIONS_TABLE_NAME).setTableSelected(true);
         tabs.get(COMBINED_ACCOUNT_NAME).get(POSITIONS_TABLE_NAME).setTableSelected(true);
-        
+       
         //gray out the existign three taps in other menu
         menuItemIB8949.setEnabled(false);
         menuItemReconcile.setEnabled(false);
@@ -321,6 +322,7 @@ public class ELLE_GUI_Frame extends JFrame implements ITableConstants {
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
+        java.awt.GridBagConstraints gridBagConstraints;
 
         filechooser = new javax.swing.JFileChooser();
         panelCTRLPanel = new javax.swing.JPanel();
@@ -334,10 +336,10 @@ public class ELLE_GUI_Frame extends JFrame implements ITableConstants {
         textFieldSymbol = new javax.swing.JTextField();
         textFieldStartDate = new javax.swing.JTextField();
         textFieldEndDate = new javax.swing.JTextField();
-        btnClearAllFilters = new java.awt.Button();
         btnPositions = new javax.swing.JButton();
         labelRecords = new javax.swing.JLabel();
         btnTableDisplayState = new javax.swing.JLabel();
+        btnClearAllFilters = new java.awt.Button();
         panelSQL = new javax.swing.JPanel();
         scrollPaneSQL = new javax.swing.JScrollPane();
         textAreaSQL = new javax.swing.JTextArea();
@@ -376,6 +378,9 @@ public class ELLE_GUI_Frame extends JFrame implements ITableConstants {
         menuTools = new javax.swing.JMenu();
         menuItemBackup = new javax.swing.JMenuItem();
         menuItemReloadTabData = new javax.swing.JMenuItem();
+        menuLoad = new javax.swing.JMenu();
+        menuItemLoadFile = new javax.swing.JMenuItem();
+        menuHelp = new javax.swing.JMenu();
         menuView = new javax.swing.JMenu();
         menuItemCheckBoxLog = new javax.swing.JCheckBoxMenuItem();
         menuItemCheckBoxSQL = new javax.swing.JCheckBoxMenuItem();
@@ -386,8 +391,6 @@ public class ELLE_GUI_Frame extends JFrame implements ITableConstants {
         viewmatches = new javax.swing.JMenuItem();
         viewnomatches = new javax.swing.JMenuItem();
         menuItemDefaultColumnWidths = new javax.swing.JMenuItem();
-        menuItemObjectTable = new javax.swing.JMenuItem();
-        menuHelp = new javax.swing.JMenu();
         menuOther = new javax.swing.JMenu();
         menuItemIB8949 = new javax.swing.JMenuItem();
         menuItemReconcile = new javax.swing.JMenuItem();
@@ -397,44 +400,83 @@ public class ELLE_GUI_Frame extends JFrame implements ITableConstants {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
+        panelCTRLPanel.setLayout(new java.awt.GridBagLayout());
+
         btnTrades.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/elle/elle_gui/images/button1.png"))); // NOI18N
         btnTrades.setText("Trades");
         btnTrades.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        btnTrades.setMaximumSize(new java.awt.Dimension(88, 52));
+        btnTrades.setMinimumSize(new java.awt.Dimension(88, 52));
+        btnTrades.setPreferredSize(new java.awt.Dimension(88, 52));
         btnTrades.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
         btnTrades.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnTradesActionPerformed(evt);
             }
         });
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.insets = new java.awt.Insets(10, 0, 0, 16);
+        panelCTRLPanel.add(btnTrades, gridBagConstraints);
 
         btnAllocations.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/elle/elle_gui/images/button3.png"))); // NOI18N
         btnAllocations.setText("Allocations");
         btnAllocations.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        btnAllocations.setMaximumSize(new java.awt.Dimension(88, 52));
+        btnAllocations.setMinimumSize(new java.awt.Dimension(88, 52));
+        btnAllocations.setPreferredSize(new java.awt.Dimension(88, 52));
         btnAllocations.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
         btnAllocations.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnAllocationsActionPerformed(evt);
             }
         });
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.insets = new java.awt.Insets(10, 0, 0, 16);
+        panelCTRLPanel.add(btnAllocations, gridBagConstraints);
 
         btnSymbol.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/elle/elle_gui/images/filter.png"))); // NOI18N
         btnSymbol.setText(" ");
         btnSymbol.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        btnSymbol.setMaximumSize(new java.awt.Dimension(35, 33));
+        btnSymbol.setMinimumSize(new java.awt.Dimension(35, 33));
+        btnSymbol.setPreferredSize(new java.awt.Dimension(35, 33));
         btnSymbol.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnSymbolActionPerformed(evt);
             }
         });
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 4;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.insets = new java.awt.Insets(10, 12, 0, 0);
+        panelCTRLPanel.add(btnSymbol, gridBagConstraints);
 
         btnDateRange.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/elle/elle_gui/images/filter.png"))); // NOI18N
         btnDateRange.setText(" ");
         btnDateRange.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         btnDateRange.setIconTextGap(0);
+        btnDateRange.setMaximumSize(new java.awt.Dimension(35, 33));
+        btnDateRange.setMinimumSize(new java.awt.Dimension(35, 33));
+        btnDateRange.setPreferredSize(new java.awt.Dimension(35, 33));
         btnDateRange.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnDateRangeActionPerformed(evt);
             }
         });
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 8;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.insets = new java.awt.Insets(10, 6, 0, 10);
+        panelCTRLPanel.add(btnDateRange, gridBagConstraints);
 
         checkBoxSymbol.setText("Symbol");
         checkBoxSymbol.addActionListener(new java.awt.event.ActionListener() {
@@ -442,6 +484,12 @@ public class ELLE_GUI_Frame extends JFrame implements ITableConstants {
                 checkBoxSymbolActionPerformed(evt);
             }
         });
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 3;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.insets = new java.awt.Insets(40, 0, 0, 0);
+        panelCTRLPanel.add(checkBoxSymbol, gridBagConstraints);
 
         checkBoxDateRange.setText("Date Range");
         checkBoxDateRange.addActionListener(new java.awt.event.ActionListener() {
@@ -449,28 +497,83 @@ public class ELLE_GUI_Frame extends JFrame implements ITableConstants {
                 checkBoxDateRangeActionPerformed(evt);
             }
         });
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 5;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.insets = new java.awt.Insets(40, 50, 0, 0);
+        panelCTRLPanel.add(checkBoxDateRange, gridBagConstraints);
 
         labelHyphen.setText("-");
+        labelHyphen.setMaximumSize(new java.awt.Dimension(4, 30));
+        labelHyphen.setMinimumSize(new java.awt.Dimension(4, 30));
+        labelHyphen.setPreferredSize(new java.awt.Dimension(4, 30));
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 6;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTH;
+        gridBagConstraints.insets = new java.awt.Insets(10, 6, 0, 6);
+        panelCTRLPanel.add(labelHyphen, gridBagConstraints);
 
-        btnClearAllFilters.setActionCommand("Clear All Filters");
-        btnClearAllFilters.setLabel("Clear All Filters");
-        btnClearAllFilters.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnClearAllFiltersActionPerformed(evt);
-            }
-        });
+        textFieldSymbol.setMaximumSize(new java.awt.Dimension(95, 30));
+        textFieldSymbol.setMinimumSize(new java.awt.Dimension(95, 30));
+        textFieldSymbol.setPreferredSize(new java.awt.Dimension(95, 30));
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 3;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.insets = new java.awt.Insets(10, 0, 0, 0);
+        panelCTRLPanel.add(textFieldSymbol, gridBagConstraints);
+
+        textFieldStartDate.setMaximumSize(new java.awt.Dimension(95, 30));
+        textFieldStartDate.setMinimumSize(new java.awt.Dimension(95, 30));
+        textFieldStartDate.setPreferredSize(new java.awt.Dimension(95, 30));
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 5;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHEAST;
+        gridBagConstraints.insets = new java.awt.Insets(10, 50, 0, 0);
+        panelCTRLPanel.add(textFieldStartDate, gridBagConstraints);
+
+        textFieldEndDate.setMaximumSize(new java.awt.Dimension(95, 30));
+        textFieldEndDate.setMinimumSize(new java.awt.Dimension(95, 30));
+        textFieldEndDate.setPreferredSize(new java.awt.Dimension(95, 30));
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 7;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.insets = new java.awt.Insets(10, 0, 0, 0);
+        panelCTRLPanel.add(textFieldEndDate, gridBagConstraints);
 
         btnPositions.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/elle/elle_gui/images/button1.png"))); // NOI18N
         btnPositions.setText("Positions");
         btnPositions.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        btnPositions.setMaximumSize(new java.awt.Dimension(88, 52));
+        btnPositions.setMinimumSize(new java.awt.Dimension(88, 52));
+        btnPositions.setPreferredSize(new java.awt.Dimension(88, 52));
         btnPositions.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
         btnPositions.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnPositionsActionPerformed(evt);
             }
         });
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.insets = new java.awt.Insets(10, 10, 0, 16);
+        panelCTRLPanel.add(btnPositions, gridBagConstraints);
 
+        labelRecords.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
         labelRecords.setText("records label");
+        labelRecords.setHorizontalTextPosition(javax.swing.SwingConstants.LEFT);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridwidth = 3;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.insets = new java.awt.Insets(10, 10, 0, 0);
+        panelCTRLPanel.add(labelRecords, gridBagConstraints);
 
         btnTableDisplayState.setForeground(new java.awt.Color(51, 153, 0));
         btnTableDisplayState.setText("Default Views");
@@ -479,83 +582,28 @@ public class ELLE_GUI_Frame extends JFrame implements ITableConstants {
                 btnTableDisplayStateMouseClicked(evt);
             }
         });
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 2;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.insets = new java.awt.Insets(10, 10, 0, 0);
+        panelCTRLPanel.add(btnTableDisplayState, gridBagConstraints);
 
-        javax.swing.GroupLayout panelCTRLPanelLayout = new javax.swing.GroupLayout(panelCTRLPanel);
-        panelCTRLPanel.setLayout(panelCTRLPanelLayout);
-        panelCTRLPanelLayout.setHorizontalGroup(
-            panelCTRLPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(panelCTRLPanelLayout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(panelCTRLPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(panelCTRLPanelLayout.createSequentialGroup()
-                        .addComponent(btnPositions, javax.swing.GroupLayout.PREFERRED_SIZE, 95, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(18, 18, 18)
-                        .addComponent(btnTrades, javax.swing.GroupLayout.PREFERRED_SIZE, 95, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(18, 18, 18)
-                        .addComponent(btnAllocations))
-                    .addGroup(panelCTRLPanelLayout.createSequentialGroup()
-                        .addGap(12, 12, 12)
-                        .addGroup(panelCTRLPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(btnTableDisplayState, javax.swing.GroupLayout.PREFERRED_SIZE, 172, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addGroup(panelCTRLPanelLayout.createSequentialGroup()
-                                .addComponent(labelRecords, javax.swing.GroupLayout.PREFERRED_SIZE, 300, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(294, 294, 294)
-                                .addGroup(panelCTRLPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addGroup(panelCTRLPanelLayout.createSequentialGroup()
-                                        .addComponent(textFieldSymbol, javax.swing.GroupLayout.PREFERRED_SIZE, 86, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                        .addComponent(btnSymbol, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                    .addComponent(checkBoxSymbol, javax.swing.GroupLayout.PREFERRED_SIZE, 86, javax.swing.GroupLayout.PREFERRED_SIZE))))))
-                .addGap(40, 40, 40)
-                .addGroup(panelCTRLPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(checkBoxDateRange)
-                    .addGroup(panelCTRLPanelLayout.createSequentialGroup()
-                        .addComponent(textFieldStartDate, javax.swing.GroupLayout.PREFERRED_SIZE, 101, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 10, Short.MAX_VALUE)
-                        .addGroup(panelCTRLPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addGroup(panelCTRLPanelLayout.createSequentialGroup()
-                                .addComponent(labelHyphen, javax.swing.GroupLayout.PREFERRED_SIZE, 4, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(textFieldEndDate, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(btnDateRange, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addComponent(btnClearAllFilters, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
-                .addContainerGap(124, Short.MAX_VALUE))
-        );
-        panelCTRLPanelLayout.setVerticalGroup(
-            panelCTRLPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(panelCTRLPanelLayout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(panelCTRLPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(panelCTRLPanelLayout.createSequentialGroup()
-                        .addGroup(panelCTRLPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addComponent(btnPositions)
-                            .addComponent(btnAllocations)
-                            .addComponent(btnTrades))
-                        .addGap(0, 0, Short.MAX_VALUE))
-                    .addGroup(panelCTRLPanelLayout.createSequentialGroup()
-                        .addGroup(panelCTRLPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(labelHyphen, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(btnDateRange, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panelCTRLPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                .addComponent(btnSymbol, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addComponent(textFieldSymbol, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addComponent(textFieldStartDate)
-                            .addComponent(textFieldEndDate))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
-                .addGroup(panelCTRLPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addGroup(panelCTRLPanelLayout.createSequentialGroup()
-                        .addGroup(panelCTRLPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(checkBoxDateRange)
-                            .addComponent(checkBoxSymbol))
-                        .addGap(9, 9, 9)
-                        .addComponent(btnClearAllFilters, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addContainerGap())
-                    .addGroup(panelCTRLPanelLayout.createSequentialGroup()
-                        .addComponent(labelRecords, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(btnTableDisplayState, javax.swing.GroupLayout.PREFERRED_SIZE, 18, javax.swing.GroupLayout.PREFERRED_SIZE))))
-        );
+        btnClearAllFilters.setActionCommand("Clear All Filters");
+        btnClearAllFilters.setLabel("Clear All Filters");
+        btnClearAllFilters.setMinimumSize(new java.awt.Dimension(99, 28));
+        btnClearAllFilters.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnClearAllFiltersActionPerformed(evt);
+            }
+        });
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 5;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.insets = new java.awt.Insets(4, 50, 0, 10);
+        panelCTRLPanel.add(btnClearAllFilters, gridBagConstraints);
 
         scrollPaneSQL.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
 
@@ -610,7 +658,7 @@ public class ELLE_GUI_Frame extends JFrame implements ITableConstants {
         panelSQLLayout.setVerticalGroup(
             panelSQLLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(panelSQLLayout.createSequentialGroup()
-                .addContainerGap()
+                .addGap(0, 0, 0)
                 .addComponent(scrollPaneSQL, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(panelSQLLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
@@ -620,11 +668,23 @@ public class ELLE_GUI_Frame extends JFrame implements ITableConstants {
                 .addGap(14, 14, 14))
         );
 
+        panelAccounts.setMinimumSize(new java.awt.Dimension(400, 200));
+        panelAccounts.setPreferredSize(new java.awt.Dimension(1200, 400));
+        panelAccounts.setLayout(new java.awt.GridBagLayout());
+
+        tabbedPaneAccounts.setMinimumSize(new java.awt.Dimension(400, 200));
+        tabbedPaneAccounts.setPreferredSize(new java.awt.Dimension(1200, 400));
         tabbedPaneAccounts.addChangeListener(new javax.swing.event.ChangeListener() {
             public void stateChanged(javax.swing.event.ChangeEvent evt) {
                 tabbedPaneAccountsStateChanged(evt);
             }
         });
+
+        panelIB9048.setMinimumSize(new java.awt.Dimension(400, 200));
+        panelIB9048.setPreferredSize(new java.awt.Dimension(1200, 400));
+
+        scrollPaneIB9048.setMinimumSize(new java.awt.Dimension(400, 200));
+        scrollPaneIB9048.setPreferredSize(new java.awt.Dimension(1200, 400));
 
         tableIB9048.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -637,26 +697,29 @@ public class ELLE_GUI_Frame extends JFrame implements ITableConstants {
                 "Title 1", "Title 2", "Title 3", "Title 4"
             }
         ));
+        tableIB9048.setMinimumSize(new java.awt.Dimension(400, 200));
+        tableIB9048.setPreferredSize(new java.awt.Dimension(1200, 400));
         scrollPaneIB9048.setViewportView(tableIB9048);
 
         javax.swing.GroupLayout panelIB9048Layout = new javax.swing.GroupLayout(panelIB9048);
         panelIB9048.setLayout(panelIB9048Layout);
         panelIB9048Layout.setHorizontalGroup(
             panelIB9048Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 1150, Short.MAX_VALUE)
-            .addGroup(panelIB9048Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                .addComponent(scrollPaneIB9048, javax.swing.GroupLayout.DEFAULT_SIZE, 1150, Short.MAX_VALUE))
+            .addGroup(panelIB9048Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(scrollPaneIB9048, javax.swing.GroupLayout.PREFERRED_SIZE, 1360, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         panelIB9048Layout.setVerticalGroup(
             panelIB9048Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 467, Short.MAX_VALUE)
-            .addGroup(panelIB9048Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                .addGroup(panelIB9048Layout.createSequentialGroup()
-                    .addComponent(scrollPaneIB9048, javax.swing.GroupLayout.PREFERRED_SIZE, 433, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addGap(0, 0, Short.MAX_VALUE)))
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panelIB9048Layout.createSequentialGroup()
+                .addGap(0, 0, Short.MAX_VALUE)
+                .addComponent(scrollPaneIB9048, javax.swing.GroupLayout.PREFERRED_SIZE, 433, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
 
         tabbedPaneAccounts.addTab("IB9048", panelIB9048);
+
+        scrollPaneTOS3622.setPreferredSize(new java.awt.Dimension(1300, 402));
 
         tableTOS3622.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -675,13 +738,13 @@ public class ELLE_GUI_Frame extends JFrame implements ITableConstants {
         panelTOS3622.setLayout(panelTOS3622Layout);
         panelTOS3622Layout.setHorizontalGroup(
             panelTOS3622Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 1150, Short.MAX_VALUE)
+            .addGap(0, 1195, Short.MAX_VALUE)
             .addGroup(panelTOS3622Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                .addComponent(scrollPaneTOS3622, javax.swing.GroupLayout.DEFAULT_SIZE, 1150, Short.MAX_VALUE))
+                .addComponent(scrollPaneTOS3622, javax.swing.GroupLayout.DEFAULT_SIZE, 1195, Short.MAX_VALUE))
         );
         panelTOS3622Layout.setVerticalGroup(
             panelTOS3622Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 467, Short.MAX_VALUE)
+            .addGap(0, 451, Short.MAX_VALUE)
             .addGroup(panelTOS3622Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                 .addGroup(panelTOS3622Layout.createSequentialGroup()
                     .addComponent(scrollPaneTOS3622, javax.swing.GroupLayout.PREFERRED_SIZE, 433, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -689,6 +752,8 @@ public class ELLE_GUI_Frame extends JFrame implements ITableConstants {
         );
 
         tabbedPaneAccounts.addTab("TOS3622", panelTOS3622);
+
+        scrollPaneCombined.setPreferredSize(new java.awt.Dimension(1200, 400));
 
         tableCombined.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -701,19 +766,21 @@ public class ELLE_GUI_Frame extends JFrame implements ITableConstants {
                 "Title 1", "Title 2", "Title 3", "Title 4"
             }
         ));
+        tableCombined.setMinimumSize(new java.awt.Dimension(1200, 400));
+        tableCombined.setPreferredSize(new java.awt.Dimension(1200, 400));
         scrollPaneCombined.setViewportView(tableCombined);
 
         javax.swing.GroupLayout panelCombinedLayout = new javax.swing.GroupLayout(panelCombined);
         panelCombined.setLayout(panelCombinedLayout);
         panelCombinedLayout.setHorizontalGroup(
             panelCombinedLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 1150, Short.MAX_VALUE)
+            .addGap(0, 1195, Short.MAX_VALUE)
             .addGroup(panelCombinedLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                .addComponent(scrollPaneCombined, javax.swing.GroupLayout.DEFAULT_SIZE, 1150, Short.MAX_VALUE))
+                .addComponent(scrollPaneCombined, javax.swing.GroupLayout.DEFAULT_SIZE, 1195, Short.MAX_VALUE))
         );
         panelCombinedLayout.setVerticalGroup(
             panelCombinedLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 467, Short.MAX_VALUE)
+            .addGap(0, 451, Short.MAX_VALUE)
             .addGroup(panelCombinedLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                 .addGroup(panelCombinedLayout.createSequentialGroup()
                     .addComponent(scrollPaneCombined, javax.swing.GroupLayout.PREFERRED_SIZE, 433, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -722,19 +789,17 @@ public class ELLE_GUI_Frame extends JFrame implements ITableConstants {
 
         tabbedPaneAccounts.addTab("Combined", panelCombined);
 
-        javax.swing.GroupLayout panelAccountsLayout = new javax.swing.GroupLayout(panelAccounts);
-        panelAccounts.setLayout(panelAccountsLayout);
-        panelAccountsLayout.setHorizontalGroup(
-            panelAccountsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(panelAccountsLayout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(tabbedPaneAccounts)
-                .addContainerGap())
-        );
-        panelAccountsLayout.setVerticalGroup(
-            panelAccountsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(tabbedPaneAccounts, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
-        );
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 1.0;
+        gridBagConstraints.insets = new java.awt.Insets(3, 0, 0, 0);
+        panelAccounts.add(tabbedPaneAccounts, gridBagConstraints);
+
+        menuBar.setMargin(new java.awt.Insets(0, 0, 0, 5));
 
         menuFile.setText("File");
 
@@ -868,6 +933,22 @@ public class ELLE_GUI_Frame extends JFrame implements ITableConstants {
 
         menuBar.add(menuTools);
 
+        menuLoad.setText("Load");
+
+        menuItemLoadFile.setText("Load File...");
+        menuItemLoadFile.setEnabled(false);
+        menuItemLoadFile.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                menuItemLoadFileActionPerformed(evt);
+            }
+        });
+        menuLoad.add(menuItemLoadFile);
+
+        menuBar.add(menuLoad);
+
+        menuHelp.setText("Help");
+        menuBar.add(menuHelp);
+
         menuView.setText("View");
 
         menuItemCheckBoxLog.setText("Log");
@@ -947,18 +1028,7 @@ public class ELLE_GUI_Frame extends JFrame implements ITableConstants {
         });
         menuView.add(menuItemDefaultColumnWidths);
 
-        menuItemObjectTable.setText("Table Objects");
-        menuItemObjectTable.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                menuItemObjectTableActionPerformed(evt);
-            }
-        });
-        menuView.add(menuItemObjectTable);
-
         menuBar.add(menuView);
-
-        menuHelp.setText("Help");
-        menuBar.add(menuHelp);
 
         menuOther.setText("Other");
 
@@ -996,15 +1066,15 @@ public class ELLE_GUI_Frame extends JFrame implements ITableConstants {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addComponent(panelSQL, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addComponent(panelAccounts, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-            .addComponent(panelCTRLPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+            .addComponent(panelCTRLPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addComponent(panelCTRLPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(0, 0, 0)
-                .addComponent(panelAccounts, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addGap(0, 0, 0)
+                .addComponent(panelAccounts, javax.swing.GroupLayout.DEFAULT_SIZE, 482, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(panelSQL, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
 
@@ -1047,6 +1117,10 @@ public class ELLE_GUI_Frame extends JFrame implements ITableConstants {
         // update records label
         String recordsText = accountTable.getRecordsLabel();
         labelRecords.setText(recordsText);
+        
+        //disable the View Record option on the view menu if no records are selected
+        //Corinne Martus 7/7/2016
+        disableMenuItemAViewATrades();
     }//GEN-LAST:event_btnTradesActionPerformed
 
     private void menuItemPuponeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuItemPuponeActionPerformed
@@ -1138,6 +1212,10 @@ public class ELLE_GUI_Frame extends JFrame implements ITableConstants {
 
     }//GEN-LAST:event_menuItemPrintDisplayWindowActionPerformed
 
+    private void menuItemLoadFileActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuItemLoadFileActionPerformed
+
+    }//GEN-LAST:event_menuItemLoadFileActionPerformed
+
     private void btnAllocationsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAllocationsActionPerformed
 
         String tabName = getSelectedTabName();
@@ -1178,6 +1256,10 @@ public class ELLE_GUI_Frame extends JFrame implements ITableConstants {
         // update records label
         String recordsText = accountTable.getRecordsLabel();
         labelRecords.setText(recordsText);
+        
+        //disable the View Record option on the view menu if no records are selected
+        //Corinne Martus 7/7/2016
+        disableMenuItemAViewATrades();
     }//GEN-LAST:event_btnAllocationsActionPerformed
 
     private void menuItemIBActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuItemIBActionPerformed
@@ -1435,6 +1517,10 @@ public class ELLE_GUI_Frame extends JFrame implements ITableConstants {
         // update records label
         String recordsText = accountTable.getRecordsLabel();
         labelRecords.setText(recordsText);
+        
+        //disable the View Record option on the view menu if no records are selected
+        //Corinne Martus 7/7/2016
+        disableMenuItemAViewATrades();
     }//GEN-LAST:event_btnPositionsActionPerformed
 
     private void menuItemCheckBoxSQLActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuItemCheckBoxSQLActionPerformed
@@ -1550,18 +1636,15 @@ public class ELLE_GUI_Frame extends JFrame implements ITableConstants {
         String tabName = getSelectedTabName();
         String tableName = getTableName(tabName);
         AccountTable accountTable = tabs.get(tabName).get(tableName);
-        Map<String,Integer> colWidths;
 
         if (viewLabel.getText().equals(VIEW_LABEL_TXT_ALL_FIELDS)) {
             accountTable.setView(VIEW_LABEL_TXT_DEFAULT_VIEW);
             accountTable.setAllFields(false);
-            colWidths = accountTable.getColWidthPercentDefaultView();
             btnTableDisplayState.setText(accountTable.getView());
         }
         else{
             accountTable.setView(VIEW_LABEL_TXT_ALL_FIELDS);
             accountTable.setAllFields(true);
-            colWidths = accountTable.getColWidthPercentAllFields();
             btnTableDisplayState.setText(accountTable.getView());
         }
 
@@ -1652,8 +1735,8 @@ public class ELLE_GUI_Frame extends JFrame implements ITableConstants {
     private void menuItemDefaultColumnWidthsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuItemDefaultColumnWidthsActionPerformed
        adjustCurrentTabColumnWidths(); 
     }//GEN-LAST:event_menuItemDefaultColumnWidthsActionPerformed
-
-    private void menuItemObjectTableActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuItemObjectTableActionPerformed
+    
+    private void menuItemObjectTableActionPerformed(java.awt.event.ActionEvent evt) {                                                    
         //Wei 2016/07/03 using the same functions designed for loading matches or noMatchs and csv reading. 
         //loadltableojects("select * from tableObjects");
         
@@ -1662,7 +1745,7 @@ public class ELLE_GUI_Frame extends JFrame implements ITableConstants {
         tableobjectswindow.setVisible(true);
         tableobjectswindow.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         
-    }//GEN-LAST:event_menuItemObjectTableActionPerformed
+    }                                                   
     
     //Returns the columns of all of the tables in the selected tab to their default widths
     public void adjustCurrentTabColumnWidths(){
@@ -1705,8 +1788,6 @@ public class ELLE_GUI_Frame extends JFrame implements ITableConstants {
                 if(n == 0){
                 LogWindow logWindow = new LogWindow();
                 logWindow.setLocationRelativeTo(this);
-                logWindow.readCurrentMessages("\n" + unexpectedColumnLog + "\n");
-                logWindow.readCurrentMessages("\n" + missingColumnLog + "\n");
                 logWindow.setVisible(true); // show log window
 
                 // remove check if window is closed from the window
@@ -2032,16 +2113,16 @@ public class ELLE_GUI_Frame extends JFrame implements ITableConstants {
 
             TableColumn tableColumnI = table.getColumnModel().getColumn(i);
 
-            if (table.getColumnName(i).toLowerCase().equals("price")
-                    || table.getColumnName(i).toLowerCase().equals("adj_price")) {
-
+            if (table.getColumnName(i).toLowerCase().contains("price"))
+               {
                 tableColumnI.setCellRenderer(new FourDecimalFormatRenderer());
-
             } else if (table.getColumnName(i).equalsIgnoreCase("q")
                     || table.getColumnName(i).equalsIgnoreCase("totalq")) {
                 tableColumnI.setCellRenderer(new TwoDecimalFormatRenderer());
             } else if (table.getColumnClass(i).getName().toLowerCase().contains("decimal")
-                    || table.getColumnClass(i).getName().toLowerCase().contains("integer")) {
+                    || table.getColumnClass(i).getName().toLowerCase().contains("integer")
+                    || table.getColumnName(i).contains("basis") || table.getColumnName(i).contains("proceeds")
+                    || table.getColumnName(i).contains("realized_PL")){
                 tableColumnI.setCellRenderer(new CommaFormatRenderer());
             }
         }
@@ -2151,7 +2232,7 @@ public class ELLE_GUI_Frame extends JFrame implements ITableConstants {
         readcsvfiles.setVisible(true);
         readcsvfiles.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
     }
-      
+
     private String removeAnyCommas(String src) {
         if(src == null) {
             return "";
@@ -2352,13 +2433,17 @@ public class ELLE_GUI_Frame extends JFrame implements ITableConstants {
         JTableHeader header = table.getTableHeader();
         
          //disable default mouse listeners
-        MouseListener[] listeners = header.getMouseListeners();
-
+         MouseListener[] listeners = header.getMouseListeners();
+         
+         /* removes MouseInputHandler since it alters the behavior of toggleSortOrder()
+         Corinne Martus, 7/7/16: Changed from deleting the entire BasicTableHeaderUI class 
+         (this disables dragging and resizing columns)
+         to only the MouseInputHandler*/
         for (MouseListener ml: listeners)
         {
             String className = ml.getClass().toString();
 
-            if (className.contains("BasicTableHeaderUI"))
+            if (className.contains("BasicTableHeaderUI.MouseInputHandler"))
                
                 header.removeMouseListener(ml);
                 
@@ -2373,6 +2458,7 @@ public class ELLE_GUI_Frame extends JFrame implements ITableConstants {
                     if (e.getClickCount() == 2) {
                         e.consume();
                         clearFilterDoubleClick(e, table);
+                        
 
                     }
                     
@@ -2383,7 +2469,7 @@ public class ELLE_GUI_Frame extends JFrame implements ITableConstants {
                     }
                     
                     
-                    if (e.getClickCount() == 1 && e.getButton() == MouseEvent.BUTTON1 && !e.isConsumed()) {
+                    if (e.getClickCount() == 1 && e.getButton() == MouseEvent.BUTTON1) {
                         
                         int columnIndex = header.columnAtPoint(e.getPoint());
                         if (columnIndex != -1) {
@@ -2440,7 +2526,8 @@ public class ELLE_GUI_Frame extends JFrame implements ITableConstants {
 //                                if (jLabelEdit.getText().equals("ON ")) {
 //                                    selectAllText(e);
 //                                }
-                                menuItemAViewATrades.setEnabled(true);
+                                enableMenuItemAViewATrades();
+                                
                             }
                         } // end if left mouse clicks
                         // if right mouse clicks
@@ -2535,7 +2622,7 @@ public class ELLE_GUI_Frame extends JFrame implements ITableConstants {
         //Wei, make the filter working with underlying only.
         int columnIndex = 20; 
                 
-        int rowIndex = table.getSelectedRow(); // this returns the rowIndex i 
+        int rowIndex = table.getSelectedRow(); // this returns the rowIndex i
         if (rowIndex != -1) {
             Object selectedField = table.getValueAt(rowIndex, columnIndex);
             AccountTable tab = getSelectedTab();
@@ -2547,7 +2634,7 @@ public class ELLE_GUI_Frame extends JFrame implements ITableConstants {
             String recordsLabel = tab.getRecordsLabel();
             labelRecords.setText(recordsLabel);
             labelRecords.repaint();
-                
+
             // apply checkbox selection
             int dateColIndex = filter.getDateColumnIndex();
             if (columnIndex == dateColIndex) {
@@ -2583,9 +2670,32 @@ public class ELLE_GUI_Frame extends JFrame implements ITableConstants {
         // update records label
         String recordsLabel = tab.getRecordsLabel();
         labelRecords.setText(recordsLabel);
+    }
+    /*called by setTableListeners on a single click
+    enables the View Record option on the view menu tab when a row is selected
+    by Corinne Martus  7/7/2016 */
+    public void enableMenuItemAViewATrades(){
+        AccountTable selectedTab = getSelectedTab();
+        JTable selectedTable = selectedTab.getTable();
+        int row = selectedTable.getSelectedRow();
+        if(row != -1){
+            menuItemAViewATrades.setEnabled(true);
+        }
         
     }
-
+    
+    /*called by setTableListeners to disable
+    the View Record option on the view menu tab when a row is selected
+    by Corinne Martus  7/7/2016 */
+    public void disableMenuItemAViewATrades(){
+        AccountTable selectedTab = getSelectedTab();
+        JTable selectedTable = selectedTab.getTable();
+        int row = selectedTable.getSelectedRow();
+        if(row == -1){
+            menuItemAViewATrades.setEnabled(false);
+        }
+    }
+    
     /**
      * setColumnFormat sets column format for each table
      *
@@ -2594,19 +2704,12 @@ public class ELLE_GUI_Frame extends JFrame implements ITableConstants {
      */
     
     public void setColumnFormat(JTable table) {
-
         // this is needed for the horizontal scrollbar to appear
         table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
-         table.getTableHeader().setResizingAllowed(true);
+         
          TableColumnAdjuster tableColumnAdjuster = new TableColumnAdjuster(table);
          tableColumnAdjuster.adjustColumns();
          
-         table.getTableHeader().addMouseListener(new MouseAdapter() {
-        @Override
-        public void mousePressed(MouseEvent e) {
-        int col = table.columnAtPoint(e.getPoint());
-         table.getTableHeader().setResizingColumn(table.getColumnModel().getColumn(col));
-        }
         
          /*int colWidth;
         for (int i = 0; i < table.getColumnCount(); i++) {
@@ -2617,8 +2720,8 @@ public class ELLE_GUI_Frame extends JFrame implements ITableConstants {
             column.setMinWidth(colWidth);
             column.setMaxWidth(colWidth + 100);
             column.setPreferredWidth(colWidth);
-        }*/
-                 });
+        }
+                 });*/
                  }
 
     /**
@@ -2749,7 +2852,18 @@ public class ELLE_GUI_Frame extends JFrame implements ITableConstants {
     public void setDatabase(String database) {
         this.database = database;
     }
+    
+    public void setServer(String server){
+        this.server = server;
+    }
 
+     public void showDatabase() {
+        databaseLabel = new JLabel(
+            server + "." + database);
+        menuBar.add(Box.createHorizontalGlue());
+        menuBar.add(databaseLabel);
+    }
+     
     public LoginWindow getLoginWindow() {
         return loginWindow;
     }
@@ -2827,10 +2941,10 @@ public class ELLE_GUI_Frame extends JFrame implements ITableConstants {
     private javax.swing.JMenuItem menuItemDefaultColumnWidths;
     private javax.swing.JMenuItem menuItemIB;
     private javax.swing.JMenuItem menuItemIB8949;
+    private javax.swing.JMenuItem menuItemLoadFile;
     private javax.swing.JMenuItem menuItemLoadsTable;
     private javax.swing.JMenuItem menuItemLocal;
     private javax.swing.JMenuItem menuItemLogOut;
-    private javax.swing.JMenuItem menuItemObjectTable;
     private javax.swing.JMenuItem menuItemPrintDisplayWindow;
     private javax.swing.JMenuItem menuItemPrintGUI;
     private javax.swing.JMenuItem menuItemPupone;
@@ -2841,6 +2955,7 @@ public class ELLE_GUI_Frame extends JFrame implements ITableConstants {
     private javax.swing.JMenuItem menuItemTL;
     private javax.swing.JMenuItem menuItemTL8949;
     private javax.swing.JMenuItem menuItemVersion;
+    private javax.swing.JMenu menuLoad;
     private javax.swing.JMenu menuOther;
     private javax.swing.JMenu menuPrint;
     private javax.swing.JMenu menuReports;
