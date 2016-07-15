@@ -1788,6 +1788,9 @@ public class ELLE_GUI_Frame extends JFrame implements ITableConstants {
                 if(n == 0){
                 LogWindow logWindow = new LogWindow();
                 logWindow.setLocationRelativeTo(this);
+                logWindow.readCurrentMessages(tableColumnAlertMessage + "\n");
+                logWindow.readCurrentMessages("\n" + unexpectedColumnLog + "\n");
+                logWindow.readCurrentMessages("\n" + missingColumnLog + "\n");
                 logWindow.setVisible(true); // show log window
 
                 // remove check if window is closed from the window
