@@ -1,5 +1,8 @@
+DELIMITER $$
+
 CREATE  PROCEDURE `processTrades_C`()
     SQL SECURITY INVOKER
+    
 BEGIN
 
 	set SQL_SAFE_UPDATES=0;
@@ -175,4 +178,6 @@ BEGIN
 	insert into `timeStamps` value(@`timeStamp`,"processTrades_C");
 /*  */
     
-END
+END$$
+
+DELIMITER ;
