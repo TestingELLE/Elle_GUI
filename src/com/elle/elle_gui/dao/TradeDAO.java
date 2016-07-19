@@ -32,7 +32,6 @@ public class TradeDAO {
     public static final String COL_BASIS = "basis";
     public static final String COL_ADJ_PROCEEDS = "adj_proceeds";
     public static final String COL_PROCESSED = "processed";
-    public static final String COL_LOT_TIME = "lot_Time";
     public static final String COL_REALIZED_PL = "realized_PL";
     public static final String COL_CODES = "codes";
     public static final String COL_KSFLAG = "ksflag";
@@ -50,14 +49,10 @@ public class TradeDAO {
     public static final String COL_STRIKE = "strike";
     public static final String COL_O_TYPE = "O_Type";
     public static final String COL_BKRGROUP = "bkrGroup";
-    public static final String COL_STRATEGY = "strategy";
     public static final String COL_XCHANGE = "Xchange";
     public static final String COL_ORDER = "order";
     public static final String COL_FILLS = "fills";
     public static final String COL_TOTAL_Q = "TotalQ";
-    public static final String COL_T_GRP = "t_grp";
-    public static final String COL_MATCHING = "matching";
-    public static final String COL_METHOD = "method";
     public static final String COL_TIMESTAMP = "timeStamp";
     
     //Names of columns in the database
@@ -73,7 +68,6 @@ public class TradeDAO {
     public static final String DATABASE_COL_BASIS = "basis";
     public static final String DATABASE_COL_ADJ_PROCEEDS = "adj_proceeds";
     public static final String DATABASE_COL_PROCESSED = "processed";
-    public static final String DATABASE_COL_LOT_TIME = "lot_Time";
     public static final String DATABASE_COL_REALIZED_PL = "realized_PL";
     public static final String DATABASE_COL_CODES = "codes";
     public static final String DATABASE_COL_KSFLAG = "ksflag";
@@ -91,14 +85,10 @@ public class TradeDAO {
     public static final String DATABASE_COL_STRIKE = "strike";
     public static final String DATABASE_COL_O_TYPE = "O_Type";
     public static final String DATABASE_COL_BKRGROUP = "bkrGroup";
-    public static final String DATABASE_COL_STRATEGY = "strategy";
     public static final String DATABASE_COL_XCHANGE = "Xchange";
     public static final String DATABASE_COL_ORDER = "order";
     public static final String DATABASE_COL_FILLS = "fills";
     public static final String DATABASE_COL_TOTAL_Q = "TotalQ";
-    public static final String DATABASE_COL_T_GRP = "t_grp";
-    public static final String DATABASE_COL_MATCHING = "matching";
-    public static final String DATABASE_COL_METHOD = "method";
     public static final String DATABASE_COL_TIMESTAMP = "timeStamp";
     
     // Array of trades table column names to display in Elle_GUI
@@ -116,7 +106,6 @@ public class TradeDAO {
         COL_BASIS,
         COL_ADJ_PROCEEDS,
         COL_PROCESSED,
-        COL_LOT_TIME,
         COL_REALIZED_PL,
         COL_CODES,
         COL_KSFLAG,
@@ -134,14 +123,10 @@ public class TradeDAO {
         COL_STRIKE,
         COL_O_TYPE,
         COL_BKRGROUP,
-        COL_STRATEGY,
         COL_XCHANGE,
         COL_ORDER,
         COL_FILLS,
         COL_TOTAL_Q,
-        COL_T_GRP,
-        COL_MATCHING,
-        COL_METHOD,
         COL_TIMESTAMP
     };
     
@@ -160,7 +145,6 @@ public class TradeDAO {
         DATABASE_COL_BASIS,
         DATABASE_COL_ADJ_PROCEEDS,
         DATABASE_COL_PROCESSED,
-        DATABASE_COL_LOT_TIME,
         DATABASE_COL_REALIZED_PL,
         DATABASE_COL_CODES,
         DATABASE_COL_KSFLAG,
@@ -178,14 +162,10 @@ public class TradeDAO {
         DATABASE_COL_STRIKE,
         DATABASE_COL_O_TYPE,
         DATABASE_COL_BKRGROUP,
-        DATABASE_COL_STRATEGY,
         DATABASE_COL_XCHANGE,
         DATABASE_COL_ORDER,
         DATABASE_COL_FILLS,
         DATABASE_COL_TOTAL_Q,
-        DATABASE_COL_T_GRP,
-        DATABASE_COL_MATCHING,
-        DATABASE_COL_METHOD,
         DATABASE_COL_TIMESTAMP
     };
  //map of the column names in the database to the column names to display 

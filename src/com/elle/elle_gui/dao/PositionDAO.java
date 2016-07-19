@@ -34,7 +34,7 @@ public class PositionDAO {
     public static final String COL_BASIS_ADJ = "basis_adj";
     public static final String COL_PRICE = "price";
     public static final String COL_BASIS = "basis";
-    public static final String COL_HOW = "How";
+    public static final String COL_HOW = "how";
     public static final String COL_T_ID = "T_id";
     public static final String COL_WASH = "wash";
     public static final String COL_KSFLAG = "ksflag";
@@ -66,7 +66,7 @@ public class PositionDAO {
     public static final String DATABASE_COL_BASIS_ADJ = "basis_adj";
     public static final String DATABASE_COL_PRICE = "price";
     public static final String DATABASE_COL_BASIS = "basis";
-    public static final String DATABASE_COL_HOW = "How";
+    public static final String DATABASE_COL_HOW = "how";
     public static final String DATABASE_COL_T_ID = "T_id";
     public static final String DATABASE_COL_WASH = "wash";
     public static final String DATABASE_COL_KSFLAG = "ksflag";
