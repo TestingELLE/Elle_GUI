@@ -1,5 +1,9 @@
-CREATE DEFINER=`pupone_Shenrui`@`%` PROCEDURE `displayPositionsToAggregate`()
-    SQL SECURITY INVOKER
+DELIMITER $$
+
+create procedure `displayPositionsToAggregate`()
+
+SQL SECURITY INVOKER
+
 BEGIN
     # creates a temporary table from orderTable grouped by symbol and Trade_time with aggregate columns
     # only for the record which have close price, same symbol and same lot_time. The records which don't need to be aggregated will be filter out
@@ -57,4 +61,6 @@ BEGIN
     (select * from aggregatedTable_temporary)
     order by underlying, symbol, grp,FIELD(ksflag,'bk','tot'), pos_id DESC;
 
-END
+END$$
+
+DELIMITER ;
