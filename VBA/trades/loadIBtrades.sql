@@ -1,9 +1,9 @@
 /* loadIBtrades ++ scripts for loading trades ++ from IB.
-Professor 2016-06-26
+Professor 2016-07-15
 
 The following tables are loaded:
 - trades
-- allocations -> brokerIBmatches
+- brokerIBmatches
 - washes
 
 The Excel download of the trades is first cleaned in VBA through cleanIBtrades VBA Macro.
@@ -13,7 +13,6 @@ This Macro cleans and formats the file and produces 4SQL.cvs files ready for upl
 use pupone_EG_LOAD;
 
  set @`timeStamp`=Now();
- 
  
 /* trades for trades */
 SET @max = (SELECT COUNT(*) FROM trades);
@@ -25,16 +24,19 @@ FIELDS OPTIONALLY ENCLOSED BY '"' TERMINATED BY ','
 LINES TERMINATED BY '\n'
 IGNORE 1 LINES
 (
-	filecode,symbol,@trade_Time,underlying,@expiry,@strike,@O_Type,Xchange,Q,price,@dummy,proceeds,comm,basis,realized_PL,@dummy,codes,TotalQ,yr, `order`, inputLine,secType,bkrGroup,account,LS,OC,multi
+	inputLine,bkrGroup,symbol,@trade_Time,OC,LS,Q,price,proceeds,comm,adj_proceeds,basis,realized_PL,codes,account,yr,filecode,TotalQ,secType,multi,
+    underlying,@expiry,@strike,@O_Type,Xchange,`order`,fills
 )
 SET 
-    strike = IF(@strike = '', NULL, @strike),
-    O_Type = IF(@O_Type = '', NULL, @O_Type),
-    expiry = IF(@expiry = '', NULL, @expiry),
-    trade_Time = STR_TO_DATE(@trade_Time, '%Y-%m-%d %H:%i:%s'),
     id = @max + inputLine,
-    adj_proceeds = proceeds + comm,
-    ksflag = '0';
+    processed = 'N',
+    trade_Time = STR_TO_DATE(@trade_Time, '%Y-%m-%d %H:%i:%s'),
+    ksflag = '0',
+    locked = 'N',
+    expiry = IF(@expiry = '', NULL, @expiry),
+    strike = IF(@strike = '', NULL, @strike),
+    O_Type = IF(@O_Type = '', NULL, @O_Type)
+    ;
 
 insert into timeStamps (timeStamp,script,file) values(@`timeStamp`,'loadIBtrades', 'U529048 Trades 2012 TEST-trades-60611P-4SQL.csv');
 
@@ -48,13 +50,12 @@ FIELDS OPTIONALLY ENCLOSED BY '"' TERMINATED BY ','
 LINES TERMINATED BY '\n'
 IGNORE 1 LINES
 (
-	filecode,symbol,@lot_Time,underlying,@strike,@O_Type,Q,basis,realized_PL,codes,TotalQ,bkrType,yr, `order`, inputLine,secType,account,bkrGroup
+	inputline,bkrGroup,symbol,Q,@lot_Time,basis,realized_PL,codes,`order`,TotalQ,yr,account,filecode
 )
 SET 
-    strike = IF(@strike = '', NULL, @strike),
-    O_Type = IF(@O_Type = '', NULL, @O_Type),
-    lot_Time = STR_TO_DATE(@lot_Time, '%Y-%m-%d %H:%i:%s'),
-    id = @max + inputLine;
+    id = @max + inputLine,
+    processed = 'N',
+    lot_Time = STR_TO_DATE(@lot_Time, '%Y-%m-%d %H:%i:%s');
 
 insert into timeStamps (timeStamp,script,file) values(@`timeStamp`,'loadIBtrades', 'U529048 Trades 2012 TEST-allocations-60611P-4SQL.csv');
 
