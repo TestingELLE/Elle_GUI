@@ -73,6 +73,7 @@ import java.awt.event.*;
 import javax.swing.Box;
 import javax.swing.JComponent;
 import javax.swing.JButton;
+import javax.swing.Timer;
 
 
 /**
@@ -253,7 +254,7 @@ public class ELLE_GUI_Frame extends JFrame implements ITableConstants {
         //setKeyboardFocusManager();
         // load data from database to tables
        loadTables(tabs);
-        
+       
         //display an alert message for any column changes in the database
         displayTableColumnAlert();
 
@@ -357,6 +358,7 @@ public class ELLE_GUI_Frame extends JFrame implements ITableConstants {
         panelCombined = new javax.swing.JPanel();
         scrollPaneCombined = new javax.swing.JScrollPane();
         tableCombined = new javax.swing.JTable();
+        informationLabel = new javax.swing.JLabel();
         menuBar = new javax.swing.JMenuBar();
         menuFile = new javax.swing.JMenu();
         menuItemVersion = new javax.swing.JMenuItem();
@@ -605,6 +607,8 @@ public class ELLE_GUI_Frame extends JFrame implements ITableConstants {
         gridBagConstraints.insets = new java.awt.Insets(4, 50, 0, 10);
         panelCTRLPanel.add(btnClearAllFilters, gridBagConstraints);
 
+        panelSQL.setLayout(new java.awt.GridBagLayout());
+
         scrollPaneSQL.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
 
         textAreaSQL.setBackground(new java.awt.Color(153, 255, 204));
@@ -616,19 +620,51 @@ public class ELLE_GUI_Frame extends JFrame implements ITableConstants {
         .setDocumentFilter(new CreateDocumentFilter(33));
         scrollPaneSQL.setViewportView(textAreaSQL);
 
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.gridwidth = 3;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.ipadx = 1157;
+        gridBagConstraints.ipady = 73;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 1.0;
+        gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 10);
+        panelSQL.add(scrollPaneSQL, gridBagConstraints);
+
         btnEnterSQL.setText("Enter");
+        btnEnterSQL.setMaximumSize(new java.awt.Dimension(93, 23));
+        btnEnterSQL.setMinimumSize(new java.awt.Dimension(93, 23));
+        btnEnterSQL.setPreferredSize(new java.awt.Dimension(93, 23));
         btnEnterSQL.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnEnterSQLActionPerformed(evt);
             }
         });
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHEAST;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.insets = new java.awt.Insets(2, 0, 2, 0);
+        panelSQL.add(btnEnterSQL, gridBagConstraints);
 
         btnClearSQL.setText("Clear");
+        btnClearSQL.setMaximumSize(new java.awt.Dimension(93, 23));
+        btnClearSQL.setMinimumSize(new java.awt.Dimension(93, 23));
+        btnClearSQL.setPreferredSize(new java.awt.Dimension(93, 23));
         btnClearSQL.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnClearSQLActionPerformed(evt);
             }
         });
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.insets = new java.awt.Insets(2, 6, 0, 9);
+        panelSQL.add(btnClearSQL, gridBagConstraints);
 
         btnShowTables.setText("Show Tables");
         btnShowTables.addActionListener(new java.awt.event.ActionListener() {
@@ -636,37 +672,12 @@ public class ELLE_GUI_Frame extends JFrame implements ITableConstants {
                 btnShowTablesActionPerformed(evt);
             }
         });
-
-        javax.swing.GroupLayout panelSQLLayout = new javax.swing.GroupLayout(panelSQL);
-        panelSQL.setLayout(panelSQLLayout);
-        panelSQLLayout.setHorizontalGroup(
-            panelSQLLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(panelSQLLayout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(panelSQLLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(panelSQLLayout.createSequentialGroup()
-                        .addComponent(scrollPaneSQL)
-                        .addContainerGap())
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panelSQLLayout.createSequentialGroup()
-                        .addComponent(btnShowTables)
-                        .addGap(350, 350, 350)
-                        .addComponent(btnEnterSQL, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(btnClearSQL, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addGap(426, 426, 426))))
-        );
-        panelSQLLayout.setVerticalGroup(
-            panelSQLLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(panelSQLLayout.createSequentialGroup()
-                .addGap(0, 0, 0)
-                .addComponent(scrollPaneSQL, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(panelSQLLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(btnEnterSQL, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(btnClearSQL, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(btnShowTables))
-                .addGap(14, 14, 14))
-        );
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.insets = new java.awt.Insets(2, 10, 2, 0);
+        panelSQL.add(btnShowTables, gridBagConstraints);
 
         panelAccounts.setMinimumSize(new java.awt.Dimension(400, 200));
         panelAccounts.setPreferredSize(new java.awt.Dimension(1200, 400));
@@ -744,7 +755,7 @@ public class ELLE_GUI_Frame extends JFrame implements ITableConstants {
         );
         panelTOS3622Layout.setVerticalGroup(
             panelTOS3622Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 451, Short.MAX_VALUE)
+            .addGap(0, 433, Short.MAX_VALUE)
             .addGroup(panelTOS3622Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                 .addGroup(panelTOS3622Layout.createSequentialGroup()
                     .addComponent(scrollPaneTOS3622, javax.swing.GroupLayout.PREFERRED_SIZE, 433, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -780,7 +791,7 @@ public class ELLE_GUI_Frame extends JFrame implements ITableConstants {
         );
         panelCombinedLayout.setVerticalGroup(
             panelCombinedLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 451, Short.MAX_VALUE)
+            .addGap(0, 433, Short.MAX_VALUE)
             .addGroup(panelCombinedLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                 .addGroup(panelCombinedLayout.createSequentialGroup()
                     .addComponent(scrollPaneCombined, javax.swing.GroupLayout.PREFERRED_SIZE, 433, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -798,6 +809,19 @@ public class ELLE_GUI_Frame extends JFrame implements ITableConstants {
         gridBagConstraints.weighty = 1.0;
         gridBagConstraints.insets = new java.awt.Insets(3, 0, 0, 0);
         panelAccounts.add(tabbedPaneAccounts, gridBagConstraints);
+
+        informationLabel.setText("Information Label");
+        informationLabel.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        informationLabel.setMaximumSize(new java.awt.Dimension(250, 14));
+        informationLabel.setMinimumSize(new java.awt.Dimension(200, 14));
+        informationLabel.setOpaque(true);
+        informationLabel.setPreferredSize(new java.awt.Dimension(250, 14));
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.insets = new java.awt.Insets(0, 4, 4, 0);
+        panelAccounts.add(informationLabel, gridBagConstraints);
 
         menuBar.setMargin(new java.awt.Insets(0, 0, 0, 5));
 
@@ -1064,7 +1088,7 @@ public class ELLE_GUI_Frame extends JFrame implements ITableConstants {
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(panelSQL, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(panelSQL, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
             .addComponent(panelAccounts, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addComponent(panelCTRLPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
@@ -1073,7 +1097,7 @@ public class ELLE_GUI_Frame extends JFrame implements ITableConstants {
             .addGroup(layout.createSequentialGroup()
                 .addComponent(panelCTRLPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(0, 0, 0)
-                .addComponent(panelAccounts, javax.swing.GroupLayout.DEFAULT_SIZE, 482, Short.MAX_VALUE)
+                .addComponent(panelAccounts, javax.swing.GroupLayout.DEFAULT_SIZE, 476, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(panelSQL, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
@@ -1837,6 +1861,19 @@ public class ELLE_GUI_Frame extends JFrame implements ITableConstants {
 
         return tabs;
     }
+    
+    //set the timer for information Label show
+    public  void startCountDownFromNow(int waitSeconds) {
+        Timer timer = new Timer(waitSeconds * 1000, new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                informationLabel.setText("v."+version);
+            }
+        });
+        timer.setRepeats(false);
+        timer.start();
+    }
 
     /**
      * loadTables This method takes a tabs Map and loads all the tabs/tables
@@ -1861,7 +1898,9 @@ public class ELLE_GUI_Frame extends JFrame implements ITableConstants {
                 // set initial total records
                 int totalRecords = table.getRowCount();
                 tab.setTotalRecords(totalRecords);
+                setInformationLabel("Tables loaded succesfully", 10);
             }
+            
         }
 
         return tabs;
@@ -2867,6 +2906,15 @@ public class ELLE_GUI_Frame extends JFrame implements ITableConstants {
         menuBar.add(databaseLabel);
     }
      
+     public JLabel getInformationLabel() {
+        return this.informationLabel;
+    }
+
+    public void setInformationLabel(String inf, int second) {
+        informationLabel.setText(inf);
+        startCountDownFromNow(second);
+    }
+     
     public LoginWindow getLoginWindow() {
         return loginWindow;
     }
@@ -2926,6 +2974,7 @@ public class ELLE_GUI_Frame extends JFrame implements ITableConstants {
     private javax.swing.JCheckBox checkBoxDateRange;
     private javax.swing.JCheckBox checkBoxSymbol;
     private javax.swing.JFileChooser filechooser;
+    private javax.swing.JLabel informationLabel;
     private javax.swing.JMenuItem jMenuItem1;
     private javax.swing.JLabel labelHyphen;
     private javax.swing.JLabel labelRecords;

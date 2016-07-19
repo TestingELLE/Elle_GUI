@@ -58,10 +58,11 @@ public class LoginWindow extends JFrame {
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
-        java.awt.GridBagConstraints gridBagConstraints;
 
-        jInputPanel = new javax.swing.JPanel();
+        jTextPanel = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
+        jPanel2 = new javax.swing.JPanel();
+        jInputPanel = new javax.swing.JPanel();
         jLabel4 = new javax.swing.JLabel();
         comboBoxServer = new javax.swing.JComboBox();
         jLabel2 = new javax.swing.JLabel();
@@ -80,69 +81,60 @@ public class LoginWindow extends JFrame {
         setMaximumSize(new java.awt.Dimension(480, 308));
         setMinimumSize(new java.awt.Dimension(480, 308));
         setSize(new java.awt.Dimension(480, 308));
-        getContentPane().setLayout(new java.awt.GridBagLayout());
 
-        jInputPanel.setMaximumSize(new java.awt.Dimension(525, 308));
-        jInputPanel.setMinimumSize(new java.awt.Dimension(525, 308));
+        jTextPanel.setOpaque(false);
+
+        jLabel1.setText("Please input your username and password to log in.");
+
+        javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
+        jPanel2.setLayout(jPanel2Layout);
+        jPanel2Layout.setHorizontalGroup(
+            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 100, Short.MAX_VALUE)
+        );
+        jPanel2Layout.setVerticalGroup(
+            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 100, Short.MAX_VALUE)
+        );
+
+        javax.swing.GroupLayout jTextPanelLayout = new javax.swing.GroupLayout(jTextPanel);
+        jTextPanel.setLayout(jTextPanelLayout);
+        jTextPanelLayout.setHorizontalGroup(
+            jTextPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jTextPanelLayout.createSequentialGroup()
+                .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(0, 0, Short.MAX_VALUE))
+            .addGroup(jTextPanelLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addGap(19, 19, 19))
+        );
+        jTextPanelLayout.setVerticalGroup(
+            jTextPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jTextPanelLayout.createSequentialGroup()
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(jLabel1)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap())
+        );
+
         jInputPanel.setOpaque(false);
-        jInputPanel.setPreferredSize(new java.awt.Dimension(525, 308));
-        jInputPanel.setLayout(new java.awt.GridBagLayout());
 
-        jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel1.setText("<html><b>Please input your username and password to log in.</b></html>");
-        jLabel1.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
-        jLabel1.setMaximumSize(new java.awt.Dimension(325, 14));
-        jLabel1.setMinimumSize(new java.awt.Dimension(320, 14));
-        jLabel1.setPreferredSize(new java.awt.Dimension(320, 14));
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.gridwidth = 3;
-        gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 8);
-        jInputPanel.add(jLabel1, gridBagConstraints);
-
-        jLabel4.setText("<html><b>Server</b></html>");
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 1;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHEAST;
-        gridBagConstraints.insets = new java.awt.Insets(18, 0, 0, 0);
-        jInputPanel.add(jLabel4, gridBagConstraints);
+        jLabel4.setText("Server");
 
         comboBoxServer.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "pupone", "Local" }));
-        comboBoxServer.setMinimumSize(new java.awt.Dimension(61, 30));
-        comboBoxServer.setPreferredSize(new java.awt.Dimension(61, 30));
         comboBoxServer.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 comboBoxServerActionPerformed(evt);
             }
         });
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 1;
-        gridBagConstraints.ipadx = 255;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        gridBagConstraints.insets = new java.awt.Insets(12, 10, 0, 0);
-        jInputPanel.add(comboBoxServer, gridBagConstraints);
 
-        jLabel2.setText("<html><b>Username</b></html>");
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 3;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHEAST;
-        gridBagConstraints.insets = new java.awt.Insets(18, 0, 0, 0);
-        jInputPanel.add(jLabel2, gridBagConstraints);
+        jLabel2.setText("Username");
 
-        jLabel3.setText("<html><b>Password</b></html>");
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 4;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHEAST;
-        gridBagConstraints.insets = new java.awt.Insets(18, 0, 0, 0);
-        jInputPanel.add(jLabel3, gridBagConstraints);
+        jLabel3.setText("Password");
 
         passwordFieldPW.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
-        passwordFieldPW.setPreferredSize(new java.awt.Dimension(6, 27));
         passwordFieldPW.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 passwordFieldPWActionPerformed(evt);
@@ -153,133 +145,143 @@ public class LoginWindow extends JFrame {
                 passwordFieldPWKeyPressed(evt);
             }
         });
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 4;
-        gridBagConstraints.ipadx = 312;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        gridBagConstraints.insets = new java.awt.Insets(12, 8, 0, 0);
-        jInputPanel.add(passwordFieldPW, gridBagConstraints);
 
-        textFieldUsername.setPreferredSize(new java.awt.Dimension(6, 27));
         textFieldUsername.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 textFieldUsernameActionPerformed(evt);
             }
         });
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 3;
-        gridBagConstraints.ipadx = 312;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        gridBagConstraints.insets = new java.awt.Insets(12, 8, 0, 0);
-        jInputPanel.add(textFieldUsername, gridBagConstraints);
 
-        jLabel5.setText("<html><b>Database</b></html>");
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 2;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHEAST;
-        gridBagConstraints.insets = new java.awt.Insets(18, 0, 0, 0);
-        jInputPanel.add(jLabel5, gridBagConstraints);
+        jLabel5.setText("Database");
 
         comboBoxDatabase.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "dummy", "Elle2015", "pupone_dummy", "pupone_Analyster" }));
-        comboBoxDatabase.setMaximumSize(new java.awt.Dimension(61, 30));
-        comboBoxDatabase.setMinimumSize(new java.awt.Dimension(61, 30));
-        comboBoxDatabase.setPreferredSize(new java.awt.Dimension(61, 30));
         comboBoxDatabase.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 comboBoxDatabaseActionPerformed(evt);
             }
         });
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 2;
-        gridBagConstraints.ipadx = 255;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        gridBagConstraints.insets = new java.awt.Insets(12, 10, 0, 0);
-        jInputPanel.add(comboBoxDatabase, gridBagConstraints);
 
         jButtonPanel.setOpaque(false);
-        jButtonPanel.setLayout(new java.awt.GridBagLayout());
 
         btnCancel.setText("Cancel/ Log off");
-        btnCancel.setMaximumSize(new java.awt.Dimension(61, 25));
-        btnCancel.setMinimumSize(new java.awt.Dimension(61, 25));
-        btnCancel.setPreferredSize(new java.awt.Dimension(61, 25));
         btnCancel.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnCancelActionPerformed(evt);
             }
         });
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.ipadx = 90;
-        gridBagConstraints.ipady = 5;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHEAST;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 8);
-        jButtonPanel.add(btnCancel, gridBagConstraints);
 
         btnLogin.setText("Log in");
-        btnLogin.setMaximumSize(new java.awt.Dimension(61, 27));
-        btnLogin.setMinimumSize(new java.awt.Dimension(61, 28));
-        btnLogin.setPreferredSize(new java.awt.Dimension(61, 25));
         btnLogin.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnLoginActionPerformed(evt);
             }
         });
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.ipadx = 90;
-        gridBagConstraints.ipady = 5;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        jButtonPanel.add(btnLogin, gridBagConstraints);
 
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 5;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        gridBagConstraints.insets = new java.awt.Insets(12, 8, 0, 0);
-        jInputPanel.add(jButtonPanel, gridBagConstraints);
+        javax.swing.GroupLayout jButtonPanelLayout = new javax.swing.GroupLayout(jButtonPanel);
+        jButtonPanel.setLayout(jButtonPanelLayout);
+        jButtonPanelLayout.setHorizontalGroup(
+            jButtonPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jButtonPanelLayout.createSequentialGroup()
+                .addGap(123, 123, 123)
+                .addComponent(btnLogin, javax.swing.GroupLayout.PREFERRED_SIZE, 80, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(26, 26, 26)
+                .addComponent(btnCancel, javax.swing.GroupLayout.PREFERRED_SIZE, 132, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(119, Short.MAX_VALUE))
+        );
+        jButtonPanelLayout.setVerticalGroup(
+            jButtonPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jButtonPanelLayout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jButtonPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(btnLogin)
+                    .addComponent(btnCancel))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
 
         btnEditDB.setText("Edit");
-        btnEditDB.setMaximumSize(new java.awt.Dimension(51, 30));
-        btnEditDB.setMinimumSize(new java.awt.Dimension(51, 30));
-        btnEditDB.setPreferredSize(new java.awt.Dimension(51, 30));
         btnEditDB.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnEditDBActionPerformed(evt);
             }
         });
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = 2;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        gridBagConstraints.insets = new java.awt.Insets(11, 6, 0, 0);
-        jInputPanel.add(btnEditDB, gridBagConstraints);
 
         JLabel6.setMaximumSize(new java.awt.Dimension(34, 21));
         JLabel6.setMinimumSize(new java.awt.Dimension(34, 21));
         JLabel6.setPreferredSize(new java.awt.Dimension(34, 21));
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 6;
-        gridBagConstraints.ipadx = 300;
-        gridBagConstraints.ipady = 30;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.SOUTHWEST;
-        gridBagConstraints.weighty = 1.0;
-        jInputPanel.add(JLabel6, gridBagConstraints);
 
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 1;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        getContentPane().add(jInputPanel, gridBagConstraints);
+        javax.swing.GroupLayout jInputPanelLayout = new javax.swing.GroupLayout(jInputPanel);
+        jInputPanel.setLayout(jInputPanelLayout);
+        jInputPanelLayout.setHorizontalGroup(
+            jInputPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jInputPanelLayout.createSequentialGroup()
+                .addGap(37, 37, 37)
+                .addGroup(jInputPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jInputPanelLayout.createSequentialGroup()
+                        .addGroup(jInputPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLabel2)
+                            .addComponent(jLabel3))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addGroup(jInputPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(passwordFieldPW)
+                            .addComponent(textFieldUsername)))
+                    .addGroup(jInputPanelLayout.createSequentialGroup()
+                        .addGroup(jInputPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLabel5)
+                            .addComponent(jLabel4, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addGroup(jInputPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(comboBoxServer, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(comboBoxDatabase, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(btnEditDB)
+                .addContainerGap())
+            .addComponent(jButtonPanel, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jInputPanelLayout.createSequentialGroup()
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(JLabel6, javax.swing.GroupLayout.PREFERRED_SIZE, 335, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(69, 69, 69))
+        );
+        jInputPanelLayout.setVerticalGroup(
+            jInputPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jInputPanelLayout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jInputPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.CENTER)
+                    .addComponent(comboBoxServer, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel4))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(jInputPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel5)
+                    .addComponent(comboBoxDatabase, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btnEditDB))
+                .addGap(18, 18, 18)
+                .addGroup(jInputPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.CENTER)
+                    .addComponent(textFieldUsername, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel2))
+                .addGap(14, 14, 14)
+                .addGroup(jInputPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel3)
+                    .addComponent(passwordFieldPW, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(18, 18, 18)
+                .addComponent(jButtonPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
+                .addComponent(JLabel6, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(28, Short.MAX_VALUE))
+        );
+
+        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
+        getContentPane().setLayout(layout);
+        layout.setHorizontalGroup(
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jTextPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(jInputPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+        );
+        layout.setVerticalGroup(
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(layout.createSequentialGroup()
+                .addComponent(jTextPanel, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jInputPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
@@ -299,13 +301,13 @@ public class LoginWindow extends JFrame {
         System.exit(0); // Terminates the currently running Java Virtual Machine.
     }
     private void btnLoginActionPerformed(ActionEvent evt) {//GEN-FIRST:event_btnLoginActionPerformed
-            login();
+        login();
     }//GEN-LAST:event_btnLoginActionPerformed
 
     private void passwordFieldPWKeyPressed(KeyEvent evt) {//GEN-FIRST:event_passwordFieldPWKeyPressed
         if (evt.getKeyChar() == KeyEvent.VK_ENTER) {
-                login();
-            }
+            login();
+        }
     }//GEN-LAST:event_passwordFieldPWKeyPressed
 
     private void comboBoxDatabaseActionPerformed(ActionEvent evt) {//GEN-FIRST:event_comboBoxDatabaseActionPerformed
@@ -340,7 +342,7 @@ public class LoginWindow extends JFrame {
             return userNameToAL;
         } else {
             return userName;
-    }
+        }
     }
 
     /**
@@ -354,56 +356,47 @@ public class LoginWindow extends JFrame {
         userName = textFieldUsername.getText();
         char[] pw = passwordFieldPW.getPassword();
         userPassword = String.valueOf(pw);
-        
+
         // logwindow
-        logWindow = new LogWindow(); 
+        logWindow = new LogWindow();
         logWindow.setUserLogFileDir(this.getUserName());
         // write to log file
         String date = logWindow.dateFormat.format(new Date());
         logWindow.addMessage(HYPHENS + date + HYPHENS);
         logWindow.readMessages(); // read log messages from the log file
-        
-        // connect to database
-        logWindow.addMessageWithDate("3:Start to connect local database...");
-        JLabel6.setText("<html><b>Start to connect local database...</b></html>");
-        JLabel6.paintImmediately(JLabel6.getVisibleRect());
 
-        if(DBConnection.connect(selectedServer, selectedDB, userName, userPassword)){
+        // connect to database
+        logWindow.addMessageWithDate("Start to connect local database...");
+        JLabel6.setText("Start to connect local database...");
+        JLabel6.paintImmediately(JLabel6.getVisibleRect());
+        
+        if (DBConnection.connect(selectedServer, selectedDB, userName, userPassword)) {
             logWindow.addMessageWithDate("Connect successfully!");
-            
-            JLabel6.setText("<html><b>Connection successful!<br>Authenticating...</b></html>");
-           JLabel6.paintImmediately(JLabel6.getVisibleRect());
-          
-           logWindow.addMessageWithDate("Authenticating...");
+            JLabel6.setText("Connection successful!");
+            JLabel6.paintImmediately(JLabel6.getVisibleRect());
             
             
-            if(!Authorization.getInfoFromDB()){
+
+            // authorize user
+            if (!Authorization.getInfoFromDB()) {
+
                 logWindow.addMessageWithDate("This user has not been authorized!"
-                                          + "\n Access denied!");
-                
-                JLabel6.setText("This user has not been authorized!"
-                                          + "\n Access denied!");
-                JLabel6.paintImmediately(JLabel6.getVisibleRect());
+                        + "\n Access denied!");
                 JOptionPane.showMessageDialog(this, "You have not been authorized. Default user access.");
                 JOptionPane.showMessageDialog(this, "Logged in as default user.");
             }
             
             userName = userName.substring(7);
-             System.out.println("userName: " + userName);
-            logWindow.addMessageWithDate("Authenticating...");
-            logWindow.addMessageWithDate("Authentication Successful!" + " Username: " + userName);
-            
-            JLabel6.setText("<html><b>Authentication complete!" + " Username: " + userName+ "<br> Loading tables...</b></html>");
+             JLabel6.setText("Connection Successful!" + " userName: " + userName);
             JLabel6.paintImmediately(JLabel6.getVisibleRect());
-            
-            
-            // create an Elle_GUI object
-           elle_gui = new ELLE_GUI_Frame();
-          
-            // pass the log window to elle_gui
-           elle_gui.setLogWindow(logWindow);
 
-            // pass the selectedDB to elle_gui
+            // create an Analyster object
+            elle_gui = new ELLE_GUI_Frame();
+
+            // pass the log window to analyster
+            elle_gui.setLogWindow(logWindow);
+
+            // pass the selectedDB to Analyster
             // it is used in sql statements
             elle_gui.setDatabase(selectedDB);
             
@@ -417,27 +410,25 @@ public class LoginWindow extends JFrame {
             // show Analyster
             elle_gui.setLocationRelativeTo(this);
             elle_gui.setVisible(true);
-            
-            
 
             // terminate this object
             this.dispose(); // returns used resources
-            
+
         } else {
 
             JOptionPane.showMessageDialog(this,
                     "There was an error.\n Please try again or contact support if you need further assistance.",
                     "Error Message",
-                   JOptionPane.ERROR_MESSAGE);
-       
+                    JOptionPane.ERROR_MESSAGE);
+
             passwordFieldPW.setText("");
         }
     }
-            
+
     public String getSelectedServer() {
         return selectedServer;
     }
-           
+
     public void setSelectedServer(String selectedServer) {
         this.selectedServer = selectedServer;
     }
@@ -453,11 +444,11 @@ public class LoginWindow extends JFrame {
     public String getUserPassword() {
         return userPassword;
     }
-            
+
     public void setUserPassword(String userPassword) {
         this.userPassword = userPassword;
     }
-            
+
     public ELLE_GUI_Frame getElleGui() {
         return elle_gui;
     }
@@ -465,15 +456,15 @@ public class LoginWindow extends JFrame {
     public void setElleGui(ELLE_GUI_Frame elle_gui) {
         this.elle_gui = elle_gui;
     }
-            
+
     public EditDatabaseWindow getEditDatabaseList() {
         return editDatabaseList;
     }
-            
+
     public void setEditDatabaseList(EditDatabaseWindow editDatabaseList) {
         this.editDatabaseList = editDatabaseList;
-       }
-       
+    }
+
     public LogWindow getLogWindow() {
         return logWindow;
     }
@@ -481,7 +472,7 @@ public class LoginWindow extends JFrame {
     public void setLogWindow(LogWindow logWindow) {
         this.logWindow = logWindow;
     }
-    
+
     public JButton getBtnCancel() {
         return btnCancel;
     }
@@ -578,6 +569,22 @@ public class LoginWindow extends JFrame {
         this.jLabel5 = jLabel5;
     }
 
+    public JPanel getjPanel2() {
+        return jPanel2;
+    }
+
+    public void setjPanel2(JPanel jPanel2) {
+        this.jPanel2 = jPanel2;
+    }
+
+    public JPanel getjTextPanel() {
+        return jTextPanel;
+    }
+
+    public void setjTextPanel(JPanel jTextPanel) {
+        this.jTextPanel = jTextPanel;
+    }
+
     public JPasswordField getPasswordFieldPW() {
         return passwordFieldPW;
     }
@@ -593,7 +600,26 @@ public class LoginWindow extends JFrame {
     public void setTextFieldUsername(JTextField textFieldUsername) {
         this.textFieldUsername = textFieldUsername;
     }
-   
+    
+    /*Corinne 7/11/16
+    //calculate the left spacing needed to center the title, 
+     create a formatted string which contains this space, and add the formatted string(spacing) to the title*/
+    private void setTitle(){
+        Font f = this.getFont();
+        FontMetrics fm = this.getFontMetrics(f);
+        String title = "Log in to Elle_GUI " + version;
+        
+        /*calcullate the left spacing needed to center the title
+         This may not return an accurate value. Adjust the amount 
+        subtracted from z/y to obtain a more accurate value.*/
+        int x = fm.stringWidth(title);
+        int y = fm.stringWidth(" ");
+        int z = this.getWidth()/2 - (x/2);
+        int w = z/y - 10; //subtract to from z/y to position the string closer to the center
+        String pad ="";
+        pad = String.format("%"+w+"s", pad);
+        this.setTitle(pad+title);
+    }
 
     private DefaultComboBoxModel getServersCBModel() {
         Vector serverNames = new Vector();
@@ -620,7 +646,7 @@ public class LoginWindow extends JFrame {
         }
         return new DefaultComboBoxModel(databases);
     }
-    
+
     public void loadServers() {
         servers = DBConnection.readServers();
         // set comboboxes for servers and databases
@@ -634,7 +660,7 @@ public class LoginWindow extends JFrame {
         textFieldUsername.setText(db.getUsername());
         passwordFieldPW.setText(db.getPassword());
     }
-    
+
     private int getDefaultServer() {
         int server = 0;
         for (int i = 0; i < servers.size(); i++) {
@@ -657,7 +683,7 @@ public class LoginWindow extends JFrame {
         }
         return database;
     }
-
+    
     /**
      * used to update the selection when a combobox is changed
      */
@@ -672,27 +698,7 @@ public class LoginWindow extends JFrame {
         textFieldUsername.setText(db.getUsername());
         passwordFieldPW.setText(db.getPassword());
     }
-    /*Corinne 7/11/16
-    //calculate the left spacing needed to center the title, 
-     create a formatted string which contains this space, and add the formatted string(spacing) to the title*/
-    private void setTitle(){
-        Font f = this.getFont();
-        FontMetrics fm = this.getFontMetrics(f);
-        String title = "Log in to Elle_GUI" + version;
-        
-        /*calcullate the left spacing needed to center the title
-        This may not return an accurate value. Adjust the amount 
-        subtracted from z/y to obtain a more accurate value.*/
-        int x = fm.stringWidth(title);
-        int y = fm.stringWidth(" ");
-        int z = this.getWidth()/2 - (x/2);
-        int w = z/y - 11; //here subtract from z/y to position the string closer to the center
-        String pad ="";
-        //for (int i=0; i!=w; i++) pad +=" "; 
-        pad = String.format("%"+w+"s", pad);
-        this.setTitle(pad+title);
-    }
-    
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel JLabel6;
     private javax.swing.JButton btnCancel;
@@ -707,6 +713,8 @@ public class LoginWindow extends JFrame {
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
+    private javax.swing.JPanel jPanel2;
+    private javax.swing.JPanel jTextPanel;
     private javax.swing.JPasswordField passwordFieldPW;
     private javax.swing.JTextField textFieldUsername;
     // End of variables declaration//GEN-END:variables
