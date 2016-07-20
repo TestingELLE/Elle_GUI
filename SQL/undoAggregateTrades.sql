@@ -1,5 +1,9 @@
-CREATE DEFINER=`pupone_Corinne`@`%` PROCEDURE `undoAggregateTrades`(IN stamp1 varchar(255))
+DELIMITER $$
+
+CREATE PROCEDURE `undoAggregateTrades`(IN stamp1 varchar(255))
+    
     SQL SECURITY INVOKER
+    
 BEGIN
     set SQL_SAFE_UPDATES=0;
 

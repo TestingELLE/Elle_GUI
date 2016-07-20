@@ -299,20 +299,20 @@ public class AccountTable implements ITableConstants {
         switch (getTableName()) {
             case POSITIONS_TABLE_NAME:
                 output = "<html><pre>"
-                        + "        Number of records shown: " + getRecordsShown()
-                        + "<br/> Number of records in Positions: " + getTotalRecords()
+                        + "Number of records shown: " + getRecordsShown()
+                        + "<br/>Number of records in Positions: " + getTotalRecords()
                         + "</pre></html>";
                 break;
             case TRADES_TABLE_NAME:
                 output = "<html><pre>"
-                        + "     Number of records shown: " + getRecordsShown()
-                        + "<br/> Number of records in Trades: " + getTotalRecords()
+                        + "Number of records shown: " + getRecordsShown()
+                        + "<br/>Number of records in Trades: " + getTotalRecords()
                         + "</pre></html>";
                 break;
             case ALLOCATIONS_TABLE_NAME:
                 output = "<html><pre>"
-                        + "          Number of records shown: " + getRecordsShown()
-                        + "<br/> Number of records in Allocations: " + getTotalRecords()
+                        + "Number of records shown: " + getRecordsShown()
+                        + "<br/>Number of records in Allocations: " + getTotalRecords()
                         + "</pre></html>";
                 break;
             default:

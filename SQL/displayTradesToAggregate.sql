@@ -1,10 +1,17 @@
-CREATE DEFINER=`pupone_Shenrui`@`%` PROCEDURE `displayTradesToAggregate`()
-    SQL SECURITY INVOKER
+DELIMITER $$
+
+CREATE PROCEDURE`displayTradesToAggregate`()
+
+SQL SECURITY INVOKER
+
 BEGIN
     
-    -- creates a temporary table from orderTable grouped by symbol and Trade_time with aggregate columns
+    /*creates a temporary table from orderTable grouped by symbol and Trade_time with aggregate columns
     -- only for the record which have close price, same symbol and same lot_time. The records which don't need to be aggregated will be filter out
     # Then it only aggregates the records which need to be aggregated
+*/
+
+
     drop temporary table if exists aggregatedCalculation_temporary;
     create temporary table if not exists aggregatedCalculation_temporary
     select min(abs(l2.id)) as grp,sum(l2.Q) as sumOfQ,sum(l2.basis) as sumOfBasis,
@@ -57,6 +64,8 @@ BEGIN
     union 
     (select * from aggregatedTable_temporary)
     order by underlying, symbol, t_grp,FIELD(ksflag,'bk','tot'),id;
-    
+ 
 
-END
+END$$
+
+DELIMITER ;
