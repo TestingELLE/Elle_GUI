@@ -1,5 +1,5 @@
 /* loadIBtrades ++ scripts for loading trades ++ from IB.
-Professor 2016-07-15
+Professor 2016-07-20
 
 The following tables are loaded:
 - trades
@@ -18,19 +18,20 @@ use pupone_EG_LOAD;
 SET @max = (SELECT COUNT(*) FROM trades);
 
 LOAD DATA LOCAL INFILE
-'/Users/luca/Dropbox/ELLE/ELLE Portfolio Management/4SQL/trades 4SQL/U529048 Trades 2012 TEST-trades-60611P-4SQL.csv'
+'/Users/luca/Dropbox/ELLE/ELLE Portfolio Management/4SQL/trades 4SQL/U529048 Trades 2012 TEST-trades-60718C-4SQL.csv'
 INTO TABLE trades 
 FIELDS OPTIONALLY ENCLOSED BY '"' TERMINATED BY ','
 LINES TERMINATED BY '\n'
 IGNORE 1 LINES
 (
-	inputLine,bkrGroup,symbol,@trade_Time,OC,LS,Q,price,proceeds,comm,adj_proceeds,basis,realized_PL,codes,account,yr,filecode,TotalQ,secType,multi,
+	inputLine,bkrGroup,symbol,@trade_Time,OC,LS,Q,price,proceeds,comm,basis,realized_PL,codes,account,yr,filecode,TotalQ,secType,multi,
     underlying,@expiry,@strike,@O_Type,Xchange,`order`,fills
 )
 SET 
     id = @max + inputLine,
     processed = 'N',
     trade_Time = STR_TO_DATE(@trade_Time, '%Y-%m-%d %H:%i:%s'),
+    adj_proceeds = proceeds + comm,
     ksflag = '0',
     locked = 'N',
     expiry = IF(@expiry = '', NULL, @expiry),
@@ -38,13 +39,13 @@ SET
     O_Type = IF(@O_Type = '', NULL, @O_Type)
     ;
 
-insert into timeStamps (timeStamp,script,file) values(@`timeStamp`,'loadIBtrades', 'U529048 Trades 2012 TEST-trades-60611P-4SQL.csv');
+insert into timeStamps (timeStamp,script,file) values(@`timeStamp`,'loadIBtrades', 'U529048 Trades 2012 TEST-trades-60718C-4SQL.csv');
 
 /* brokerIBmatches for allocations */
 SET @max = (SELECT COUNT(*) FROM brokerIBmatches);
 
 LOAD DATA LOCAL INFILE
-'/Users/luca/Dropbox/ELLE/ELLE Portfolio Management/4SQL/trades 4SQL/U529048 Trades 2012 TEST-allocations-60611P-4SQL.csv'
+'/Users/luca/Dropbox/ELLE/ELLE Portfolio Management/4SQL/trades 4SQL/U529048 Trades 2012 TEST-brokerIBmatches-60718C-4SQL.csv'
 INTO TABLE brokerIBmatches 
 FIELDS OPTIONALLY ENCLOSED BY '"' TERMINATED BY ','
 LINES TERMINATED BY '\n'
@@ -57,19 +58,19 @@ SET
     processed = 'N',
     lot_Time = STR_TO_DATE(@lot_Time, '%Y-%m-%d %H:%i:%s');
 
-insert into timeStamps (timeStamp,script,file) values(@`timeStamp`,'loadIBtrades', 'U529048 Trades 2012 TEST-allocations-60611P-4SQL.csv');
+insert into timeStamps (timeStamp,script,file) values(@`timeStamp`,'loadIBtrades', 'U529048 Trades 2012 TEST-brokerIBmatches-60718C-4SQL.csv');
 
 /* brokerIBwashes for washes */
 SET @max = (SELECT COUNT(*) FROM brokerIBwashes);
 
 LOAD DATA LOCAL INFILE
-'/Users/luca/Dropbox/ELLE/ELLE Portfolio Management/4SQL/trades 4SQL/U529048 Trades 2012 TEST-washes-60611P-4SQL.csv'
+'/Users/luca/Dropbox/ELLE/ELLE Portfolio Management/4SQL/trades 4SQL/U529048 Trades 2012 TEST-washes-60718C-4SQL.csv'
 INTO TABLE brokerIBwashes 
 FIELDS OPTIONALLY ENCLOSED BY '"' TERMINATED BY ','
 LINES TERMINATED BY '\n'
 IGNORE 1 LINES
 (
-	filecode,symbol,@lot_Time,underlying,@strike,@O_Type,Q,realized_PL,codes,bkrType,yr, `order`, inputLine,secType,account,bkrGroup
+	inputLine,bkrGroup,symbol,@lot_Time,Q,realized_PL,codes,yr, `order`,account,filecode
 )
 SET 
     strike = IF(@strike = '', NULL, @strike),
@@ -77,4 +78,4 @@ SET
     lot_Time = STR_TO_DATE(@lot_Time, '%Y-%m-%d %H:%i:%s'),
     id = @max + inputLine;
 
-insert into timeStamps (timeStamp,script,file) values(@`timeStamp`,'loadIBtrades', 'U529048 Trades 2012 TEST-washes-60611P-4SQL.csv');
+insert into timeStamps (timeStamp,script,file) values(@`timeStamp`,'loadIBtrades', 'U529048 Trades 2012 TEST-washes-60718C-4SQL');
