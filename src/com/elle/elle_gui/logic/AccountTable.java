@@ -335,5 +335,16 @@ public class AccountTable implements ITableConstants {
 
         return output;
     }
+    
+    //returm tje column intdex by column name
+    public int getColumnIndexbyColumnName(String columnname){
+        int columnindex = 0;
+        for (int i = 0; i < table.getColumnCount(); i++) {
+            if (table.getColumnName(i) == columnname){
+                columnindex = i;
+            }
+        }
+        return columnindex;
+    }
 
 }// end Tab
