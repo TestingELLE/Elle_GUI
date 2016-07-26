@@ -1,5 +1,8 @@
-CREATE DEFINER=`pupone_Shenrui`@`%` PROCEDURE `aggregatePositions`()
+DELIMITER $$
+
+CREATE  PROCEDURE `aggregatePositions`()
     SQL SECURITY INVOKER
+
 BEGIN
     # turn safe mode off
     set SQL_SAFE_UPDATES=0;
@@ -13,9 +16,10 @@ BEGIN
     create temporary table if not exists orderedtable
     select * from positions order by pos_id;
 
-    # creates a temporary table from orderTable grouped by symbol and Trade_time with aggregate columns
+    /* creates a temporary table from orderTable grouped by symbol and Trade_time with aggregate columns
     #only for the record which have close price, same symbol and same lot_time. The records which don't need to be aggregated will be filter out
-   #Then it only aggregates the records which need to be aggregated
+Then it only aggregates the records which need to be aggregated
+*/
     
     drop temporary table if exists aggregatedCalculation_temporary;
     create temporary table if not exists aggregatedCalculation_temporary
@@ -83,4 +87,6 @@ BEGIN
     -- delete original and bk records from the current table 
     delete from positions where pos_id in (select pos_id from aggregatedPositions) and ksflag<>"tot";
     
-END
+END $$
+
+DELIMITER ;

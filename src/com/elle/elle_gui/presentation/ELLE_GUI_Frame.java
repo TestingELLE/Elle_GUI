@@ -311,7 +311,27 @@ public class ELLE_GUI_Frame extends JFrame implements ITableConstants {
         menuItemIB8949.setEnabled(false);
         menuItemReconcile.setEnabled(false);
         menuItemTL8949.setEnabled(false);
-
+        
+        //set cellrenders to all three tables to hide decimals in price
+        JTable positions_ib9048 = tabs.get(IB9048_ACCOUNT_NAME).get(POSITIONS_TABLE_NAME).getTable();
+        int price_column_index_positions = tabs.get(IB9048_ACCOUNT_NAME).get(POSITIONS_TABLE_NAME).getColumnIndexbyColumnName("price");
+        positions_ib9048.getColumnModel().getColumn(price_column_index_positions).setCellRenderer(new pricerender());
+        positions_ib9048.getColumnModel().getColumn(price_column_index_positions).setMaxWidth(50);
+        
+        JTable trades_ib9048 = tabs.get(IB9048_ACCOUNT_NAME).get(TRADES_TABLE_NAME).getTable();
+        int price_column_index_trades = tabs.get(IB9048_ACCOUNT_NAME).get(TRADES_TABLE_NAME).getColumnIndexbyColumnName("price");
+        trades_ib9048.getColumnModel().getColumn(price_column_index_trades).setCellRenderer(new pricerender());
+        trades_ib9048.getColumnModel().getColumn(price_column_index_trades).setMaxWidth(50);
+        
+        JTable positions_combined = tabs.get(COMBINED_ACCOUNT_NAME).get(POSITIONS_TABLE_NAME).getTable();
+        positions_combined.getColumnModel().getColumn(price_column_index_positions).setCellRenderer(new pricerender());
+        positions_combined.getColumnModel().getColumn(price_column_index_positions).setMaxWidth(50);
+        
+        JTable trades_combined = tabs.get(COMBINED_ACCOUNT_NAME).get(TRADES_TABLE_NAME).getTable();
+        trades_combined.getColumnModel().getColumn(price_column_index_trades).setCellRenderer(new pricerender());
+        trades_combined.getColumnModel().getColumn(price_column_index_trades).setMaxWidth(50);
+        
+        
         Authorization.authorize(this);
     }
 
@@ -2957,6 +2977,25 @@ public class ELLE_GUI_Frame extends JFrame implements ITableConstants {
         } else {
             return panelCombined;
         }
+    }
+    
+    //cell render to hide the decimals of prices; enable tooltips to show the price. 
+    public class pricerender extends DefaultTableCellRenderer {
+        
+        @Override public void setValue(Object aValue) {
+            
+            //convert price to float number, because it was stored as string in jtable.
+            if (aValue != null) {
+                float price_in_float = Float.parseFloat((String) aValue);
+                int price_rounded = (int) price_in_float;
+                String price_rounded_instring = Integer.toString(price_rounded);
+                super.setText(price_rounded_instring);
+                super.setToolTipText((String) aValue);
+                super.setHorizontalAlignment( JLabel.CENTER );
+            }
+
+        }
+
     }
 
     @SuppressWarnings("unused")

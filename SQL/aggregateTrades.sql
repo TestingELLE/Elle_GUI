@@ -1,28 +1,31 @@
-CREATE DEFINER=`pupone_Shenrui`@`%` PROCEDURE `aggregateTrades`()
+DELIMITER $$
+
+CREATE  PROCEDURE `aggregateTrades`()
     SQL SECURITY INVOKER
+
 BEGIN 
     -- turn safe mode off
     set SQL_SAFE_UPDATES=0;
       
     set @`timeStamp`=Now();
     
-    insert into `timeStamps` (timeStamp, script) values (@`timeStamp`, 'aggregateTrades');
-    
    -- creates a temporary table sorted by ID
     drop temporary table if exists orderedtable;
     create temporary table if not exists orderedtable
     select * from trades order by id;
    
-    # creates a temporary table from orderTable grouped by symbol and Trade_time with aggregate columns
-    #only for the record which have close price, same symbol and same lot_time. The records which don't need to be aggregated will be filter out
-    #Then it only aggregates the records which need to be aggregated
+    /* reates a temporary table from orderTable grouped by symbol and Trade_time with aggregate columns
+    only for the record which have close price, same symbol and same lot_time. The records which don't need to be aggregated will be filter out
+    Then it only aggregates the records which need to be aggregated
+*/
+
     drop temporary table if exists aggregatedCalculation_temporary;
     create temporary table if not exists aggregatedCalculation_temporary
-    select min(abs(l2.id)) as grp,sum(l2.Q) as sumOfQ,sum(l2.basis) as sumOfBasis,
+    select min(l2.id) as grp,sum(l2.Q) as sumOfQ,sum(l2.basis) as sumOfBasis,
     avg(l2.multi) as avgOfMulti, -sum(l2.proceeds)/sum(l2.Q)/avg(l2.multi) as price,sum(l2.comm) as sumOfComm,
     sum(l2.proceeds) as sumOfProceeds
     from orderedtable l2
-    where OC = "O" and !field(ksflag,"ks","bk")
+    where OC = "O" and !field(ksflag,"ks","bk","tot")
     and 
     exists(select "X" from trades group_team
     where group_team.symbol=l2.symbol and group_team.trade_Time=l2.trade_Time and
@@ -65,14 +68,15 @@ BEGIN
 
     -- inserts the aggregated trades into the aggregatedTrades table 
     Insert into aggregatedTrades
-    select * from aggregatedTable_temporary;
-    
-    Insert into aggregatedTrades
-    select * from trades
-    where ksflag="bk";
+    select * from trades where ksflag="bk" or ksflag="tot"
+    order by underlying, symbol, t_grp,FIELD(ksflag,'bk','tot'),id;
     
     #remove trades with ksflag = bk from the current table
     delete from trades where ksflag = "bk";
     
+    insert into `timeStamps` (timeStamp, script) values (@`timeStamp`, 'aggregateTrades');
+    
 
-END
+END$$
+
+DELIMITER ;

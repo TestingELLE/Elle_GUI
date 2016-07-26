@@ -1,17 +1,18 @@
-CREATE DEFINER=`pupone_Shenrui`@`%` PROCEDURE `processTrades_O`(IN MYTABLE varchar(50))
+  DELIMITER $$
+  
+  CREATE PROCEDURE `processTrades_O`()
+  
     SQL SECURITY INVOKER
+    
 BEGIN
 	set @`timeStamp`=Now();
 	set @rownum1=0;
 	drop temporary table if exists tradesRecord_temporary;
     
     #filter the trades record with processed = N and OC=O
-	SET @cmd3 = CONCAT('create temporary table if not exists tradesRecord_temporary
-    select *,@rownum1 := @rownum1 + 1 AS rank from ',MYTABLE,'
-    where processed = "N" and OC = "O" and ksflag<>"bk";');
-	PREPARE STMT3 FROM @cmd3;
-	EXECUTE STMT3;
-	DEALLOCATE PREPARE STMT3;
+	create temporary table if not exists tradesRecord_temporary
+    select *,@rownum1 := @rownum1 + 1 AS rank from trades
+    where processed = "N" and OC = "O" and ksflag<>"bk";
     
     
 	#duplicate same number positions table with pos_id =1
@@ -68,13 +69,12 @@ BEGIN
     
     
     #update trades table from processed = N to Y
-	SET @cmd4 = CONCAT('update ',MYTABLE,'
+	update trades
     set processed = "Y" 
-    where processed = "N" and OC = "O" and ksflag <>"bk";');
-	PREPARE STMT4 FROM @cmd4;
-	EXECUTE STMT4;
-	DEALLOCATE PREPARE STMT4;
+    where processed = "N" and OC = "O" and ksflag <>"bk";
     
     insert into `timeStamps` value(@`timeStamp`,'processTrades_O');
     
-END
+END$$
+
+DELIMITER ;

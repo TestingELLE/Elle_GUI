@@ -1,5 +1,5 @@
 /* loadIBpositions script for loading positions from IB.
-Professor 2016-06-26
+Professor 2016-07-20
 
 The following tables are loaded:
 - positions

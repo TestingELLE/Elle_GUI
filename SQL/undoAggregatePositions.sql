@@ -1,5 +1,9 @@
-CREATE DEFINER=`pupone_Corinne`@`%` PROCEDURE `undoAggregatePositions`(IN stamp1 varchar(255))
+DELIMITER $$
+
+
+CREATE PROCEDURE `undoAggregatePositions`(IN stamp1 varchar(255))
     SQL SECURITY INVOKER
+    
 BEGIN
     set SQL_SAFE_UPDATES=0;
     
@@ -39,4 +43,6 @@ BEGIN
     delete from `timeStamps`
     where `timeStamp`=@stamp;
 
-END
+END$$
+
+DELIMITER ;
