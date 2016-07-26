@@ -61,14 +61,20 @@ public class TableColumnAdjuster implements PropertyChangeListener, TableModelLi
 	 */
 	public void adjustColumn(final int column)
 	{
+                int preferredWidth;
 		TableColumn tableColumn = table.getColumnModel().getColumn(column);
 
 		if (! tableColumn.getResizable()) return;
 
 		int columnHeaderWidth = getColumnHeaderWidth( column );
 		int columnDataWidth   = getColumnDataWidth( column );
-		int preferredWidth	= Math.max(columnHeaderWidth, columnDataWidth);
-
+                
+                if (table.getColumnName(column).equalsIgnoreCase("price")){
+                     preferredWidth = columnHeaderWidth;
+                }
+                else{
+                     preferredWidth	= Math.max(columnHeaderWidth, columnDataWidth);
+                }
 		updateTableColumn(column, preferredWidth);
 	}
 
@@ -145,7 +151,9 @@ public class TableColumnAdjuster implements PropertyChangeListener, TableModelLi
 
 		if (isOnlyAdjustLarger)
 		{
+                     if (!table.getColumnName(column).equalsIgnoreCase("price")){
 			width = Math.max(width, 75);
+                         }
 		}
 
 		columnSizes.put(tableColumn, new Integer(tableColumn.getWidth()));
