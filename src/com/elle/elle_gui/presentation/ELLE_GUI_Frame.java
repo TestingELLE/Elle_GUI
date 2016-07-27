@@ -24,6 +24,7 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.Point;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
@@ -76,6 +77,7 @@ import javax.swing.JButton;
 import javax.swing.Timer;
 import java.lang.Double;
 import static java.lang.Double.parseDouble;
+import javafx.scene.control.Tooltip;
 
 /**
  * ELLE_GUI_Frame
@@ -2161,7 +2163,7 @@ public class ELLE_GUI_Frame extends JFrame implements ITableConstants {
 
             if (table.getColumnName(i).toLowerCase().contains("price"))
                {
-                tableColumnI.setCellRenderer(new FourDecimalFormatRenderer());
+                tableColumnI.setCellRenderer(new priceFormatRenderer());
             } else if (table.getColumnName(i).equalsIgnoreCase("q")
                     || table.getColumnName(i).equalsIgnoreCase("totalq")) {
                 tableColumnI.setCellRenderer(new TwoDecimalFormatRenderer());
@@ -2440,7 +2442,7 @@ public class ELLE_GUI_Frame extends JFrame implements ITableConstants {
      */
     private static class FourDecimalFormatRenderer extends DefaultTableCellRenderer {
 
-        private static final DecimalFormat formatter = new DecimalFormat("###,###.00");
+        private static final DecimalFormat formatter = new DecimalFormat("###,###.0000");
 
         public FourDecimalFormatRenderer() {
             super();
@@ -2464,7 +2466,44 @@ public class ELLE_GUI_Frame extends JFrame implements ITableConstants {
         }
 
     }
+    
+    /**
+     * DecimalFormatRenderer This is the format renderer for price column only
+     * 
+     * (including decimal formatting, tooltiptext and tooltiplocaltion settings)
+     * 
+     *
+     * @author Wei Ren
+     */
+    
+    private static class priceFormatRenderer extends DefaultTableCellRenderer {
 
+        private static final DecimalFormat formatter = new DecimalFormat("###,###.00");
+
+        public priceFormatRenderer() {
+            super();
+            setHorizontalAlignment(JLabel.RIGHT);
+        }
+
+        @Override
+        public Component getTableCellRendererComponent(
+                JTable table, Object value, boolean isSelected,
+                boolean hasFocus, int row, int col) {
+
+            Double doubleValue = 0.0;
+            
+            if (value != null) {
+                doubleValue = Double.parseDouble(value.toString());
+                super.setToolTipText((String) value);
+                value = formatter.format((Number) doubleValue);
+            }
+
+            return super.getTableCellRendererComponent(table,
+                    value, isSelected, hasFocus, row, col);
+        }
+
+    }
+    
     /**
      * setTableListeners This adds mouselisteners and keylisteners to tables.
      *
@@ -2964,25 +3003,6 @@ public class ELLE_GUI_Frame extends JFrame implements ITableConstants {
         }
     }
     
-    //cell render to hide the decimals of prices; enable tooltips to show the price. 
-    public class pricerender extends DefaultTableCellRenderer {
-        
-        @Override public void setValue(Object aValue) {
-            
-            //convert price to float number, because it was stored as string in jtable.
-           /* if (aValue != null) {
-                double price_in_double = parseDouble((String) aValue);
-                DecimalFormat df = new DecimalFormat("#.00");
-                df.format(price_in_double);
-                String price_rounded_instring = Double.toString(price_in_double);
-                super.setText(price_rounded_instring);
-                super.setToolTipText((String) aValue);
-                super.setHorizontalAlignment( JLabel.CENTER );
-            }*/
-
-        }
-
-    }
 
     @SuppressWarnings("unused")
     // Variables declaration - do not modify//GEN-BEGIN:variables
