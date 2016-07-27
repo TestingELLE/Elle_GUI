@@ -1,4 +1,3 @@
-
 package com.elle.elle_gui.entities;
 
 /**

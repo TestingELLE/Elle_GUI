@@ -364,8 +364,8 @@ public class LoginWindow extends JFrame {
         logWindow.readMessages(); // read log messages from the log file
         
         // connect to database
-        logWindow.addMessageWithDate("3:Start to connect local database...");
-        JLabel6.setText("<html><b>Start to connect local database...</b></html>");
+        logWindow.addMessageWithDate("3:Start to connect to local database...");
+        JLabel6.setText("<html><b>Connecting to local database...</b></html>");
         JLabel6.paintImmediately(JLabel6.getVisibleRect());
 
         if(DBConnection.connect(selectedServer, selectedDB, userName, userPassword)){
