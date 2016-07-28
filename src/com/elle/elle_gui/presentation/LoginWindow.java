@@ -686,7 +686,7 @@ public class LoginWindow extends JFrame {
         int x = fm.stringWidth(title);
         int y = fm.stringWidth(" ");
         int z = this.getWidth()/2 - (x/2);
-        int w = z/y - 11; //here subtract from z/y to position the string closer to the center
+        int w = z/y - 35; //here subtract from z/y to position the string closer to the center
         String pad ="";
         //for (int i=0; i!=w; i++) pad +=" "; 
         pad = String.format("%"+w+"s", pad);

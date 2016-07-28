@@ -70,7 +70,7 @@ public class TableColumnAdjuster implements PropertyChangeListener, TableModelLi
 		int columnDataWidth   = getColumnDataWidth( column );
                 
                 if (table.getColumnName(column).equalsIgnoreCase("price")){
-                     preferredWidth = columnHeaderWidth;
+                     preferredWidth = columnHeaderWidth + 11;
                 }
                 else{
                      preferredWidth	= Math.max(columnHeaderWidth, columnDataWidth);
