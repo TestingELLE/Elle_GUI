@@ -70,7 +70,7 @@ public class TableColumnAdjuster implements PropertyChangeListener, TableModelLi
 		int columnDataWidth   = getColumnDataWidth( column );
                 
                 if (table.getColumnName(column).equalsIgnoreCase("price")){
-                     preferredWidth = columnHeaderWidth + 11;
+                     preferredWidth = columnHeaderWidth + 22;
                 }
                 else{
                      preferredWidth	= Math.max(columnHeaderWidth, columnDataWidth);
@@ -149,12 +149,12 @@ public class TableColumnAdjuster implements PropertyChangeListener, TableModelLi
 
 		//  Don't shrink the column width
 
-		if (isOnlyAdjustLarger)
-		{
-                     if (!table.getColumnName(column).equalsIgnoreCase("price")){
-			width = Math.max(width, 75);
-                         }
-		}
+//		if (isOnlyAdjustLarger)
+//		{
+//                     if (!table.getColumnName(column).equalsIgnoreCase("price")){
+//			width = width;
+//                         }
+//		}
 
 		columnSizes.put(tableColumn, new Integer(tableColumn.getWidth()));
 
