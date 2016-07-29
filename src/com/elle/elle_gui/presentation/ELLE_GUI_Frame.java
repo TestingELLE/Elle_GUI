@@ -2161,15 +2161,16 @@ public class ELLE_GUI_Frame extends JFrame implements ITableConstants {
 
             TableColumn tableColumnI = table.getColumnModel().getColumn(i);
 
-            if (table.getColumnName(i).toLowerCase().contains("price"))
+            if (table.getColumnName(i).toLowerCase().contains("price") || table.getColumnName(i).equalsIgnoreCase("q")
+                    || table.getColumnName(i).equalsIgnoreCase("basis") || table.getColumnName(i).equalsIgnoreCase("price_adj") 
+                    || table.getColumnName(i).equalsIgnoreCase("basis_adj"))
                {
                 tableColumnI.setCellRenderer(new priceFormatRenderer());
-            } else if (table.getColumnName(i).equalsIgnoreCase("q")
-                    || table.getColumnName(i).equalsIgnoreCase("totalq")) {
+            } else if (table.getColumnName(i).equalsIgnoreCase("totalq")) {
                 tableColumnI.setCellRenderer(new TwoDecimalFormatRenderer());
             } else if (table.getColumnClass(i).getName().toLowerCase().contains("decimal")
                     || table.getColumnClass(i).getName().toLowerCase().contains("integer")
-                    || table.getColumnName(i).contains("basis") || table.getColumnName(i).contains("proceeds")
+                    || table.getColumnName(i).contains("proceeds")
                     || table.getColumnName(i).contains("realized_PL")){
                 tableColumnI.setCellRenderer(new CommaFormatRenderer());
             }
