@@ -557,16 +557,19 @@ Sub clean_ib_positions()
     Sheets("Total Report").Select
     
     ActiveWorkbook.SaveAs Filename:= _
-        savetodirectory & ":" & savefilename, _
+        savetodirectory & "\" & savefilename, _
         FileFormat:=xlCSVMac
     
     ws2.Name = "Cleaned Positions"
     
     newworkbookname = workbook_name & "-Cleaned"
-    wb.SaveAs Filename:=savetodirectory & ":" & newworkbookname, FileFormat:=xlOpenXMLWorkbookMacroEnabled
+    wb.SaveAs Filename:=savetodirectory & "\" & newworkbookname, FileFormat:=xlOpenXMLWorkbookMacroEnabled
 
     Application.ScreenUpdating = True
 
     
 
 End Sub
+
+
+
