@@ -11,20 +11,14 @@ import com.elle.elle_gui.database.DBConnection;
 import com.elle.elle_gui.admissions.Authorization;
 import com.elle.elle_gui.database.Database;
 import com.elle.elle_gui.database.Server;
-import com.elle.elle_gui.logic.LoggingAspect;
 import static com.elle.elle_gui.presentation.LogWindow.HYPHENS;
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 import java.util.Vector;
 import java.awt.FontMetrics;
-import java.util.Formatter;
 import java.awt.Font;
 
 public class LoginWindow extends JFrame {
@@ -358,6 +352,7 @@ public class LoginWindow extends JFrame {
         // logwindow
         logWindow = new LogWindow(); 
         logWindow.setUserLogFileDir(this.getUserName());
+       
         // write to log file
         String date = logWindow.dateFormat.format(new Date());
         logWindow.addMessage(HYPHENS + date + HYPHENS);
@@ -413,8 +408,12 @@ public class LoginWindow extends JFrame {
 
             // show the database name in menubar
             elle_gui.showDatabase();
+            
+            //displays an alert message for any incogruencies between
+            //the column names in the database and the column name constants stored in TableConstants.java
+            elle_gui.displayColumnAlert();
 
-            // show Analyster
+            // show elle_gui
             elle_gui.setLocationRelativeTo(this);
             elle_gui.setVisible(true);
             
@@ -672,13 +671,14 @@ public class LoginWindow extends JFrame {
         textFieldUsername.setText(db.getUsername());
         passwordFieldPW.setText(db.getPassword());
     }
+    
     /*Corinne 7/11/16
     //calculate the left spacing needed to center the title, 
      create a formatted string which contains this space, and add the formatted string(spacing) to the title*/
     private void setTitle(){
         Font f = this.getFont();
         FontMetrics fm = this.getFontMetrics(f);
-        String title = "Log in to Elle_GUI" + version;
+        String title = "Log in to Elle_GUI-" + version;
         
         /*calcullate the left spacing needed to center the title
         This may not return an accurate value. Adjust the amount 
