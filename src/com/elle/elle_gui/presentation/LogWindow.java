@@ -1,12 +1,16 @@
 
 package com.elle.elle_gui.presentation;
 
-import com.elle.elle_gui.admissions.Authorization;
 import com.elle.elle_gui.logic.LogMessage;
-import com.elle.elle_gui.logic.LoggingAspect;
-import com.elle.elle_gui.logic.ShortCutSetting;
+import com.elle.elle_gui.miscellaneous.LoggingAspect;
 import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeSupport;
 
 import javax.swing.*;
 
@@ -39,6 +43,10 @@ public class LogWindow extends JFrame{
     //private final JCheckBox jCheckBoxOrder;  // check box for order of dates
     //private final JLabel jLabelOrder; // label for checkbox order
     
+    // manages a listener and dispatches a PropertyChangeEvent for windowOpen
+    PropertyChangeSupport pcs; 
+    
+    private boolean windowOpen;
 
     // constructor
     public LogWindow() {
@@ -122,14 +130,23 @@ public class LogWindow extends JFrame{
         buttonsPanelConstraints.gridx = 0; // first col cell
         buttonsPanelConstraints.gridy = 1; // second row cell
 
+        //intialize a propertyChangeSupport to manage a listener and 
+        //dispatch a PropertyChangeEvent for windowOpen
+        pcs= new PropertyChangeSupport(windowOpen);
+        
         // add panel to the frame
         this.add(panelLogWindowButtons,buttonsPanelConstraints);
 
         this.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         this.setPreferredSize(new Dimension(860, 540));
+        
+        //sets listeners for when this window is set visible and closed
+        setListener();
+        windowOpen = false;
 
         this.pack();
-        this.setVisible(false);    
+        this.setVisible(false);
+        
     }
     
     /**
@@ -453,6 +470,45 @@ public class LogWindow extends JFrame{
     public static void setParent(Component parent) {
         LogWindow.parent = parent;
     }
+    
+    //registers listeners for changes to windowOpen
+    //Elle_GUI frame calls this method
+    public void addLogWindowClosedListener(PropertyChangeListener listener) {
+        pcs.addPropertyChangeListener(listener);
+    }
+    
+    private void setListener(){
+        
+        this.addComponentListener(new ComponentAdapter() {
+            // fire propertychange event when this window is set invisible 
+            @Override
+            public void componentHidden(ComponentEvent e) 
+            {
+                boolean oldValue = windowOpen;
+                windowOpen = false;
+               pcs.firePropertyChange("LogWindow closed",
+                                 oldValue  , windowOpen);
+            }
+            // fire propertychange event when this window is set visible 
+            @Override
+            public void componentShown(ComponentEvent e) {
+                boolean oldValue = windowOpen;
+                windowOpen = true;
+                pcs.firePropertyChange("LogWindow opened",
+                                 oldValue  , windowOpen);
+            }
+        });
+        // fire propertychange event when this window is closed 
+        addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                boolean oldValue = windowOpen;
+                windowOpen = false;
+                pcs.firePropertyChange("LogWindow closed",
+                           oldValue, windowOpen);
+            }
+        });
+   }
     
 }
 

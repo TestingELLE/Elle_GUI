@@ -1,7 +1,7 @@
 package com.elle.elle_gui;
 
 import com.elle.elle_gui.logic.FilePathFormat;
-import com.elle.elle_gui.logic.LoggingAspect;
+import com.elle.elle_gui.miscellaneous.LoggingAspect;
 import static com.elle.elle_gui.presentation.ELLE_GUI_Frame.creationDate;
 import static com.elle.elle_gui.presentation.ELLE_GUI_Frame.version;
 import com.elle.elle_gui.presentation.LoginWindow;
