@@ -1,10 +1,10 @@
 package com.elle.elle_gui.presentation;
 
-import com.elle.elle_gui.dao.BackupDBTableDAO;
+import com.elle.elle_gui.database.DataManager;
+import com.elle.elle_gui.database.DataManagerFactory;
 import com.elle.elle_gui.entities.BackupDBTableRecord;
-import com.elle.elle_gui.logic.BackupTableCheckBoxItem;
-import com.elle.elle_gui.logic.CheckBoxList;
-import com.elle.elle_gui.logic.LoggingAspect;
+import static com.elle.elle_gui.miscellaneous.TableConstants.TABLE_NAMES;
+import com.elle.elle_gui.miscellaneous.LoggingAspect;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Dimension;
@@ -32,8 +32,7 @@ public class BackupDBTablesDialog extends javax.swing.JPanel {
     private ArrayList<BackupTableCheckBoxItem> checkBoxItems;
     private Dimension dimension = new Dimension(600,400); // dimension
     private final String CHECK_ALL_ITEM_TEXT = "(All)";
-    private BackupDBTableDAO dao;
-    private String[] tableNames = {"positions","trades","allocations"};
+    private final DataManager dataManager;
 
     /**
      * Creates new form BackupDBTablesWindow
@@ -42,7 +41,7 @@ public class BackupDBTablesDialog extends javax.swing.JPanel {
         initComponents();
 
         this.parentComponent = parent;
-        this.dao = new BackupDBTableDAO(parent);
+        dataManager = DataManagerFactory.getDataManager();
 
         setCheckBoxListListener();
 
@@ -151,7 +150,7 @@ public class BackupDBTablesDialog extends javax.swing.JPanel {
 
         if(newName != null && !newName.equals(backupTableName)){
             record.setBackupTableName(newName);
-            if(!dao.updateRecord(record,backupTableName)){
+            if(!dataManager.updateBackupTableRecord(record,backupTableName)){
                 updateSuccess = false;
             }
         }
@@ -189,7 +188,7 @@ public class BackupDBTablesDialog extends javax.swing.JPanel {
         for(BackupTableCheckBoxItem item: checkBoxItems){
             if(item.isSelected()){
                 if(!item.getText().equals(CHECK_ALL_ITEM_TEXT)){
-                    if(!dao.deleteRecord(item.getRecord())){
+                    if(!dataManager.deleteBackupTableRecord(item.getRecord())){
                         backupSuccess = false;
                     }
                 }
@@ -227,7 +226,7 @@ public class BackupDBTablesDialog extends javax.swing.JPanel {
         boolean backupSuccess = true;
         String overwrite = "undefined";
         
-        for (String tableName : tableNames) {
+        for (String tableName : TABLE_NAMES) {
             String backupTableName = tableName + getTodaysDate();
             BackupDBTableRecord record = new BackupDBTableRecord();
             record.setTableName(tableName);
@@ -245,7 +244,7 @@ public class BackupDBTablesDialog extends javax.swing.JPanel {
                             break;
                         }
                     }
-                    if(!dao.deleteRecord(backupTableName)){
+                    if(!dataManager.deleteBackupTable(backupTableName)){
                         backupSuccess = false;
                     }
                 }
@@ -253,7 +252,7 @@ public class BackupDBTablesDialog extends javax.swing.JPanel {
             if(overwrite.equals("false")){
                 break;
             }
-            if(!dao.addRecord(record)){
+            if(!dataManager.addBackupTableRecord(record)){
                 backupSuccess = false;
             }
         }
@@ -307,7 +306,7 @@ public class BackupDBTablesDialog extends javax.swing.JPanel {
     public ArrayList<BackupTableCheckBoxItem> getCheckBoxItemsFromDB() {
 
         ArrayList<BackupTableCheckBoxItem> items = new ArrayList<>();
-        ArrayList<BackupDBTableRecord> records = dao.getRecords();
+        ArrayList<BackupDBTableRecord> records = dataManager.getBackupTableRecords();
 
         for(BackupDBTableRecord record: records){
             items.add(new BackupTableCheckBoxItem(record));

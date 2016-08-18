@@ -1,7 +1,7 @@
 package com.elle.elle_gui.admissions;
 
-import com.elle.elle_gui.dao.AccessLevelDAO;
 import com.elle.elle_gui.database.DBConnection;
+import com.elle.elle_gui.database.DataManagerFactory;
 import com.elle.elle_gui.presentation.*;
 import java.awt.Component;
 
@@ -34,7 +34,7 @@ public class Authorization {
      */
     public static boolean getInfoFromDB(){
         userLogin = DBConnection.getUserName();
-        accessLevel = AccessLevelDAO.get(userLogin);
+        accessLevel = DataManagerFactory.getDataManager().getAccessLevel(userLogin);
 
         if(accessLevel != null){
             setAdminComponentType(accessLevel);

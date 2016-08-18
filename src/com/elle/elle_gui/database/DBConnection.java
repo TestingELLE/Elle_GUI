@@ -4,7 +4,7 @@ package com.elle.elle_gui.database;
 import static com.elle.elle_gui.admissions.AESCrypt.decrypt;
 import static com.elle.elle_gui.admissions.AESCrypt.encrypt;
 import com.elle.elle_gui.logic.FilePathFormat;
-import com.elle.elle_gui.logic.LoggingAspect;
+import com.elle.elle_gui.miscellaneous.LoggingAspect;
 import java.awt.Component;
 import java.io.File;
 import java.io.FileNotFoundException;
